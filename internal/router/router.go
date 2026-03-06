@@ -1,9 +1,6 @@
 package router
 
 import (
-	"encoding/json"
-	"net/http"
-
 	"github.com/cyradin/fixik/internal/config"
 	"github.com/go-chi/chi/v5"
 )
@@ -30,10 +27,4 @@ func New(_ *config.Config) *chi.Mux {
 	r.Post("/incidents/{id}/status", changeStatus)
 
 	return r
-}
-
-func writeJSON(w http.ResponseWriter, status int, v any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(v)
 }

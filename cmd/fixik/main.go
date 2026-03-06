@@ -38,6 +38,14 @@ func run() error {
 		}
 	}()
 
+	go func() {
+		server := initHTTPDebugServer(ctx, cfg)
+
+		if err := server.ListenAndServe(); err != nil {
+			errCh <- fmt.Errorf("debug server error: %w", err)
+		}
+	}()
+
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -48,6 +56,22 @@ func run() error {
 
 func initHTTPServer(ctx context.Context, cfg *config.Config) *http.Server {
 	r := router.New(cfg)
+
+	return &http.Server{
+		Addr:              cfg.HTTPServer.Addr,
+		ReadTimeout:       cfg.HTTPServer.ReadTimeout,
+		ReadHeaderTimeout: cfg.HTTPServer.ReadHeaderTimeout,
+		WriteTimeout:      cfg.HTTPServer.WriteTimeout,
+		IdleTimeout:       cfg.HTTPServer.IdleTimeout,
+		Handler:           r,
+		BaseContext: func(_ net.Listener) context.Context {
+			return ctx
+		},
+	}
+}
+
+func initHTTPDebugServer(ctx context.Context, cfg *config.Config) *http.Server {
+	r := router.NewDebug(cfg)
 
 	return &http.Server{
 		Addr:              cfg.HTTPServer.Addr,
