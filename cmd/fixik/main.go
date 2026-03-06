@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/cyradin/fixik/internal/config"
+	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/internal/router"
 )
 
@@ -22,7 +23,7 @@ func main() {
 func run() error {
 	cfg, err := config.New()
 	if err != nil {
-		return err
+		return fmt.Errorf("config error: %w", err)
 	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -30,8 +31,10 @@ func run() error {
 
 	errCh := make(chan error, 1)
 
+	container := container.New(cfg)
+
 	go func() {
-		server := initHTTPServer(ctx, cfg)
+		server := initHTTPServer(ctx, container, cfg)
 
 		if err := server.ListenAndServe(); err != nil {
 			errCh <- fmt.Errorf("server error: %w", err)
@@ -39,7 +42,7 @@ func run() error {
 	}()
 
 	go func() {
-		server := initHTTPDebugServer(ctx, cfg)
+		server := initHTTPDebugServer(ctx, container, cfg)
 
 		if err := server.ListenAndServe(); err != nil {
 			errCh <- fmt.Errorf("debug server error: %w", err)
@@ -54,8 +57,8 @@ func run() error {
 	}
 }
 
-func initHTTPServer(ctx context.Context, cfg *config.Config) *http.Server {
-	r := router.New(cfg)
+func initHTTPServer(ctx context.Context, container *container.Container, cfg *config.Config) *http.Server {
+	r := router.New(container)
 
 	return &http.Server{
 		Addr:              cfg.HTTPServer.Addr,
@@ -70,15 +73,15 @@ func initHTTPServer(ctx context.Context, cfg *config.Config) *http.Server {
 	}
 }
 
-func initHTTPDebugServer(ctx context.Context, cfg *config.Config) *http.Server {
-	r := router.NewDebug(cfg)
+func initHTTPDebugServer(ctx context.Context, container *container.Container, cfg *config.Config) *http.Server {
+	r := router.NewDebug(container)
 
 	return &http.Server{
-		Addr:              cfg.HTTPServer.Addr,
-		ReadTimeout:       cfg.HTTPServer.ReadTimeout,
-		ReadHeaderTimeout: cfg.HTTPServer.ReadHeaderTimeout,
-		WriteTimeout:      cfg.HTTPServer.WriteTimeout,
-		IdleTimeout:       cfg.HTTPServer.IdleTimeout,
+		Addr:              cfg.HTTPDebugServer.Addr,
+		ReadTimeout:       cfg.HTTPDebugServer.ReadTimeout,
+		ReadHeaderTimeout: cfg.HTTPDebugServer.ReadHeaderTimeout,
+		WriteTimeout:      cfg.HTTPDebugServer.WriteTimeout,
+		IdleTimeout:       cfg.HTTPDebugServer.IdleTimeout,
 		Handler:           r,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx

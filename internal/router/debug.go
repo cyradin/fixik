@@ -3,11 +3,11 @@ package router
 import (
 	"net/http"
 
-	"github.com/cyradin/fixik/internal/config"
+	"github.com/cyradin/fixik/internal/container"
 	"github.com/go-chi/chi/v5"
 )
 
-func NewDebug(_ *config.Config) *chi.Mux {
+func NewDebug(_ *container.Container) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Get("/livez", livenessHandler)

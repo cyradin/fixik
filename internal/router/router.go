@@ -1,11 +1,11 @@
 package router
 
 import (
-	"github.com/cyradin/fixik/internal/config"
+	"github.com/cyradin/fixik/internal/container"
 	"github.com/go-chi/chi/v5"
 )
 
-func New(_ *config.Config) *chi.Mux {
+func New(_ *container.Container) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Post("/users", createUser)
