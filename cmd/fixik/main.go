@@ -10,7 +10,7 @@ import (
 	"syscall"
 
 	"github.com/cyradin/fixik/internal/config"
-	"github.com/go-chi/chi/v5"
+	"github.com/cyradin/fixik/internal/router"
 )
 
 func main() {
@@ -47,7 +47,7 @@ func run() error {
 }
 
 func initHTTPServer(ctx context.Context, cfg *config.Config) *http.Server {
-	r := chi.NewRouter()
+	r := router.New(cfg)
 
 	return &http.Server{
 		Addr:              cfg.HTTPServer.Addr,
