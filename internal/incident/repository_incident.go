@@ -2,6 +2,7 @@ package incident
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/cyradin/fixik/pkg/transaction"
@@ -22,16 +23,16 @@ func (r *Repository) Create(ctx context.Context, i *Incident) error {
 		INSERT INTO incidents (
 			title,
 			description,
-			impact,
-			priority,
-			status
+			impact_id,
+			priority_id,
+			status_id
 		)
 		VALUES (
 			@title,
 			@description,
-			@impact,
-			@priority,
-			@status
+			@impact_id,
+			@priority_id,
+			@status_id
 		)
 		RETURNING id, created_at, updated_at
 	`
@@ -39,9 +40,9 @@ func (r *Repository) Create(ctx context.Context, i *Incident) error {
 	args := pgx.NamedArgs{
 		"title":       i.Title,
 		"description": i.Description,
-		"impact":      i.Impact,
-		"priority":    i.Priority,
-		"status":      i.Status,
+		"impact_id":   i.ImpactID,
+		"priority_id": i.PriorityID,
+		"status_id":   i.StatusID,
 	}
 
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(
@@ -55,42 +56,49 @@ func (r *Repository) Create(ctx context.Context, i *Incident) error {
 	return nil
 }
 
-func (r *Repository) GetByID(ctx context.Context, id int64) (*Incident, error) {
+func (r *Repository) GetByID(ctx context.Context, id int64) (Incident, error) {
 	const query = `
 		SELECT
 			id,
 			title,
 			description,
-			impact,
-			priority,
-			status,
+			impact_id,
+			priority_id,
+			status_id,
 			created_at,
-			updated_at
+			updated_at,
+			deleted_at
 		FROM incidents
 		WHERE id = @id
+		  AND deleted_at IS NULL
 	`
 
 	args := pgx.NamedArgs{
 		"id": id,
 	}
 
-	var i Incident
+	var incident Incident
 
 	err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(
-		&i.ID,
-		&i.Title,
-		&i.Description,
-		&i.Impact,
-		&i.Priority,
-		&i.Status,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&incident.ID,
+		&incident.Title,
+		&incident.Description,
+		&incident.ImpactID,
+		&incident.PriorityID,
+		&incident.StatusID,
+		&incident.CreatedAt,
+		&incident.UpdatedAt,
+		&incident.DeletedAt,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("db query: %w", err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return Incident{}, nil
+		}
+
+		return Incident{}, fmt.Errorf("db query: %w", err)
 	}
 
-	return &i, nil
+	return incident, nil
 }
 
 func (r *Repository) Update(ctx context.Context, i *Incident) error {
@@ -99,11 +107,12 @@ func (r *Repository) Update(ctx context.Context, i *Incident) error {
 		SET
 			title = @title,
 			description = @description,
-			impact = @impact,
-			priority = @priority,
-			status = @status,
+			impact_id = @impact_id,
+			priority_id = @priority_id,
+			status_id = @status_id,
 			updated_at = now()
 		WHERE id = @id
+		  AND deleted_at IS NULL
 		RETURNING updated_at
 	`
 
@@ -111,9 +120,9 @@ func (r *Repository) Update(ctx context.Context, i *Incident) error {
 		"id":          i.ID,
 		"title":       i.Title,
 		"description": i.Description,
-		"impact":      i.Impact,
-		"priority":    i.Priority,
-		"status":      i.Status,
+		"impact_id":   i.ImpactID,
+		"priority_id": i.PriorityID,
+		"status_id":   i.StatusID,
 	}
 
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(&i.UpdatedAt); err != nil {
@@ -130,6 +139,7 @@ func (r *Repository) Delete(ctx context.Context, id int64) error {
 			deleted_at = now(),
 			updated_at = now()
 		WHERE id = @id
+		  AND deleted_at IS NULL
 	`
 
 	args := pgx.NamedArgs{
