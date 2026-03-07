@@ -18,12 +18,19 @@ import (
 var GitCommit string = "dev"
 
 func main() {
-	if err := run(); err != nil {
+	cfg, err := config.New()
+	if err != nil {
 		log.Fatal(err)
+	}
+
+	container := container.New(GitCommit, cfg)
+
+	if err := run(cfg, container); err != nil {
+		container.Logger().Error("application error", logger.Error(err))
 	}
 }
 
-func run() error {
+func run(cfg *config.Config, container *container.Container) error {
 	cfg, err := config.New()
 	if err != nil {
 		return fmt.Errorf("config error: %w", err)
@@ -33,8 +40,6 @@ func run() error {
 	defer cancel()
 
 	errCh := make(chan error, 1)
-
-	container := container.New(GitCommit, cfg)
 
 	go func() {
 		server := initHTTPServer(ctx, container, cfg)

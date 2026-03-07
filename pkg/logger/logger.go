@@ -37,10 +37,6 @@ func New(
 	return logger
 }
 
-func Error(err error) slog.Attr {
-	return slog.Any("error", err)
-}
-
 func levelFromString(level string) slog.Leveler {
 	switch level {
 	case "debug":

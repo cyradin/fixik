@@ -13,3 +13,7 @@ func AddFields(ctx context.Context, fields ...any) context.Context {
 func Address(value string) slog.Attr {
 	return slog.String("address", value)
 }
+
+func Error(err error) slog.Attr {
+	return slog.Any("error", err)
+}
