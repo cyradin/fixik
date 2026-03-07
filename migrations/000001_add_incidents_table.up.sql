@@ -3,7 +3,6 @@ CREATE TABLE incidents (
     title TEXT NOT NULL,
     description TEXT NOT NULL,
     impact TEXT NOT NULL,
-    urgency TEXT NOT NULL,
     priority TEXT NOT NULL,
     status TEXT NOT NULL,
 

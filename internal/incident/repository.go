@@ -23,7 +23,6 @@ func (r *Repository) Create(ctx context.Context, i *Incident) error {
 			title,
 			description,
 			impact,
-			urgency,
 			priority,
 			status
 		)
@@ -31,7 +30,6 @@ func (r *Repository) Create(ctx context.Context, i *Incident) error {
 			@title,
 			@description,
 			@impact,
-			@urgency,
 			@priority,
 			@status
 		)
@@ -42,7 +40,6 @@ func (r *Repository) Create(ctx context.Context, i *Incident) error {
 		"title":       i.Title,
 		"description": i.Description,
 		"impact":      i.Impact,
-		"urgency":     i.Urgency,
 		"priority":    i.Priority,
 		"status":      i.Status,
 	}
@@ -65,7 +62,6 @@ func (r *Repository) GetByID(ctx context.Context, id int64) (*Incident, error) {
 			title,
 			description,
 			impact,
-			urgency,
 			priority,
 			status,
 			created_at,
@@ -85,7 +81,6 @@ func (r *Repository) GetByID(ctx context.Context, id int64) (*Incident, error) {
 		&i.Title,
 		&i.Description,
 		&i.Impact,
-		&i.Urgency,
 		&i.Priority,
 		&i.Status,
 		&i.CreatedAt,
@@ -105,7 +100,6 @@ func (r *Repository) Update(ctx context.Context, i *Incident) error {
 			title = @title,
 			description = @description,
 			impact = @impact,
-			urgency = @urgency,
 			priority = @priority,
 			status = @status,
 			updated_at = now()
@@ -118,7 +112,6 @@ func (r *Repository) Update(ctx context.Context, i *Incident) error {
 		"title":       i.Title,
 		"description": i.Description,
 		"impact":      i.Impact,
-		"urgency":     i.Urgency,
 		"priority":    i.Priority,
 		"status":      i.Status,
 	}

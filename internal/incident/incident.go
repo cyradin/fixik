@@ -7,7 +7,6 @@ type Incident struct {
 	Title       string
 	Description string
 	Impact      string
-	Urgency     string
 	Priority    string
 	Status      string
 	CreatedAt   time.Time

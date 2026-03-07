@@ -28,7 +28,6 @@ func (s *IncidentRepositorySuite) TestCreate() {
 		Title:       "DB down",
 		Description: "Database unavailable",
 		Impact:      "high",
-		Urgency:     "high",
 		Priority:    "critical",
 		Status:      "open",
 	}
@@ -42,7 +41,7 @@ func (s *IncidentRepositorySuite) TestCreate() {
 
 func (s *IncidentRepositorySuite) TestGetByID_Found() {
 	inc := s.loadIncidents([]Incident{
-		{Title: "Service down", Description: "Manual insert", Impact: "medium", Urgency: "medium", Priority: "medium", Status: "open"},
+		{Title: "Service down", Description: "Manual insert", Impact: "medium", Priority: "medium", Status: "open"},
 	})[0]
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), inc.ID)
@@ -51,7 +50,6 @@ func (s *IncidentRepositorySuite) TestGetByID_Found() {
 	s.Equal(inc.Title, fromDB.Title)
 	s.Equal(inc.Description, fromDB.Description)
 	s.Equal(inc.Impact, fromDB.Impact)
-	s.Equal(inc.Urgency, fromDB.Urgency)
 	s.Equal(inc.Priority, fromDB.Priority)
 	s.Equal(inc.Status, fromDB.Status)
 }
@@ -63,7 +61,7 @@ func (s *IncidentRepositorySuite) TestGetByID_NotFound() {
 
 func (s *IncidentRepositorySuite) TestUpdate_Found() {
 	inc := s.loadIncidents([]Incident{
-		{Title: "Service unavailable", Description: "Initial description", Impact: "medium", Urgency: "medium", Priority: "medium", Status: "open"},
+		{Title: "Service unavailable", Description: "Initial description", Impact: "medium", Priority: "medium", Status: "open"},
 	})[0]
 
 	oldUpdatedAt := inc.UpdatedAt
@@ -92,7 +90,7 @@ func (s *IncidentRepositorySuite) TestUpdate_NotFound() {
 
 func (s *IncidentRepositorySuite) TestDelete_Found() {
 	inc := s.loadIncidents([]Incident{
-		{Title: "Temp incident", Description: "To be deleted", Impact: "low", Urgency: "low", Priority: "low", Status: "open"},
+		{Title: "Temp incident", Description: "To be deleted", Impact: "low", Priority: "low", Status: "open"},
 	})[0]
 
 	err := s.repo.Delete(s.T().Context(), inc.ID)
@@ -118,7 +116,7 @@ func (s *IncidentRepositorySuite) loadIncidents(fixtures []Incident) []Incident 
 			`INSERT INTO incidents (title, description, impact, urgency, priority, status)
              VALUES ($1, $2, $3, $4, $5, $6)
              RETURNING id, created_at, updated_at`,
-			inc.Title, inc.Description, inc.Impact, inc.Urgency, inc.Priority, inc.Status,
+			inc.Title, inc.Description, inc.Impact, inc.Priority, inc.Status,
 		)
 		err := row.Scan(&inc.ID, &inc.CreatedAt, &inc.UpdatedAt)
 		s.Require().NoError(err)
