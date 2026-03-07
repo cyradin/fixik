@@ -10,6 +10,7 @@ import (
 type Config struct {
 	HTTPServer      HTTPServerConfig
 	HTTPDebugServer HTTPDebugServerConfig
+	Log             LogConfig
 }
 
 type HTTPServerConfig struct {
@@ -26,6 +27,10 @@ type HTTPDebugServerConfig struct {
 	ReadTimeout       time.Duration `envconfig:"FIXIK_HTTP_DEBUG_SERVER_READ_TIMEOUT" required:"true"`
 	WriteTimeout      time.Duration `envconfig:"FIXIK_HTTP_DEBUG_SERVER_WRITE_TIMEOUT" required:"true"`
 	IdleTimeout       time.Duration `envconfig:"FIXIK_HTTP_DEBUG_SERVER_IDLE_TIMEOUT" required:"true"`
+}
+
+type LogConfig struct {
+	Level string `envconfig:"FIXIK_LOG_LEVEL" required:"true"`
 }
 
 func New() (*Config, error) {

@@ -12,7 +12,10 @@ import (
 	"github.com/cyradin/fixik/internal/config"
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/internal/router"
+	"github.com/cyradin/fixik/pkg/logger"
 )
+
+var GitCommit string = "dev"
 
 func main() {
 	if err := run(); err != nil {
@@ -31,10 +34,12 @@ func run() error {
 
 	errCh := make(chan error, 1)
 
-	container := container.New(cfg)
+	container := container.New(GitCommit, cfg)
 
 	go func() {
 		server := initHTTPServer(ctx, container, cfg)
+
+		container.Logger().Info("started http server", logger.Address(cfg.HTTPServer.Addr))
 
 		if err := server.ListenAndServe(); err != nil {
 			errCh <- fmt.Errorf("server error: %w", err)
@@ -43,6 +48,8 @@ func run() error {
 
 	go func() {
 		server := initHTTPDebugServer(ctx, container, cfg)
+
+		container.Logger().Info("started http debug server", logger.Address(cfg.HTTPDebugServer.Addr))
 
 		if err := server.ListenAndServe(); err != nil {
 			errCh <- fmt.Errorf("debug server error: %w", err)

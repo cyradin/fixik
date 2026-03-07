@@ -1,13 +1,32 @@
 package container
 
-import "github.com/cyradin/fixik/internal/config"
+import (
+	"log/slog"
+
+	"github.com/cyradin/fixik/internal/config"
+	"github.com/cyradin/fixik/pkg/logger"
+)
 
 type Container struct {
-	cfg *config.Config
+	version string
+	cfg     *config.Config
+	logger  *slog.Logger
 }
 
-func New(cfg *config.Config) *Container {
+func New(
+	version string,
+	cfg *config.Config,
+) *Container {
 	return &Container{
-		cfg: cfg,
+		version: version,
+		cfg:     cfg,
 	}
+}
+
+func (c *Container) Logger() *slog.Logger {
+	if c.logger == nil {
+		c.logger = logger.New(c.version, c.cfg.Log.Level)
+	}
+
+	return c.logger
 }
