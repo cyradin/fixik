@@ -20,3 +20,21 @@ test:
 
 lint:
 	go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10.1 run
+
+MIGRATE_COMMAND=go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
+
+migrate:
+	${MIGRATE_COMMAND} -path $(FIXIK_POSTGRES_MIGRATIONS_DIR) -database $(FIXIK_POSTGRES_URL) up
+
+migrate-create:
+	@if [ -z "$(word 2,$(MAKECMDGOALS))" ]; then echo "Name is required: make migrate-create <name>"; exit 1; fi
+	migrate create -ext sql -seq -dir $(FIXIK_POSTGRES_MIGRATIONS_DIR) $(word 2,$(MAKECMDGOALS))
+
+migrate-down:
+	${MIGRATE_COMMAND} -path $(FIXIK_POSTGRES_MIGRATIONS_DIR) -database $(FIXIK_POSTGRES_URL) down 1
+
+migrate-down-all:
+	${MIGRATE_COMMAND} -path $(FIXIK_POSTGRES_MIGRATIONS_DIR) -database $(FIXIK_POSTGRES_URL) down
+
+migrate-version:
+	${MIGRATE_COMMAND} -path $(FIXIK_POSTGRES_MIGRATIONS_DIR) -database $(FIXIK_POSTGRES_URL) version
