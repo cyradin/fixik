@@ -11,6 +11,7 @@ type Config struct {
 	HTTPServer      HTTPServerConfig
 	HTTPDebugServer HTTPDebugServerConfig
 	Log             LogConfig
+	Postgres        PostgresConfig
 }
 
 type HTTPServerConfig struct {
@@ -31,6 +32,10 @@ type HTTPDebugServerConfig struct {
 
 type LogConfig struct {
 	Level string `envconfig:"FIXIK_LOG_LEVEL" required:"true"`
+}
+
+type PostgresConfig struct {
+	URL string `envconfig:"FIXIK_POSTGRES_URL" required:"true"`
 }
 
 func New() (*Config, error) {
