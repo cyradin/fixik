@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: "postgres:18.1-alpine3.23"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+      start_period: 1s
+
+volumes:
+  pg_data:
