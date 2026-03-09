@@ -38,3 +38,15 @@ type Status struct {
 	Code string
 	Name string
 }
+
+type Team struct {
+	ID   int64
+	Code string
+	Name string
+}
+
+type Role struct {
+	ID   int64
+	Code string
+	Name string
+}

@@ -20,6 +20,8 @@ type Container struct {
 	statusRepo   *db.StatusRepository
 	impactRepo   *db.ImpactRepository
 	priorityRepo *db.PriorityRepository
+	teamRepo     *db.TeamRepository
+	roleRepo     *db.RoleRepository
 
 	statusManager   *incident.StatusManager
 	priorityManager *incident.PriorityManager

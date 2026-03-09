@@ -58,3 +58,19 @@ func (c *Container) PriorityRepository() *db.PriorityRepository {
 
 	return c.priorityRepo
 }
+
+func (c *Container) TeamRepository() *db.TeamRepository {
+	if c.teamRepo == nil {
+		c.teamRepo = db.NewTeamRepository(c.PgPool())
+	}
+
+	return c.teamRepo
+}
+
+func (c *Container) RoleRepository() *db.RoleRepository {
+	if c.roleRepo == nil {
+		c.roleRepo = db.NewRoleRepository(c.PgPool())
+	}
+
+	return c.roleRepo
+}
