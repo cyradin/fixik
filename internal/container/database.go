@@ -74,3 +74,11 @@ func (c *Container) RoleRepository() *db.RoleRepository {
 
 	return c.roleRepo
 }
+
+func (c *Container) UserRepository() *db.UserRepository {
+	if c.userRepo == nil {
+		c.userRepo = db.NewUserRepository(c.PgPool())
+	}
+
+	return c.userRepo
+}

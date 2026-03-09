@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-type postgres interface {
+type Postgres interface {
 	Begin(ctx context.Context) (pgx.Tx, error)
 
 	SendBatch(ctx context.Context, b *pgx.Batch) pgx.BatchResults
@@ -22,8 +22,8 @@ type ctxKey struct{}
 
 var txKey ctxKey = struct{}{}
 
-func FromContext(ctx context.Context, db postgres) postgres {
-	if tx, ok := ctx.Value(txKey).(postgres); ok {
+func FromContext(ctx context.Context, db Postgres) Postgres {
+	if tx, ok := ctx.Value(txKey).(Postgres); ok {
 		return tx
 	}
 
@@ -31,10 +31,10 @@ func FromContext(ctx context.Context, db postgres) postgres {
 }
 
 type Executor struct {
-	db postgres
+	db Postgres
 }
 
-func NewExecutor(db postgres) *Executor {
+func NewExecutor(db Postgres) *Executor {
 	return &Executor{db: db}
 }
 

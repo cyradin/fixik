@@ -46,8 +46,8 @@ func TestExec(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		tx          postgres
-		db          postgres
+		tx          Postgres
+		db          Postgres
 		callback    func(context.Context) error
 		expectedErr error
 	}{
