@@ -16,12 +16,12 @@ type Container struct {
 	logger  *slog.Logger
 	pgPool  *pgxpool.Pool
 
+	statusRepo   *db.DictRepository
+	impactRepo   *db.DictRepository
+	priorityRepo *db.DictRepository
+	teamRepo     *db.DictRepository
+	roleRepo     *db.DictRepository
 	incidentRepo *db.IncidentRepository
-	statusRepo   *db.StatusRepository
-	impactRepo   *db.ImpactRepository
-	priorityRepo *db.PriorityRepository
-	teamRepo     *db.TeamRepository
-	roleRepo     *db.RoleRepository
 	userRepo     *db.UserRepository
 
 	statusManager   *incident.StatusManager

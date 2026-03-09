@@ -21,35 +21,23 @@ type Incident struct {
 	DeletedAt *time.Time
 }
 
-type Priority struct {
-	ID   int64
-	Code string
-	Name string
+type DictEntity struct {
+	ID          int64
+	Code        string
+	Name        string
+	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   *time.Time
 }
 
-type Impact struct {
-	ID   int64
-	Code string
-	Name string
-}
-
-type Status struct {
-	ID   int64
-	Code string
-	Name string
-}
-
-type Team struct {
-	ID   int64
-	Code string
-	Name string
-}
-
-type Role struct {
-	ID   int64
-	Code string
-	Name string
-}
+type (
+	Priority = DictEntity
+	Impact   = DictEntity
+	Status   = DictEntity
+	Team     = DictEntity
+	Role     = DictEntity
+)
 
 type User struct {
 	ID       int64

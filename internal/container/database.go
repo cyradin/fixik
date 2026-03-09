@@ -35,7 +35,7 @@ func (c *Container) IncidentRepository() *db.IncidentRepository {
 	return c.incidentRepo
 }
 
-func (c *Container) StatusRepository() *db.StatusRepository {
+func (c *Container) StatusRepository() *db.DictRepository {
 	if c.statusRepo == nil {
 		c.statusRepo = db.NewStatusRepository(c.PgPool())
 	}
@@ -43,7 +43,7 @@ func (c *Container) StatusRepository() *db.StatusRepository {
 	return c.statusRepo
 }
 
-func (c *Container) ImpactRepository() *db.ImpactRepository {
+func (c *Container) ImpactRepository() *db.DictRepository {
 	if c.impactRepo == nil {
 		c.impactRepo = db.NewImpactRepository(c.PgPool())
 	}
@@ -51,7 +51,7 @@ func (c *Container) ImpactRepository() *db.ImpactRepository {
 	return c.impactRepo
 }
 
-func (c *Container) PriorityRepository() *db.PriorityRepository {
+func (c *Container) PriorityRepository() *db.DictRepository {
 	if c.priorityRepo == nil {
 		c.priorityRepo = db.NewPriorityRepository(c.PgPool())
 	}
@@ -59,7 +59,7 @@ func (c *Container) PriorityRepository() *db.PriorityRepository {
 	return c.priorityRepo
 }
 
-func (c *Container) TeamRepository() *db.TeamRepository {
+func (c *Container) TeamRepository() *db.DictRepository {
 	if c.teamRepo == nil {
 		c.teamRepo = db.NewTeamRepository(c.PgPool())
 	}
@@ -67,7 +67,7 @@ func (c *Container) TeamRepository() *db.TeamRepository {
 	return c.teamRepo
 }
 
-func (c *Container) RoleRepository() *db.RoleRepository {
+func (c *Container) RoleRepository() *db.DictRepository {
 	if c.roleRepo == nil {
 		c.roleRepo = db.NewRoleRepository(c.PgPool())
 	}

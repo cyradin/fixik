@@ -157,8 +157,13 @@ func (r *UserRepository) Update(ctx context.Context, u *User) error {
 
 	tx := transaction.FromContext(ctx, r.db)
 
-	if _, err := tx.Exec(ctx, query, args); err != nil {
+	tag, err := tx.Exec(ctx, query, args)
+	if err != nil {
 		return fmt.Errorf("update user: %w", err)
+	}
+
+	if tag.RowsAffected() == 0 {
+		return ErrNotFound
 	}
 
 	if _, err := tx.Exec(ctx, `DELETE FROM user_roles WHERE user_id = $1`, u.ID); err != nil {
@@ -171,7 +176,6 @@ func (r *UserRepository) Update(ctx context.Context, u *User) error {
 
 	return nil
 }
-
 func (r *UserRepository) Delete(ctx context.Context, id int64) error {
 	const query = `
 		DELETE FROM users
