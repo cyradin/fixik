@@ -5,6 +5,7 @@ import (
 
 	"github.com/cyradin/fixik/internal/config"
 	"github.com/cyradin/fixik/internal/db"
+	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/incident"
 	"github.com/cyradin/fixik/pkg/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -24,9 +25,12 @@ type Container struct {
 	incidentRepo *db.IncidentRepository
 	userRepo     *db.UserRepository
 
-	statusManager   *incident.StatusManager
-	priorityManager *incident.PriorityManager
-	impactManager   *incident.ImpactManager
+	statusManager   *dict.EntityManager
+	priorityManager *dict.EntityManager
+	impactManager   *dict.EntityManager
+	teamManager     *dict.EntityManager
+	roleManager     *dict.EntityManager
+
 	incidentManager *incident.IncidentManager
 }
 

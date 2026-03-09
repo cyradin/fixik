@@ -1,30 +1,10 @@
 package incident
 
-import "time"
+import (
+	"time"
 
-type StatusID = int64
-
-type Status struct {
-	ID   StatusID
-	Name string
-	Code string
-}
-
-type PriorityID = int64
-
-type Priority struct {
-	ID   PriorityID
-	Name string
-	Code string
-}
-
-type ImpactID = int64
-
-type Impact struct {
-	ID   ImpactID
-	Name string
-	Code string
-}
+	"github.com/cyradin/fixik/internal/dict"
+)
 
 type IncidentID = int64
 
@@ -33,9 +13,9 @@ type Incident struct {
 	Title       string
 	Description string
 
-	Impact   Impact
-	Priority Priority
-	Status   Status
+	Impact   dict.Entity
+	Priority dict.Entity
+	Status   dict.Entity
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -45,9 +25,9 @@ type CreateIncident struct {
 	Title       string
 	Description string
 
-	ImpactID   ImpactID
-	PriorityID PriorityID
-	StatusID   StatusID
+	ImpactID   dict.EntityID
+	PriorityID dict.EntityID
+	StatusID   dict.EntityID
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -59,7 +39,7 @@ type UpdateIncident struct {
 	Title       string
 	Description string
 
-	ImpactID   ImpactID
-	PriorityID PriorityID
-	StatusID   StatusID
+	ImpactID   dict.EntityID
+	PriorityID dict.EntityID
+	StatusID   dict.EntityID
 }

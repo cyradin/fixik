@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cyradin/fixik/internal/db"
+	"github.com/cyradin/fixik/internal/dict"
 )
 
 type incidentRepo interface {
@@ -14,33 +15,23 @@ type incidentRepo interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-type impactProvider interface {
-	GetByID(ctx context.Context, id ImpactID) (Impact, error)
-	List(ctx context.Context) ([]Impact, error)
-}
-
-type statusProvider interface {
-	GetByID(ctx context.Context, id StatusID) (Status, error)
-	List(ctx context.Context) ([]Status, error)
-}
-
-type priorityProvider interface {
-	GetByID(ctx context.Context, id PriorityID) (Priority, error)
-	List(ctx context.Context) ([]Priority, error)
+type entityProvider interface {
+	GetByID(ctx context.Context, id dict.EntityID) (dict.Entity, error)
+	List(ctx context.Context) ([]dict.Entity, error)
 }
 
 type IncidentManager struct {
 	repo             incidentRepo
-	impactProvider   impactProvider
-	statusProvider   statusProvider
-	priorityProvider priorityProvider
+	impactProvider   entityProvider
+	statusProvider   entityProvider
+	priorityProvider entityProvider
 }
 
 func NewIncidentManager(
 	repo incidentRepo,
-	impactProvider impactProvider,
-	statusProvider statusProvider,
-	priorityProvider priorityProvider,
+	impactProvider entityProvider,
+	statusProvider entityProvider,
+	priorityProvider entityProvider,
 ) *IncidentManager {
 	return &IncidentManager{
 		repo:             repo,
@@ -115,7 +106,7 @@ func (m *IncidentManager) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (m *IncidentManager) fromDB(incident db.Incident, status Status, impact Impact, priority Priority) Incident {
+func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, impact dict.Entity, priority dict.Entity) Incident {
 	return Incident{
 		ID:          incident.ID,
 		Title:       incident.Title,
