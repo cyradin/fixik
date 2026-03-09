@@ -19,20 +19,10 @@ func NewUserRepository(db *pgxpool.Pool) *UserRepository {
 }
 
 func (r *UserRepository) Create(ctx context.Context, u *User) error {
-	const insertUser = `
-		INSERT INTO users (
-			username,
-			email,
-			password,
-			team_id
-		)
-		VALUES (
-			@username,
-			@email,
-			@password,
-			@team_id
-		)
-		RETURNING id
+	const query = `
+		INSERT INTO users (username, email, password, team_id, created_at, updated_at)
+		VALUES (@username, @email, @password, @team_id, now(), now())
+		RETURNING id, created_at, updated_at
 	`
 
 	args := pgx.NamedArgs{
@@ -43,30 +33,22 @@ func (r *UserRepository) Create(ctx context.Context, u *User) error {
 	}
 
 	tx := transaction.FromContext(ctx, r.db)
-
-	if err := tx.QueryRow(ctx, insertUser, args).Scan(&u.ID); err != nil {
+	if err := tx.QueryRow(ctx, query, args).Scan(&u.ID, &u.CreatedAt, &u.UpdatedAt); err != nil {
 		return fmt.Errorf("insert user: %w", err)
 	}
 
-	if err := r.insertRoles(ctx, tx, u.ID, u.RoleIDs); err != nil {
-		return err
-	}
-
-	return nil
+	return r.insertRoles(ctx, tx, u.ID, u.RoleIDs)
 }
 
 func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 	const query = `
 		SELECT
-			u.id,
-			u.username,
-			u.email,
-			u.password,
-			u.team_id,
-			COALESCE(array_agg(ur.role_id) FILTER (WHERE ur.role_id IS NOT NULL), '{}')
+			u.id, u.username, u.email, u.password, u.team_id,
+			COALESCE(array_agg(ur.role_id) FILTER (WHERE ur.role_id IS NOT NULL), '{}'),
+			u.created_at, u.updated_at, u.deleted_at
 		FROM users u
 		LEFT JOIN user_roles ur ON ur.user_id = u.id
-		WHERE u.id = $1
+		WHERE u.id = $1 AND u.deleted_at IS NULL
 		GROUP BY u.id
 	`
 
@@ -79,6 +61,9 @@ func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 		&u.Password,
 		&u.TeamID,
 		&u.RoleIDs,
+		&u.CreatedAt,
+		&u.UpdatedAt,
+		&u.DeletedAt,
 	)
 
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -95,14 +80,12 @@ func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 func (r *UserRepository) List(ctx context.Context) ([]User, error) {
 	const query = `
 		SELECT
-			u.id,
-			u.username,
-			u.email,
-			u.password,
-			u.team_id,
-			COALESCE(array_agg(ur.role_id) FILTER (WHERE ur.role_id IS NOT NULL), '{}')
+			u.id, u.username, u.email, u.password, u.team_id,
+			COALESCE(array_agg(ur.role_id) FILTER (WHERE ur.role_id IS NOT NULL), '{}'),
+			u.created_at, u.updated_at, u.deleted_at
 		FROM users u
 		LEFT JOIN user_roles ur ON ur.user_id = u.id
+		WHERE u.deleted_at IS NULL
 		GROUP BY u.id
 		ORDER BY u.id
 	`
@@ -111,14 +94,12 @@ func (r *UserRepository) List(ctx context.Context) ([]User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("db query: %w", err)
 	}
-
 	defer rows.Close()
 
 	var users []User
 
 	for rows.Next() {
 		var u User
-
 		if err := rows.Scan(
 			&u.ID,
 			&u.Username,
@@ -126,8 +107,11 @@ func (r *UserRepository) List(ctx context.Context) ([]User, error) {
 			&u.Password,
 			&u.TeamID,
 			&u.RoleIDs,
+			&u.CreatedAt,
+			&u.UpdatedAt,
+			&u.DeletedAt,
 		); err != nil {
-			return nil, fmt.Errorf("scan value: %w", err)
+			return nil, fmt.Errorf("scan: %w", err)
 		}
 
 		users = append(users, u)
@@ -139,12 +123,9 @@ func (r *UserRepository) List(ctx context.Context) ([]User, error) {
 func (r *UserRepository) Update(ctx context.Context, u *User) error {
 	const query = `
 		UPDATE users
-		SET
-			username = @username,
-			email = @email,
-			password = @password,
-			team_id = @team_id
-		WHERE id = @id
+		SET username = @username, email = @email, password = @password,
+		    team_id = @team_id, updated_at = now()
+		WHERE id = @id AND deleted_at IS NULL
 	`
 
 	args := pgx.NamedArgs{
@@ -170,22 +151,21 @@ func (r *UserRepository) Update(ctx context.Context, u *User) error {
 		return fmt.Errorf("delete roles: %w", err)
 	}
 
-	if err := r.insertRoles(ctx, tx, u.ID, u.RoleIDs); err != nil {
-		return err
-	}
-
-	return nil
+	return r.insertRoles(ctx, tx, u.ID, u.RoleIDs)
 }
+
 func (r *UserRepository) Delete(ctx context.Context, id int64) error {
 	const query = `
-		DELETE FROM users
-		WHERE id = @id
+		UPDATE users
+		SET deleted_at = now()
+		WHERE id = $1 AND deleted_at IS NULL
 	`
 
-	args := pgx.NamedArgs{"id": id}
+	tx := transaction.FromContext(ctx, r.db)
 
-	if _, err := transaction.FromContext(ctx, r.db).Exec(ctx, query, args); err != nil {
-		return fmt.Errorf("db query: %w", err)
+	_, err := tx.Exec(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("soft delete user: %w", err)
 	}
 
 	return nil

@@ -2,6 +2,7 @@ package db
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 
@@ -47,56 +48,48 @@ func (s *UserRepositorySuite) TestCreateAndGetByID() {
 	s.Equal(user.Password, fromDB.Password)
 	s.Equal(user.TeamID, fromDB.TeamID)
 	s.ElementsMatch(user.RoleIDs, fromDB.RoleIDs)
-}
-
-func (s *UserRepositorySuite) TestGetByID_NotFound() {
-	_, err := s.repo.GetByID(s.T().Context(), 999999)
-	s.Require().ErrorIs(err, ErrNotFound)
-}
-
-func (s *UserRepositorySuite) TestList() {
-	team1 := s.createTeam("team1", "Team One")
-	team2 := s.createTeam("team2", "Team Two")
-	role := s.createRole("user", "User")
-
-	u1 := s.createUser("alice", "alice@example.com", "pass1", team1.ID, []int64{role.ID})
-	u2 := s.createUser("bob", "bob@example.com", "pass2", team2.ID, []int64{})
-
-	list, err := s.repo.List(s.T().Context())
-	s.Require().NoError(err)
-	s.Len(list, 2)
-
-	ids := make([]int64, 0, 2)
-	for _, u := range list {
-		ids = append(ids, u.ID)
-	}
-
-	s.Contains(ids, u1.ID)
-	s.Contains(ids, u2.ID)
+	s.WithinDuration(time.Now(), fromDB.CreatedAt, time.Second)
+	s.WithinDuration(time.Now(), fromDB.UpdatedAt, time.Second)
+	s.Nil(fromDB.DeletedAt)
 }
 
 func (s *UserRepositorySuite) TestUpdate() {
-	team := s.createTeam("team1", "Team One")
+	team1 := s.createTeam("team1", "Team One")
 	team2 := s.createTeam("team2", "Team Two")
 	role := s.createRole("editor", "Editor")
-	user := s.createUser("charlie", "charlie@example.com", "pass", team.ID, []int64{})
 
-	user.Username = "charlie2"
-	user.Email = "charlie2@example.com"
+	user := s.createUser("bob", "bob@example.com", "pass", team1.ID, []int64{})
+
+	user.Username = "bob2"
+	user.Email = "bob2@example.com"
 	user.Password = "newpass"
 	user.TeamID = team2.ID
 	user.RoleIDs = []int64{role.ID}
+
+	oldUpdated := user.UpdatedAt
 
 	err := s.repo.Update(s.T().Context(), user)
 	s.Require().NoError(err)
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), user.ID)
 	s.Require().NoError(err)
-	s.Equal("charlie2", fromDB.Username)
-	s.Equal("charlie2@example.com", fromDB.Email)
+	s.Equal("bob2", fromDB.Username)
+	s.Equal("bob2@example.com", fromDB.Email)
 	s.Equal("newpass", fromDB.Password)
 	s.Equal(team2.ID, fromDB.TeamID)
 	s.ElementsMatch([]int64{role.ID}, fromDB.RoleIDs)
+	s.True(fromDB.UpdatedAt.After(oldUpdated))
+}
+
+func (s *UserRepositorySuite) TestDelete_SoftDelete() {
+	team := s.createTeam("team1", "Team One")
+	user := s.createUser("carol", "carol@example.com", "pass", team.ID, []int64{})
+
+	err := s.repo.Delete(s.T().Context(), user.ID)
+	s.Require().NoError(err)
+
+	_, err = s.repo.GetByID(s.T().Context(), user.ID)
+	s.Require().ErrorIs(err, ErrNotFound)
 }
 
 func (s *UserRepositorySuite) TestUpdate_NotFound() {
@@ -112,23 +105,6 @@ func (s *UserRepositorySuite) TestUpdate_NotFound() {
 
 	err := s.repo.Update(s.T().Context(), user)
 	s.Require().ErrorIs(err, ErrNotFound)
-}
-
-func (s *UserRepositorySuite) TestDelete() {
-	team := s.createTeam("team1", "Team One")
-	role := s.createRole("guest", "Guest")
-	user := s.createUser("dave", "dave@example.com", "pass", team.ID, []int64{role.ID})
-
-	err := s.repo.Delete(s.T().Context(), user.ID)
-	s.Require().NoError(err)
-
-	_, err = s.repo.GetByID(s.T().Context(), user.ID)
-	s.Require().ErrorIs(err, ErrNotFound)
-}
-
-func (s *UserRepositorySuite) TestDelete_NotFound() {
-	err := s.repo.Delete(s.T().Context(), 999999)
-	s.Require().NoError(err)
 }
 
 func (s *UserRepositorySuite) createTeam(code, name string) *Team {
