@@ -1,4 +1,4 @@
-package incident
+package db
 
 import (
 	"context"
@@ -62,7 +62,7 @@ func (r *StatusRepository) GetByID(ctx context.Context, id int64) (Status, error
 		&s.Name,
 	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return Status{}, nil
+			return Status{}, ErrNotFound
 		}
 
 		return Status{}, fmt.Errorf("db query: %w", err)

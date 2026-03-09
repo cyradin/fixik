@@ -1,4 +1,4 @@
-package incident
+package db
 
 import (
 	"testing"
@@ -52,7 +52,7 @@ func (s *PriorityRepositorySuite) TestGetByID_Found() {
 
 func (s *PriorityRepositorySuite) TestGetByID_NotFound() {
 	fromDB, err := s.repo.GetByID(s.T().Context(), 999999)
-	s.Require().NoError(err)
+	s.Require().ErrorIs(err, ErrNotFound)
 	s.Equal(Priority{}, fromDB)
 }
 
@@ -88,8 +88,13 @@ func (s *PriorityRepositorySuite) TestDelete() {
 	s.Require().NoError(err)
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), p.ID)
-	s.Require().NoError(err)
+	s.Require().ErrorIs(err, ErrNotFound)
 	s.Equal(Priority{}, fromDB)
+}
+
+func (s *PriorityRepositorySuite) TestDeleteNotFound() {
+	err := s.repo.Delete(s.T().Context(), 123)
+	s.Require().NoError(err)
 }
 
 func (s *PriorityRepositorySuite) createPriority(code, name string) *Priority {

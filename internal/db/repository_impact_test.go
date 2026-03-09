@@ -1,4 +1,4 @@
-package incident
+package db
 
 import (
 	"testing"
@@ -52,7 +52,7 @@ func (s *ImpactRepositorySuite) TestGetByID_Found() {
 
 func (s *ImpactRepositorySuite) TestGetByID_NotFound() {
 	fromDB, err := s.repo.GetByID(s.T().Context(), 999999)
-	s.Require().NoError(err)
+	s.Require().ErrorIs(err, ErrNotFound)
 	s.Equal(Impact{}, fromDB)
 }
 
@@ -88,8 +88,13 @@ func (s *ImpactRepositorySuite) TestDelete() {
 	s.Require().NoError(err)
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), im.ID)
-	s.Require().NoError(err)
+	s.Require().ErrorIs(err, ErrNotFound)
 	s.Equal(Impact{}, fromDB)
+}
+
+func (s *ImpactRepositorySuite) TestDeleteNotFound() {
+	err := s.repo.Delete(s.T().Context(), 123)
+	s.Require().NoError(err)
 }
 
 func (s *ImpactRepositorySuite) createImpact(code, name string) *Impact {

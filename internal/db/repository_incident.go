@@ -1,4 +1,4 @@
-package incident
+package db
 
 import (
 	"context"
@@ -10,15 +10,15 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Repository struct {
+type IncidentRepository struct {
 	db *pgxpool.Pool
 }
 
-func NewRepository(db *pgxpool.Pool) *Repository {
-	return &Repository{db: db}
+func NewIncidentRepository(db *pgxpool.Pool) *IncidentRepository {
+	return &IncidentRepository{db: db}
 }
 
-func (r *Repository) Create(ctx context.Context, i *Incident) error {
+func (r *IncidentRepository) Create(ctx context.Context, i *Incident) error {
 	const query = `
 		INSERT INTO incidents (
 			title,
@@ -56,7 +56,7 @@ func (r *Repository) Create(ctx context.Context, i *Incident) error {
 	return nil
 }
 
-func (r *Repository) GetByID(ctx context.Context, id int64) (Incident, error) {
+func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, error) {
 	const query = `
 		SELECT
 			id,
@@ -92,7 +92,7 @@ func (r *Repository) GetByID(ctx context.Context, id int64) (Incident, error) {
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return Incident{}, nil
+			return Incident{}, ErrNotFound
 		}
 
 		return Incident{}, fmt.Errorf("db query: %w", err)
@@ -101,7 +101,7 @@ func (r *Repository) GetByID(ctx context.Context, id int64) (Incident, error) {
 	return incident, nil
 }
 
-func (r *Repository) Update(ctx context.Context, i *Incident) error {
+func (r *IncidentRepository) Update(ctx context.Context, i *Incident) error {
 	const query = `
 		UPDATE incidents
 		SET
@@ -132,7 +132,7 @@ func (r *Repository) Update(ctx context.Context, i *Incident) error {
 	return nil
 }
 
-func (r *Repository) Delete(ctx context.Context, id int64) error {
+func (r *IncidentRepository) Delete(ctx context.Context, id int64) error {
 	const query = `
 		UPDATE incidents
 		SET

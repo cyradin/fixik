@@ -1,4 +1,4 @@
-package incident
+package db
 
 import (
 	"testing"
@@ -52,7 +52,7 @@ func (s *StatusRepositorySuite) TestGetByID_Found() {
 
 func (s *StatusRepositorySuite) TestGetByID_NotFound() {
 	fromDB, err := s.repo.GetByID(s.T().Context(), 999999)
-	s.Require().NoError(err)
+	s.Require().ErrorIs(err, ErrNotFound)
 	s.Equal(Status{}, fromDB)
 }
 
@@ -88,8 +88,13 @@ func (s *StatusRepositorySuite) TestDelete() {
 	s.Require().NoError(err)
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), status.ID)
-	s.Require().NoError(err)
+	s.Require().ErrorIs(err, ErrNotFound)
 	s.Equal(Status{}, fromDB)
+}
+
+func (s *StatusRepositorySuite) TestDeleteNotFound() {
+	err := s.repo.Delete(s.T().Context(), 123)
+	s.Require().NoError(err)
 }
 
 func (s *StatusRepositorySuite) createStatus(code, name string) *Status {

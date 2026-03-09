@@ -1,4 +1,4 @@
-package incident
+package db
 
 import (
 	"context"
@@ -50,7 +50,7 @@ func (r *PriorityRepository) GetByID(ctx context.Context, id int64) (Priority, e
 
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(&p.ID, &p.Code, &p.Name); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return Priority{}, nil
+			return Priority{}, ErrNotFound
 		}
 
 		return Priority{}, fmt.Errorf("get priority: %w", err)

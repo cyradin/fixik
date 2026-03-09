@@ -1,4 +1,4 @@
-package incident
+package db
 
 import (
 	"testing"
@@ -10,7 +10,7 @@ import (
 
 type IncidentRepositorySuite struct {
 	tests.PostgresSuite
-	repo *Repository
+	repo *IncidentRepository
 }
 
 func TestIncidentRepositorySuite(t *testing.T) {
@@ -19,7 +19,7 @@ func TestIncidentRepositorySuite(t *testing.T) {
 }
 
 func (s *IncidentRepositorySuite) SetupTest() {
-	s.repo = NewRepository(s.Postgres())
+	s.repo = NewIncidentRepository(s.Postgres())
 
 	_, err := s.Postgres().Exec(s.T().Context(), `
 		TRUNCATE TABLE incidents RESTART IDENTITY CASCADE;
@@ -69,6 +69,12 @@ func (s *IncidentRepositorySuite) TestGetByID_Found() {
 	s.Equal(inc.ImpactID, fromDB.ImpactID)
 	s.Equal(inc.PriorityID, fromDB.PriorityID)
 	s.Equal(inc.StatusID, fromDB.StatusID)
+}
+
+func (s *IncidentRepositorySuite) TestGetByID_NotFound() {
+	fromDB, err := s.repo.GetByID(s.T().Context(), 999999)
+	s.Require().ErrorIs(err, ErrNotFound)
+	s.Equal(Incident{}, fromDB)
 }
 
 func (s *IncidentRepositorySuite) TestUpdate_Found() {
@@ -124,7 +130,7 @@ func (s *IncidentRepositorySuite) TestDelete_Found() {
 	s.Require().NoError(err)
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), inc.ID)
-	s.Require().NoError(err)
+	s.Require().ErrorIs(err, ErrNotFound)
 	s.Require().Empty(fromDB)
 }
 

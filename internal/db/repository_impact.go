@@ -1,4 +1,4 @@
-package incident
+package db
 
 import (
 	"context"
@@ -49,7 +49,7 @@ func (r *ImpactRepository) GetByID(ctx context.Context, id int64) (Impact, error
 	var impact Impact
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(&impact.ID, &impact.Code, &impact.Name); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return Impact{}, nil
+			return Impact{}, ErrNotFound
 		}
 
 		return Impact{}, fmt.Errorf("get impact: %w", err)

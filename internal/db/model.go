@@ -1,6 +1,11 @@
-package incident
+package db
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
+
+var ErrNotFound = fmt.Errorf("not found")
 
 type Incident struct {
 	ID          int64
