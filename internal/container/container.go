@@ -5,6 +5,7 @@ import (
 
 	"github.com/cyradin/fixik/internal/config"
 	"github.com/cyradin/fixik/internal/db"
+	"github.com/cyradin/fixik/internal/incident"
 	"github.com/cyradin/fixik/pkg/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -19,6 +20,11 @@ type Container struct {
 	statusRepo   *db.StatusRepository
 	impactRepo   *db.ImpactRepository
 	priorityRepo *db.PriorityRepository
+
+	statusManager   *incident.StatusManager
+	priorityManager *incident.PriorityManager
+	impactManager   *incident.ImpactManager
+	incidentManager *incident.IncidentManager
 }
 
 func New(
