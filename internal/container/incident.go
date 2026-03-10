@@ -2,7 +2,6 @@ package container
 
 import "github.com/cyradin/fixik/internal/incident"
 
-
 func (c *Container) IncidentManager() *incident.IncidentManager {
 	if c.incidentManager == nil {
 		c.incidentManager = incident.NewIncidentManager(

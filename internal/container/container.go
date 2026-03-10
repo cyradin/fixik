@@ -7,6 +7,7 @@ import (
 	"github.com/cyradin/fixik/internal/db"
 	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/incident"
+	"github.com/cyradin/fixik/internal/user"
 	"github.com/cyradin/fixik/pkg/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -32,6 +33,7 @@ type Container struct {
 	roleManager     *dict.EntityManager
 
 	incidentManager *incident.IncidentManager
+	userManager     *user.UserManager
 }
 
 func New(

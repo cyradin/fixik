@@ -1,0 +1,16 @@
+package container
+
+import (
+	"github.com/cyradin/fixik/internal/user"
+)
+
+func (c *Container) UserNamaner() *user.UserManager {
+	if c.userManager == nil {
+		c.userManager = user.NewUserManager(
+			c.UserRepository(),
+			c.RoleManager(),
+		)
+	}
+
+	return c.userManager
+}
