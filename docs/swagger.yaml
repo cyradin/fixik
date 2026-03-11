@@ -50,6 +50,143 @@ info:
   title: Fixik API
   version: "1.0"
 paths:
+  /priorities:
+    get:
+      consumes:
+      - application/json
+      description: Get all priorities in dictionary
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.ListDictEntitiesResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: List priorities
+      tags:
+      - priorities
+    post:
+      consumes:
+      - application/json
+      description: Create new status dictionary entry
+      parameters:
+      - description: Priority data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/router.CreateDictEntityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.DictEntityResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Create status
+      tags:
+      - priorities
+  /priorities/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete status dictionary entry by ID
+      parameters:
+      - description: Priority ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Delete status
+      tags:
+      - priorities
+    get:
+      consumes:
+      - application/json
+      description: Get status dictionary entry by ID
+      parameters:
+      - description: Priority ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.DictEntityResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Get status by ID
+      tags:
+      - priorities
+    put:
+      consumes:
+      - application/json
+      description: Update status dictionary entry by ID
+      parameters:
+      - description: Priority ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Priority data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/router.UpdateDictEntityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.DictEntityResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Update status
+      tags:
+      - priorities
   /statuses:
     get:
       consumes:

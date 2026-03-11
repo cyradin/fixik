@@ -34,6 +34,7 @@ func New(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 		r.Delete("/users/{id}", deleteUser)
 
 		r.Route("/statuses", statusRoutes(c))
+		r.Route("/priorities", priorityRoutes(c))
 
 		r.Post("/incidents", createIncident)
 		r.Get("/incidents", listIncidents)
