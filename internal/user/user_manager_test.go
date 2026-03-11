@@ -12,7 +12,6 @@ import (
 
 func TestUserManager_Create(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
 
 	tests := []struct {
 		name string
@@ -63,6 +62,7 @@ func TestUserManager_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			repo := &userRepoMock{}
 			tt.mock(repo)
 
@@ -72,7 +72,7 @@ func TestUserManager_Create(t *testing.T) {
 				},
 			})
 
-			u, err := manager.Create(ctx, tt.cmd)
+			u, err := manager.Create(t.Context(), tt.cmd)
 			if tt.err {
 				require.Error(t, err)
 				return
@@ -87,7 +87,6 @@ func TestUserManager_Create(t *testing.T) {
 
 func TestUserManager_GetByID(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
 
 	dbUser := db.User{
 		ID:       1,
@@ -122,6 +121,7 @@ func TestUserManager_GetByID(t *testing.T) {
 					if id == 2 {
 						return dict.Entity{}, errors.New("role error")
 					}
+
 					return dict.Entity{ID: id}, nil
 				}
 			},
@@ -143,12 +143,13 @@ func TestUserManager_GetByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			repo := &userRepoMock{}
 			role := &roleProviderMock{}
 			tt.mock(repo, role)
 
 			manager := NewUserManager(repo, role)
-			u, err := manager.GetByID(ctx, 1)
+			u, err := manager.GetByID(t.Context(), 1)
 
 			if tt.err {
 				require.Error(t, err)
@@ -164,7 +165,6 @@ func TestUserManager_GetByID(t *testing.T) {
 
 func TestUserManager_Update(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
 
 	tests := []struct {
 		name string
@@ -206,16 +206,17 @@ func TestUserManager_Update(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			repo := &userRepoMock{}
 			tt.mock(repo)
 
 			manager := NewUserManager(repo, &roleProviderMock{
-				getByIDFn: func(ctx context.Context, id dict.EntityID) (dict.Entity, error) {
+				getByIDFn: func(_ context.Context, id dict.EntityID) (dict.Entity, error) {
 					return dict.Entity{ID: id}, nil
 				},
 			})
 
-			_, err := manager.Update(ctx, tt.cmd)
+			_, err := manager.Update(t.Context(), tt.cmd)
 			if tt.err {
 				require.Error(t, err)
 				return
@@ -228,7 +229,6 @@ func TestUserManager_Update(t *testing.T) {
 
 func TestUserManager_Delete(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
 
 	tests := []struct {
 		name string
@@ -260,11 +260,12 @@ func TestUserManager_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			repo := &userRepoMock{}
 			tt.mock(repo)
 
 			manager := NewUserManager(repo, &roleProviderMock{})
-			err := manager.Delete(ctx, tt.id)
+			err := manager.Delete(t.Context(), tt.id)
 
 			if tt.err {
 				require.Error(t, err)

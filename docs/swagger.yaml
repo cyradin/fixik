@@ -1,0 +1,192 @@
+basePath: /api
+definitions:
+  router.CreateDictEntityRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  router.DictEntityResponse:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  router.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  router.ListDictEntitiesResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/router.DictEntityResponse'
+        type: array
+    type: object
+  router.UpdateDictEntityRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Incident management system API
+  title: Fixik API
+  version: "1.0"
+paths:
+  /statuses:
+    get:
+      consumes:
+      - application/json
+      description: Get all statuses in dictionary
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.ListDictEntitiesResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: List statuses
+      tags:
+      - statuses
+    post:
+      consumes:
+      - application/json
+      description: Create new status dictionary entry
+      parameters:
+      - description: Status data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/router.CreateDictEntityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.DictEntityResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Create status
+      tags:
+      - statuses
+  /statuses/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete status dictionary entry by ID
+      parameters:
+      - description: Status ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Delete status
+      tags:
+      - statuses
+    get:
+      consumes:
+      - application/json
+      description: Get status dictionary entry by ID
+      parameters:
+      - description: Status ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.DictEntityResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Get status by ID
+      tags:
+      - statuses
+    put:
+      consumes:
+      - application/json
+      description: Update status dictionary entry by ID
+      parameters:
+      - description: Status ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Status data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/router.UpdateDictEntityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.DictEntityResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Update status
+      tags:
+      - statuses
+schemes:
+- http
+swagger: "2.0"

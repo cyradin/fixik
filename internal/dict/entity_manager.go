@@ -45,11 +45,11 @@ func NewRoleManager(repo entityRepo) *EntityManager {
 	return newEntityManager(repo)
 }
 
-func (m *EntityManager) Create(ctx context.Context, status Entity) (Entity, error) {
-	dbEntity := m.toDB(status)
+func (m *EntityManager) Create(ctx context.Context, e Entity) (Entity, error) {
+	dbEntity := m.toDB(e)
 
 	if err := m.repo.Create(ctx, &dbEntity); err != nil {
-		return Entity{}, fmt.Errorf("create status: %w", err)
+		return Entity{}, fmt.Errorf("repository create: %w", err)
 	}
 
 	result := m.fromDB(dbEntity)
@@ -60,7 +60,7 @@ func (m *EntityManager) Create(ctx context.Context, status Entity) (Entity, erro
 func (m *EntityManager) GetByID(ctx context.Context, id EntityID) (Entity, error) {
 	result, err := m.repo.GetByID(ctx, id)
 	if err != nil {
-		return Entity{}, fmt.Errorf("get status by id: %w", err)
+		return Entity{}, fmt.Errorf("repository get by id: %w", err)
 	}
 
 	return m.fromDB(result), nil
@@ -69,7 +69,7 @@ func (m *EntityManager) GetByID(ctx context.Context, id EntityID) (Entity, error
 func (m *EntityManager) List(ctx context.Context) ([]Entity, error) {
 	items, err := m.repo.List(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("get status list: %w", err)
+		return nil, fmt.Errorf("repository get list: %w", err)
 	}
 
 	result := make([]Entity, 0, len(items))
@@ -80,11 +80,11 @@ func (m *EntityManager) List(ctx context.Context) ([]Entity, error) {
 	return result, nil
 }
 
-func (m *EntityManager) Update(ctx context.Context, status Entity) (Entity, error) {
-	dbEntity := m.toDB(status)
+func (m *EntityManager) Update(ctx context.Context, e Entity) (Entity, error) {
+	dbEntity := m.toDB(e)
 
 	if err := m.repo.Update(ctx, &dbEntity); err != nil {
-		return Entity{}, fmt.Errorf("update status: %w", err)
+		return Entity{}, fmt.Errorf("repository update: %w", err)
 	}
 
 	result := m.fromDB(dbEntity)
@@ -94,7 +94,7 @@ func (m *EntityManager) Update(ctx context.Context, status Entity) (Entity, erro
 
 func (m *EntityManager) Delete(ctx context.Context, id EntityID) error {
 	if err := m.repo.Delete(ctx, id); err != nil {
-		return fmt.Errorf("delete status: %w", err)
+		return fmt.Errorf("repository delete: %w", err)
 	}
 
 	return nil

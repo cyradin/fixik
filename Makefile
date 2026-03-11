@@ -38,3 +38,6 @@ migrate-down-all:
 
 migrate-version:
 	${MIGRATE_COMMAND} -path $(FIXIK_POSTGRES_MIGRATIONS_DIR) -database $(FIXIK_POSTGRES_URL) version
+
+swagger:
+	go run github.com/swaggo/swag/cmd/swag@v1.16.6 init  -d cmd/fixik,internal/router

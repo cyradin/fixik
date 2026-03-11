@@ -20,6 +20,7 @@ type HTTPServerConfig struct {
 	ReadTimeout       time.Duration `envconfig:"FIXIK_HTTP_SERVER_READ_TIMEOUT" required:"true"`
 	WriteTimeout      time.Duration `envconfig:"FIXIK_HTTP_SERVER_WRITE_TIMEOUT" required:"true"`
 	IdleTimeout       time.Duration `envconfig:"FIXIK_HTTP_SERVER_IDLE_TIMEOUT" required:"true"`
+	AllowedOrigins    []string      `envconfig:"FIXIK_HTTP_SERVER_ALLOWED_ORIGINS" required:"true"`
 }
 
 type HTTPDebugServerConfig struct {
@@ -28,6 +29,8 @@ type HTTPDebugServerConfig struct {
 	ReadTimeout       time.Duration `envconfig:"FIXIK_HTTP_DEBUG_SERVER_READ_TIMEOUT" required:"true"`
 	WriteTimeout      time.Duration `envconfig:"FIXIK_HTTP_DEBUG_SERVER_WRITE_TIMEOUT" required:"true"`
 	IdleTimeout       time.Duration `envconfig:"FIXIK_HTTP_DEBUG_SERVER_IDLE_TIMEOUT" required:"true"`
+	// Куда ходит веб-интерфейс сваггера в Try it out
+	SwaggerAddr string `envconfig:"FIXIK_HTTP_DEBUG_SWAGGER_ADDR" required:"true"`
 }
 
 type LogConfig struct {

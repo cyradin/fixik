@@ -3,9 +3,11 @@ package router
 import (
 	"net/http"
 
+	_ "github.com/cyradin/fixik/docs"
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func NewDebug(container *container.Container) *chi.Mux {
@@ -13,6 +15,7 @@ func NewDebug(container *container.Container) *chi.Mux {
 
 	r.Get("/livez", livenessHandler)
 	r.Get("/readyz", readinessHandler(container.PgPool()))
+	r.Get("/docs/*", httpSwagger.WrapHandler)
 
 	return r
 }
