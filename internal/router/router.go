@@ -3,12 +3,15 @@ package router
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/pkg/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type ErrorResponse struct {
@@ -27,11 +30,7 @@ func New(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 	}))
 
 	r.Route("/api", func(r chi.Router) {
-		r.Post("/users", createUser)
-		r.Get("/users", listUsers)
-		r.Get("/users/{id}", getUser)
-		r.Patch("/users/{id}", updateUser)
-		r.Delete("/users/{id}", deleteUser)
+		r.Route("/users", userRoutes(c))
 
 		r.Route("/statuses", statusRoutes(c))
 		r.Route("/priorities", priorityRoutes(c))
@@ -119,3 +118,42 @@ type Validatable interface {
 }
 
 type NoBody struct{}
+
+func decodePagination(r *http.Request, minLimit int, maxLimit int) (int, int, error) {
+	type pagination struct {
+		Limit  int
+		Offset int
+	}
+
+	limitStr := r.URL.Query().Get("limit")
+	offsetStr := r.URL.Query().Get("offset")
+	limit, offset := 0, 0
+
+	var err error
+
+	if limitStr != "" {
+		limit, err = strconv.Atoi(limitStr)
+		if err != nil {
+			return 0, 0, fmt.Errorf("parse 'limit': %w", err)
+		}
+	}
+
+	if offsetStr != "" {
+		offset, err = strconv.Atoi(offsetStr)
+		if err != nil {
+			return 0, 0, fmt.Errorf("parse 'offset': %w", err)
+		}
+	}
+
+	p := pagination{Limit: limit, Offset: offset}
+
+	if err := validation.ValidateStruct(
+		&p,
+		validation.Field(&p.Limit, validation.Required, validation.Min(minLimit), validation.Max(maxLimit)),
+		validation.Field(&p.Offset, validation.Min(0)),
+	); err != nil {
+		return 0, 0, err
+	}
+
+	return limit, offset, nil
+}

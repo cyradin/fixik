@@ -9,12 +9,14 @@ import (
 )
 
 func statusRoutes(c *container.Container) func(r chi.Router) {
+	statusManager := c.StatusManager()
+
 	return func(r chi.Router) {
-		r.Get("/", listStatuses(c.StatusManager()))
-		r.Post("/", createStatus(c.StatusManager()))
-		r.Get("/{id}", getStatus(c.StatusManager()))
-		r.Put("/{id}", updateStatus(c.StatusManager()))
-		r.Delete("/{id}", deleteStatus(c.StatusManager()))
+		r.Get("/", listStatuses(statusManager))
+		r.Post("/", createStatus(statusManager))
+		r.Get("/{id}", getStatus(statusManager))
+		r.Put("/{id}", updateStatus(statusManager))
+		r.Delete("/{id}", deleteStatus(statusManager))
 	}
 }
 

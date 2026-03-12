@@ -416,6 +416,7 @@ func (m *roleProviderMock) GetByID(ctx context.Context, id dict.EntityID) (dict.
 	if m.getByIDFn == nil {
 		return dict.Entity{}, nil
 	}
+
 	return m.getByIDFn(ctx, id)
 }
 
@@ -423,5 +424,6 @@ func (m *roleProviderMock) List(ctx context.Context) ([]dict.Entity, error) {
 	if m.listFn == nil {
 		return nil, nil
 	}
+
 	return m.listFn(ctx)
 }

@@ -9,12 +9,14 @@ import (
 )
 
 func priorityRoutes(c *container.Container) func(r chi.Router) {
+	priorityManager := c.PriorityManager()
+
 	return func(r chi.Router) {
-		r.Get("/", listPriorities(c.PriorityManager()))
-		r.Post("/", createPriority(c.PriorityManager()))
-		r.Get("/{id}", getPriority(c.PriorityManager()))
-		r.Put("/{id}", updatePriority(c.PriorityManager()))
-		r.Delete("/{id}", deletePriority(c.PriorityManager()))
+		r.Get("/", listPriorities(priorityManager))
+		r.Post("/", createPriority(priorityManager))
+		r.Get("/{id}", getPriority(priorityManager))
+		r.Put("/{id}", updatePriority(priorityManager))
+		r.Delete("/{id}", deletePriority(priorityManager))
 	}
 }
 

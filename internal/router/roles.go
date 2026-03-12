@@ -9,12 +9,14 @@ import (
 )
 
 func roleRoutes(c *container.Container) func(r chi.Router) {
+	roleManager := c.RoleManager()
+
 	return func(r chi.Router) {
-		r.Get("/", listRoles(c.RoleManager()))
-		r.Post("/", createRole(c.RoleManager()))
-		r.Get("/{id}", getRole(c.RoleManager()))
-		r.Put("/{id}", updateRole(c.RoleManager()))
-		r.Delete("/{id}", deleteRole(c.RoleManager()))
+		r.Get("/", listRoles(roleManager))
+		r.Post("/", createRole(roleManager))
+		r.Get("/{id}", getRole(roleManager))
+		r.Put("/{id}", updateRole(roleManager))
+		r.Delete("/{id}", deleteRole(roleManager))
 	}
 }
 

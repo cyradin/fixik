@@ -9,12 +9,14 @@ import (
 )
 
 func teamRoutes(c *container.Container) func(r chi.Router) {
+	teamManager := c.TeamManager()
+
 	return func(r chi.Router) {
-		r.Get("/", listTeams(c.TeamManager()))
-		r.Post("/", createTeam(c.TeamManager()))
-		r.Get("/{id}", getTeam(c.TeamManager()))
-		r.Put("/{id}", updateTeam(c.TeamManager()))
-		r.Delete("/{id}", deleteTeam(c.TeamManager()))
+		r.Get("/", listTeams(teamManager))
+		r.Post("/", createTeam(teamManager))
+		r.Get("/{id}", getTeam(teamManager))
+		r.Put("/{id}", updateTeam(teamManager))
+		r.Delete("/{id}", deleteTeam(teamManager))
 	}
 }
 

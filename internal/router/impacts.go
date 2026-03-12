@@ -9,12 +9,14 @@ import (
 )
 
 func impactRoutes(c *container.Container) func(r chi.Router) {
+	impactManager := c.ImpactManager()
+
 	return func(r chi.Router) {
-		r.Get("/", listImpacts(c.ImpactManager()))
-		r.Post("/", createImpact(c.ImpactManager()))
-		r.Get("/{id}", getImpact(c.ImpactManager()))
-		r.Put("/{id}", updateImpact(c.ImpactManager()))
-		r.Delete("/{id}", deleteImpact(c.ImpactManager()))
+		r.Get("/", listImpacts(impactManager))
+		r.Post("/", createImpact(impactManager))
+		r.Get("/{id}", getImpact(impactManager))
+		r.Put("/{id}", updateImpact(impactManager))
+		r.Delete("/{id}", deleteImpact(impactManager))
 	}
 }
 

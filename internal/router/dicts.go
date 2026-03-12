@@ -76,12 +76,7 @@ func createDictEntity(manager entityManager) http.HandlerFunc {
 			return DictEntityResponse{}, err
 		}
 
-		return DictEntityResponse{
-			ID:          result.ID,
-			Name:        result.Name,
-			Code:        result.Code,
-			Description: result.Description,
-		}, nil
+		return toDictEntityResponse(result), nil
 	})
 }
 
@@ -99,12 +94,7 @@ func getDictEntity(manager entityManager) http.HandlerFunc {
 				return DictEntityResponse{}, err
 			}
 
-			return DictEntityResponse{
-				ID:          result.ID,
-				Name:        result.Name,
-				Code:        result.Code,
-				Description: result.Description,
-			}, nil
+			return toDictEntityResponse(result), nil
 		})(w, r)
 	}
 }
@@ -130,12 +120,7 @@ func updateDictEntity(manager entityManager) http.HandlerFunc {
 				return DictEntityResponse{}, err
 			}
 
-			return DictEntityResponse{
-				ID:          result.ID,
-				Name:        result.Name,
-				Code:        result.Code,
-				Description: result.Description,
-			}, nil
+			return toDictEntityResponse(result), nil
 		})(w, r)
 	}
 }
@@ -167,14 +152,18 @@ func listDictEntities(manager entityManager) http.HandlerFunc {
 
 		resp := make([]DictEntityResponse, 0, len(items))
 		for _, item := range items {
-			resp = append(resp, DictEntityResponse{
-				ID:          item.ID,
-				Name:        item.Name,
-				Code:        item.Code,
-				Description: item.Description,
-			})
+			resp = append(resp, toDictEntityResponse(item))
 		}
 
 		return ListDictEntitiesResponse{Items: resp}, nil
 	})
+}
+
+func toDictEntityResponse(item dict.Entity) DictEntityResponse {
+	return DictEntityResponse{
+		ID:          item.ID,
+		Name:        item.Name,
+		Code:        item.Code,
+		Description: item.Description,
+	}
 }
