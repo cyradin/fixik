@@ -77,7 +77,7 @@ func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 	return u, nil
 }
 
-func (r *UserRepository) List(ctx context.Context) ([]User, error) {
+func (r *UserRepository) List(ctx context.Context, limit, offset int) ([]User, error) {
 	const query = `
 		SELECT
 			u.id, u.username, u.email, u.password, u.team_id,
@@ -88,18 +88,20 @@ func (r *UserRepository) List(ctx context.Context) ([]User, error) {
 		WHERE u.deleted_at IS NULL
 		GROUP BY u.id
 		ORDER BY u.id
+		LIMIT $1 OFFSET $2
 	`
 
-	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, query)
+	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, query, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("db query: %w", err)
 	}
 	defer rows.Close()
 
-	var users []User
+	users := make([]User, 0, limit)
 
 	for rows.Next() {
 		var u User
+
 		if err := rows.Scan(
 			&u.ID,
 			&u.Username,
@@ -117,7 +119,11 @@ func (r *UserRepository) List(ctx context.Context) ([]User, error) {
 		users = append(users, u)
 	}
 
-	return users, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
+	return users, nil
 }
 
 func (r *UserRepository) Update(ctx context.Context, u *User) error {

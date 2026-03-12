@@ -32,7 +32,7 @@ func (s *UserRepositorySuite) SetupTest() {
 	s.Require().NoError(err)
 }
 
-func (s *UserRepositorySuite) TestCreateAndGetByID() {
+func (s *UserRepositorySuite) TestGetByID() {
 	team := s.createTeam("team1", "Team One")
 	role1 := s.createRole("admin", "Admin")
 	role2 := s.createRole("user", "User")
@@ -51,6 +51,65 @@ func (s *UserRepositorySuite) TestCreateAndGetByID() {
 	s.WithinDuration(time.Now(), fromDB.CreatedAt, time.Second)
 	s.WithinDuration(time.Now(), fromDB.UpdatedAt, time.Second)
 	s.Nil(fromDB.DeletedAt)
+}
+
+func (s *UserRepositorySuite) TestList() {
+	ctx := s.T().Context()
+
+	team := s.createTeam("team1", "Team One")
+	role := s.createRole("user", "User")
+
+	u1 := s.createUser("u1", "u1@example.com", "pass", team.ID, []int64{role.ID})
+	u2 := s.createUser("u2", "u2@example.com", "pass", team.ID, []int64{})
+	u3 := s.createUser("u3", "u3@example.com", "pass", team.ID, []int64{})
+
+	s.Run("list all", func() {
+		users, err := s.repo.List(ctx, 100, 0)
+		s.Require().NoError(err)
+
+		s.Len(users, 3)
+		s.Equal(u1.ID, users[0].ID)
+		s.Equal(u2.ID, users[1].ID)
+		s.Equal(u3.ID, users[2].ID)
+	})
+
+	s.Run("limit", func() {
+		users, err := s.repo.List(ctx, 2, 0)
+		s.Require().NoError(err)
+
+		s.Len(users, 2)
+		s.Equal(u1.ID, users[0].ID)
+		s.Equal(u2.ID, users[1].ID)
+	})
+
+	s.Run("offset", func() {
+		users, err := s.repo.List(ctx, 100, 1)
+		s.Require().NoError(err)
+
+		s.Len(users, 2)
+		s.Equal(u2.ID, users[0].ID)
+		s.Equal(u3.ID, users[1].ID)
+	})
+
+	s.Run("limit with offset", func() {
+		users, err := s.repo.List(ctx, 1, 1)
+		s.Require().NoError(err)
+
+		s.Len(users, 1)
+		s.Equal(u2.ID, users[0].ID)
+	})
+
+	s.Run("deleted users not returned", func() {
+		err := s.repo.Delete(ctx, u2.ID)
+		s.Require().NoError(err)
+
+		users, err := s.repo.List(ctx, 100, 0)
+		s.Require().NoError(err)
+
+		s.Len(users, 2)
+		s.Equal(u1.ID, users[0].ID)
+		s.Equal(u3.ID, users[1].ID)
+	})
 }
 
 func (s *UserRepositorySuite) TestUpdate() {
