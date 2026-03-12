@@ -22,7 +22,6 @@ type Container struct {
 	impactRepo   *db.DictRepository
 	priorityRepo *db.DictRepository
 	teamRepo     *db.DictRepository
-	roleRepo     *db.DictRepository
 	incidentRepo *db.IncidentRepository
 	userRepo     *db.UserRepository
 
@@ -30,7 +29,6 @@ type Container struct {
 	priorityManager *dict.EntityManager
 	impactManager   *dict.EntityManager
 	teamManager     *dict.EntityManager
-	roleManager     *dict.EntityManager
 
 	incidentManager *incident.IncidentManager
 	userManager     *user.UserManager

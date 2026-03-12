@@ -35,10 +35,6 @@ func NewTeamRepository(db *pgxpool.Pool) *DictRepository {
 	return newDictRepository(db, "teams")
 }
 
-func NewRoleRepository(db *pgxpool.Pool) *DictRepository {
-	return newDictRepository(db, "roles")
-}
-
 func (r *DictRepository) Create(ctx context.Context, e *DictEntity) error {
 	const queryTemplate = `
 		INSERT INTO %s (code, name, description, created_at, updated_at)

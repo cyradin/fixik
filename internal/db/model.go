@@ -36,7 +36,6 @@ type (
 	Impact   = DictEntity
 	Status   = DictEntity
 	Team     = DictEntity
-	Role     = DictEntity
 )
 
 type User struct {
@@ -45,8 +44,16 @@ type User struct {
 	Email     string
 	Password  string //nolint:gosec
 	TeamID    int64
-	RoleIDs   []int64
+	Role      Role
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
 }
+
+type Role = string
+
+const (
+	RoleUser    = "user"
+	RoleManager = "manager"
+	RoleAdmin   = "admin"
+)

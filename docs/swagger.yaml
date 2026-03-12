@@ -15,10 +15,12 @@ definitions:
         type: string
       password:
         type: string
-      roleIds:
-        items:
-          type: integer
-        type: array
+      role:
+        enum:
+        - admin
+        - manager
+        - user
+        type: string
       teamId:
         type: integer
       username:
@@ -47,12 +49,32 @@ definitions:
           $ref: '#/definitions/router.DictEntityResponse'
         type: array
     type: object
+  router.ListRolesResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/router.Role'
+        type: array
+    type: object
   router.ListUsersResponse:
     properties:
       items:
         items:
           $ref: '#/definitions/router.UserResponse'
         type: array
+    type: object
+  router.Role:
+    properties:
+      code:
+        enum:
+        - admin
+        - manager
+        - user
+        type: string
+      description:
+        type: string
+      name:
+        type: string
     type: object
   router.UpdateDictEntityRequest:
     properties:
@@ -71,10 +93,12 @@ definitions:
         type: string
       password:
         type: string
-      roleIds:
-        items:
-          type: integer
-        type: array
+      role:
+        enum:
+        - admin
+        - manager
+        - user
+        type: string
       teamId:
         type: integer
       username:
@@ -86,10 +110,12 @@ definitions:
         type: string
       id:
         type: integer
-      roles:
-        items:
-          $ref: '#/definitions/router.DictEntityResponse'
-        type: array
+      role:
+        enum:
+        - admin
+        - manager
+        - user
+        type: string
       teamId:
         type: integer
       username:
@@ -380,137 +406,19 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get all roles in dictionary
+      description: Get all user roles
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.ListDictEntitiesResponse'
+            $ref: '#/definitions/router.ListRolesResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/router.ErrorResponse'
       summary: List roles
-      tags:
-      - roles
-    post:
-      consumes:
-      - application/json
-      description: Create new role dictionary entry
-      parameters:
-      - description: Role data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/router.CreateDictEntityRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/router.DictEntityResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/router.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/router.ErrorResponse'
-      summary: Create role
-      tags:
-      - roles
-  /roles/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete role dictionary entry by ID
-      parameters:
-      - description: Role ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/router.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/router.ErrorResponse'
-      summary: Delete role
-      tags:
-      - roles
-    get:
-      consumes:
-      - application/json
-      description: Get role dictionary entry by ID
-      parameters:
-      - description: Role ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/router.DictEntityResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/router.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/router.ErrorResponse'
-      summary: Get role by ID
-      tags:
-      - roles
-    put:
-      consumes:
-      - application/json
-      description: Update role dictionary entry by ID
-      parameters:
-      - description: Role ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Role data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/router.UpdateDictEntityRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/router.DictEntityResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/router.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/router.ErrorResponse'
-      summary: Update role
       tags:
       - roles
   /statuses:

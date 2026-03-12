@@ -20,8 +20,8 @@ func NewUserRepository(db *pgxpool.Pool) *UserRepository {
 
 func (r *UserRepository) Create(ctx context.Context, u *User) error {
 	const query = `
-		INSERT INTO users (username, email, password, team_id, created_at, updated_at)
-		VALUES (@username, @email, @password, @team_id, now(), now())
+		INSERT INTO users (username, email, password, team_id, role, created_at, updated_at)
+		VALUES (@username, @email, @password, @team_id, @role, now(), now())
 		RETURNING id, created_at, updated_at
 	`
 
@@ -30,6 +30,7 @@ func (r *UserRepository) Create(ctx context.Context, u *User) error {
 		"email":    u.Email,
 		"password": u.Password,
 		"team_id":  u.TeamID,
+		"role":     u.Role,
 	}
 
 	tx := transaction.FromContext(ctx, r.db)
@@ -37,17 +38,15 @@ func (r *UserRepository) Create(ctx context.Context, u *User) error {
 		return fmt.Errorf("insert user: %w", err)
 	}
 
-	return r.insertRoles(ctx, tx, u.ID, u.RoleIDs)
+	return nil
 }
 
 func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 	const query = `
 		SELECT
 			u.id, u.username, u.email, u.password, u.team_id,
-			COALESCE(array_agg(ur.role_id) FILTER (WHERE ur.role_id IS NOT NULL), '{}'),
-			u.created_at, u.updated_at, u.deleted_at
+			u.role, u.created_at, u.updated_at, u.deleted_at
 		FROM users u
-		LEFT JOIN user_roles ur ON ur.user_id = u.id
 		WHERE u.id = $1 AND u.deleted_at IS NULL
 		GROUP BY u.id
 	`
@@ -60,7 +59,7 @@ func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 		&u.Email,
 		&u.Password,
 		&u.TeamID,
-		&u.RoleIDs,
+		&u.Role,
 		&u.CreatedAt,
 		&u.UpdatedAt,
 		&u.DeletedAt,
@@ -81,10 +80,8 @@ func (r *UserRepository) List(ctx context.Context, limit, offset int) ([]User, e
 	const query = `
 		SELECT
 			u.id, u.username, u.email, u.password, u.team_id,
-			COALESCE(array_agg(ur.role_id) FILTER (WHERE ur.role_id IS NOT NULL), '{}'),
-			u.created_at, u.updated_at, u.deleted_at
+			u.role, u.created_at, u.updated_at, u.deleted_at
 		FROM users u
-		LEFT JOIN user_roles ur ON ur.user_id = u.id
 		WHERE u.deleted_at IS NULL
 		GROUP BY u.id
 		ORDER BY u.id
@@ -108,7 +105,7 @@ func (r *UserRepository) List(ctx context.Context, limit, offset int) ([]User, e
 			&u.Email,
 			&u.Password,
 			&u.TeamID,
-			&u.RoleIDs,
+			&u.Role,
 			&u.CreatedAt,
 			&u.UpdatedAt,
 			&u.DeletedAt,
@@ -130,7 +127,7 @@ func (r *UserRepository) Update(ctx context.Context, u *User) error {
 	const query = `
 		UPDATE users
 		SET username = @username, email = @email, password = @password,
-		    team_id = @team_id, updated_at = now()
+		    team_id = @team_id, role = @role, updated_at = now()
 		WHERE id = @id AND deleted_at IS NULL
 	`
 
@@ -140,6 +137,7 @@ func (r *UserRepository) Update(ctx context.Context, u *User) error {
 		"email":    u.Email,
 		"password": u.Password,
 		"team_id":  u.TeamID,
+		"role":     u.Role,
 	}
 
 	tx := transaction.FromContext(ctx, r.db)
@@ -153,11 +151,7 @@ func (r *UserRepository) Update(ctx context.Context, u *User) error {
 		return ErrNotFound
 	}
 
-	if _, err := tx.Exec(ctx, `DELETE FROM user_roles WHERE user_id = $1`, u.ID); err != nil {
-		return fmt.Errorf("delete roles: %w", err)
-	}
-
-	return r.insertRoles(ctx, tx, u.ID, u.RoleIDs)
+	return nil
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id int64) error {
@@ -172,21 +166,6 @@ func (r *UserRepository) Delete(ctx context.Context, id int64) error {
 	_, err := tx.Exec(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("soft delete user: %w", err)
-	}
-
-	return nil
-}
-
-func (r *UserRepository) insertRoles(ctx context.Context, tx transaction.Postgres, userID int64, roleIDs []int64) error {
-	const query = `
-		INSERT INTO user_roles (user_id, role_id)
-		VALUES ($1, $2)
-	`
-
-	for _, roleID := range roleIDs {
-		if _, err := tx.Exec(ctx, query, userID, roleID); err != nil {
-			return fmt.Errorf("insert role: %w", err)
-		}
 	}
 
 	return nil

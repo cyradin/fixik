@@ -24,9 +24,7 @@ func (s *UserRepositorySuite) SetupTest() {
 
 	ctx := s.T().Context()
 	_, err := s.Postgres().Exec(ctx, `
-		TRUNCATE TABLE user_roles RESTART IDENTITY CASCADE;
 		TRUNCATE TABLE users RESTART IDENTITY CASCADE;
-		TRUNCATE TABLE roles RESTART IDENTITY CASCADE;
 		TRUNCATE TABLE teams RESTART IDENTITY CASCADE;
 	`)
 	s.Require().NoError(err)
@@ -34,10 +32,8 @@ func (s *UserRepositorySuite) SetupTest() {
 
 func (s *UserRepositorySuite) TestGetByID() {
 	team := s.createTeam("team1", "Team One")
-	role1 := s.createRole("admin", "Admin")
-	role2 := s.createRole("user", "User")
 
-	user := s.createUser("alice", "alice@example.com", "passhash", team.ID, []int64{role1.ID, role2.ID})
+	user := s.createUser("alice", "alice@example.com", "passhash", team.ID, RoleUser)
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), user.ID)
 	s.Require().NoError(err)
@@ -47,7 +43,7 @@ func (s *UserRepositorySuite) TestGetByID() {
 	s.Equal(user.Email, fromDB.Email)
 	s.Equal(user.Password, fromDB.Password)
 	s.Equal(user.TeamID, fromDB.TeamID)
-	s.ElementsMatch(user.RoleIDs, fromDB.RoleIDs)
+	s.Equal(user.Role, fromDB.Role)
 	s.WithinDuration(time.Now(), fromDB.CreatedAt, time.Second)
 	s.WithinDuration(time.Now(), fromDB.UpdatedAt, time.Second)
 	s.Nil(fromDB.DeletedAt)
@@ -57,11 +53,10 @@ func (s *UserRepositorySuite) TestList() {
 	ctx := s.T().Context()
 
 	team := s.createTeam("team1", "Team One")
-	role := s.createRole("user", "User")
 
-	u1 := s.createUser("u1", "u1@example.com", "pass", team.ID, []int64{role.ID})
-	u2 := s.createUser("u2", "u2@example.com", "pass", team.ID, []int64{})
-	u3 := s.createUser("u3", "u3@example.com", "pass", team.ID, []int64{})
+	u1 := s.createUser("u1", "u1@example.com", "pass", team.ID, RoleAdmin)
+	u2 := s.createUser("u2", "u2@example.com", "pass", team.ID, RoleUser)
+	u3 := s.createUser("u3", "u3@example.com", "pass", team.ID, RoleManager)
 
 	s.Run("list all", func() {
 		users, err := s.repo.List(ctx, 100, 0)
@@ -115,15 +110,14 @@ func (s *UserRepositorySuite) TestList() {
 func (s *UserRepositorySuite) TestUpdate() {
 	team1 := s.createTeam("team1", "Team One")
 	team2 := s.createTeam("team2", "Team Two")
-	role := s.createRole("editor", "Editor")
 
-	user := s.createUser("bob", "bob@example.com", "pass", team1.ID, []int64{})
+	user := s.createUser("bob", "bob@example.com", "pass", team1.ID, RoleUser)
 
 	user.Username = "bob2"
 	user.Email = "bob2@example.com"
 	user.Password = "newpass"
 	user.TeamID = team2.ID
-	user.RoleIDs = []int64{role.ID}
+	user.Role = RoleAdmin
 
 	oldUpdated := user.UpdatedAt
 
@@ -136,13 +130,13 @@ func (s *UserRepositorySuite) TestUpdate() {
 	s.Equal("bob2@example.com", fromDB.Email)
 	s.Equal("newpass", fromDB.Password)
 	s.Equal(team2.ID, fromDB.TeamID)
-	s.ElementsMatch([]int64{role.ID}, fromDB.RoleIDs)
+	s.Equal(user.Role, fromDB.Role)
 	s.True(fromDB.UpdatedAt.After(oldUpdated))
 }
 
 func (s *UserRepositorySuite) TestDelete_SoftDelete() {
 	team := s.createTeam("team1", "Team One")
-	user := s.createUser("carol", "carol@example.com", "pass", team.ID, []int64{})
+	user := s.createUser("carol", "carol@example.com", "pass", team.ID, RoleUser)
 
 	err := s.repo.Delete(s.T().Context(), user.ID)
 	s.Require().NoError(err)
@@ -159,7 +153,7 @@ func (s *UserRepositorySuite) TestUpdate_NotFound() {
 		Email:    "ghost@example.com",
 		Password: "pass",
 		TeamID:   team.ID,
-		RoleIDs:  []int64{},
+		Role:     RoleUser,
 	}
 
 	err := s.repo.Update(s.T().Context(), user)
@@ -179,27 +173,14 @@ func (s *UserRepositorySuite) createTeam(code, name string) *Team {
 	return team
 }
 
-func (s *UserRepositorySuite) createRole(code, name string) *Role {
-	ctx := s.T().Context()
-	role := &Role{Code: code, Name: name}
-
-	err := s.Postgres().QueryRow(ctx,
-		`INSERT INTO roles (code, name) VALUES ($1, $2) RETURNING id`,
-		role.Code, role.Name,
-	).Scan(&role.ID)
-	s.Require().NoError(err)
-
-	return role
-}
-
-func (s *UserRepositorySuite) createUser(username, email, password string, teamID int64, roleIDs []int64) *User {
+func (s *UserRepositorySuite) createUser(username, email, password string, teamID int64, role Role) *User {
 	ctx := s.T().Context()
 	user := &User{
 		Username: username,
 		Email:    email,
 		Password: password,
 		TeamID:   teamID,
-		RoleIDs:  roleIDs,
+		Role:     role,
 	}
 
 	err := s.repo.Create(ctx, user)

@@ -43,13 +43,3 @@ func (c *Container) TeamManager() *dict.EntityManager {
 
 	return c.teamManager
 }
-
-func (c *Container) RoleManager() *dict.EntityManager {
-	if c.roleManager == nil {
-		c.roleManager = dict.NewRoleManager(
-			c.RoleRepository(),
-		)
-	}
-
-	return c.roleManager
-}

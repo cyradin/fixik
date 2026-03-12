@@ -41,10 +41,6 @@ func NewTeamManager(repo entityRepo) *EntityManager {
 	return newEntityManager(repo)
 }
 
-func NewRoleManager(repo entityRepo) *EntityManager {
-	return newEntityManager(repo)
-}
-
 func (m *EntityManager) Create(ctx context.Context, e Entity) (Entity, error) {
 	dbEntity := m.toDB(e)
 

@@ -5,14 +5,8 @@ import (
 	"fmt"
 
 	"github.com/cyradin/fixik/internal/db"
-	"github.com/cyradin/fixik/internal/dict"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type entityProvider interface {
-	GetByID(ctx context.Context, id dict.EntityID) (dict.Entity, error)
-	List(ctx context.Context) ([]dict.Entity, error)
-}
 
 type userRepo interface {
 	Create(ctx context.Context, u *db.User) error
@@ -23,17 +17,14 @@ type userRepo interface {
 }
 
 type UserManager struct {
-	repo         userRepo
-	roleProvider entityProvider
+	repo userRepo
 }
 
 func NewUserManager(
 	repo userRepo,
-	roleProvider entityProvider,
 ) *UserManager {
 	return &UserManager{
-		repo:         repo,
-		roleProvider: roleProvider,
+		repo: repo,
 	}
 }
 
@@ -48,7 +39,7 @@ func (m *UserManager) Create(ctx context.Context, u CreateUser) (User, error) {
 		Email:    u.Email,
 		Password: hashed,
 		TeamID:   u.TeamID,
-		RoleIDs:  u.RoleIDs,
+		Role:     u.Role,
 	}
 
 	if err := m.repo.Create(ctx, &user); err != nil {
@@ -85,8 +76,8 @@ func (m *UserManager) Update(ctx context.Context, u UpdateUser) (User, error) {
 		user.Password = hashed
 	}
 
-	if u.RoleIDs != nil {
-		user.RoleIDs = *u.RoleIDs
+	if u.Role != nil {
+		user.Role = *u.Role
 	}
 
 	if err := m.repo.Update(ctx, &user); err != nil {
@@ -106,22 +97,12 @@ func (m *UserManager) GetByID(ctx context.Context, id int64) (User, error) {
 		return User{}, fmt.Errorf("get user: %w", err)
 	}
 
-	roles := make([]dict.Entity, 0, len(userDB.RoleIDs))
-	for _, roleID := range userDB.RoleIDs {
-		role, err := m.roleProvider.GetByID(ctx, dict.EntityID(roleID))
-		if err != nil {
-			return User{}, fmt.Errorf("get role %d: %w", roleID, err)
-		}
-
-		roles = append(roles, role)
-	}
-
 	return User{
 		ID:        userDB.ID,
 		Username:  userDB.Username,
 		Email:     userDB.Email,
 		TeamID:    userDB.TeamID,
-		Roles:     roles,
+		Role:      userDB.Role,
 		CreatedAt: userDB.CreatedAt,
 		UpdatedAt: userDB.UpdatedAt,
 	}, nil
@@ -133,36 +114,15 @@ func (m *UserManager) List(ctx context.Context, limit, offset int) ([]User, erro
 		return nil, fmt.Errorf("list users: %w", err)
 	}
 
-	roles, err := m.roleProvider.List(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("list roles: %w", err)
-	}
-
-	roleMap := make(map[int64]dict.Entity, len(roles))
-	for _, r := range roles {
-		roleMap[int64(r.ID)] = r
-	}
-
 	users := make([]User, 0, len(usersDB))
 
 	for _, u := range usersDB {
-		userRoles := make([]dict.Entity, 0, len(u.RoleIDs))
-
-		for _, roleID := range u.RoleIDs {
-			role, ok := roleMap[roleID]
-			if !ok {
-				return nil, fmt.Errorf("role %d not found", roleID)
-			}
-
-			userRoles = append(userRoles, role)
-		}
-
 		users = append(users, User{
 			ID:        u.ID,
 			Username:  u.Username,
 			Email:     u.Email,
 			TeamID:    u.TeamID,
-			Roles:     userRoles,
+			Role:      u.Role,
 			CreatedAt: u.CreatedAt,
 			UpdatedAt: u.UpdatedAt,
 		})

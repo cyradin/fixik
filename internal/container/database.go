@@ -67,14 +67,6 @@ func (c *Container) TeamRepository() *db.DictRepository {
 	return c.teamRepo
 }
 
-func (c *Container) RoleRepository() *db.DictRepository {
-	if c.roleRepo == nil {
-		c.roleRepo = db.NewRoleRepository(c.PgPool())
-	}
-
-	return c.roleRepo
-}
-
 func (c *Container) UserRepository() *db.UserRepository {
 	if c.userRepo == nil {
 		c.userRepo = db.NewUserRepository(c.PgPool())

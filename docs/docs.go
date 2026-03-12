@@ -431,7 +431,7 @@ const docTemplate = `{
         },
         "/roles": {
             "get": {
-                "description": "Get all roles in dictionary",
+                "description": "Get all user roles",
                 "consumes": [
                     "application/json"
                 ],
@@ -446,185 +446,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListDictEntitiesResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create new role dictionary entry",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Create role",
-                "parameters": [
-                    {
-                        "description": "Role data",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/router.CreateDictEntityRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/roles/{id}": {
-            "get": {
-                "description": "Get role dictionary entry by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Get role by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Role ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update role dictionary entry by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Update role",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Role ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Role data",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/router.UpdateDictEntityRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete role dictionary entry by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Delete role",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Role ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/router.ListRolesResponse"
                         }
                     },
                     "500": {
@@ -1306,11 +1128,13 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "roleIds": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "admin",
+                        "manager",
+                        "user"
+                    ]
                 },
                 "teamId": {
                     "type": "integer"
@@ -1356,6 +1180,17 @@ const docTemplate = `{
                 }
             }
         },
+        "router.ListRolesResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/router.Role"
+                    }
+                }
+            }
+        },
         "router.ListUsersResponse": {
             "type": "object",
             "properties": {
@@ -1364,6 +1199,25 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/router.UserResponse"
                     }
+                }
+            }
+        },
+        "router.Role": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "enum": [
+                        "admin",
+                        "manager",
+                        "user"
+                    ]
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1393,11 +1247,13 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "roleIds": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "admin",
+                        "manager",
+                        "user"
+                    ]
                 },
                 "teamId": {
                     "type": "integer"
@@ -1416,11 +1272,13 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "roles": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/router.DictEntityResponse"
-                    }
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "admin",
+                        "manager",
+                        "user"
+                    ]
                 },
                 "teamId": {
                     "type": "integer"

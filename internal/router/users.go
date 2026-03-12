@@ -25,11 +25,11 @@ type userManager interface {
 }
 
 type CreateUserRequest struct {
-	Username string  `json:"username"`
-	Email    string  `json:"email"`
-	Password string  `json:"password"` //nolint:gosec
-	TeamID   int64   `json:"teamId"`
-	RoleIDs  []int64 `json:"roleIds"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"` //nolint:gosec
+	TeamID   int64  `json:"teamId"`
+	Role     string `json:"role" enums:"admin,manager,user"`
 }
 
 func (r CreateUserRequest) Validate() error {
@@ -39,15 +39,16 @@ func (r CreateUserRequest) Validate() error {
 		validation.Field(&r.Email, validation.Required, validation.Length(1, maxEmailLen)),
 		validation.Field(&r.Password, validation.Required, validation.Length(minPasswordLen, maxPasswordLen)),
 		validation.Field(&r.TeamID, validation.Required, validation.Min(1)),
+		validation.Field(&r.Role, validation.Required, validation.In(toAnySlice(user.RoleTypes())...)),
 	)
 }
 
 type UpdateUserRequest struct {
-	Username *string  `json:"username"`
-	Email    *string  `json:"email"`
-	Password *string  `json:"password"` //nolint:gosec
-	TeamID   *int64   `json:"teamId"`
-	RoleIDs  *[]int64 `json:"roleIds"`
+	Username *string `json:"username"`
+	Email    *string `json:"email"`
+	Password *string `json:"password"` //nolint:gosec
+	TeamID   *int64  `json:"teamId"`
+	Role     *string `json:"role" enums:"admin,manager,user"`
 }
 
 func (r UpdateUserRequest) Validate() error {
@@ -57,15 +58,16 @@ func (r UpdateUserRequest) Validate() error {
 		validation.Field(&r.Email, validation.Length(1, maxEmailLen)),
 		validation.Field(&r.Password, validation.Length(minPasswordLen, maxPasswordLen)),
 		validation.Field(&r.TeamID, validation.Min(1)),
+		validation.Field(&r.Role, validation.In(toAnySlice(user.RoleTypes())...)),
 	)
 }
 
 type UserResponse struct {
-	ID       int64                `json:"id"`
-	Username string               `json:"username"`
-	Email    string               `json:"email"`
-	TeamID   int64                `json:"teamId"`
-	Roles    []DictEntityResponse `json:"roles"`
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	TeamID   int64  `json:"teamId"`
+	Role     string `json:"role" enums:"admin,manager,user"`
 }
 
 type ListUsersResponse struct {
@@ -105,7 +107,7 @@ func createUser(manager userManager) http.HandlerFunc {
 			Email:    req.Email,
 			Password: req.Password,
 			TeamID:   req.TeamID,
-			RoleIDs:  req.RoleIDs,
+			Role:     req.Role,
 		})
 		if err != nil {
 			return UserResponse{}, err
@@ -170,7 +172,7 @@ func updateUser(manager userManager) http.HandlerFunc {
 				Email:    req.Email,
 				Password: req.Password,
 				TeamID:   req.TeamID,
-				RoleIDs:  req.RoleIDs,
+				Role:     req.Role,
 			})
 			if err != nil {
 				return UserResponse{}, err
@@ -241,16 +243,21 @@ func listUsers(manager userManager) http.HandlerFunc {
 }
 
 func toUserResponse(u user.User) UserResponse {
-	roles := make([]DictEntityResponse, 0, len(u.Roles))
-	for _, r := range u.Roles {
-		roles = append(roles, toDictEntityResponse(r))
-	}
-
 	return UserResponse{
 		ID:       u.ID,
 		Username: u.Username,
 		Email:    u.Email,
 		TeamID:   u.TeamID,
-		Roles:    roles,
+		Role:     u.Role,
 	}
+}
+
+func toAnySlice[T any](value []T) []any {
+	result := make([]any, 0, len(value))
+
+	for _, v := range value {
+		result = append(result, v)
+	}
+
+	return result
 }
