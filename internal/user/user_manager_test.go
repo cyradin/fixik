@@ -80,7 +80,7 @@ func TestUserManager_Create(t *testing.T) {
 
 			require.NoError(t, err)
 			require.Equal(t, tt.cmd.Username, u.Username)
-			require.Len(t, u.RoleIDs, len(tt.cmd.RoleIDs))
+			require.Len(t, u.Roles, len(tt.cmd.RoleIDs))
 		})
 	}
 }
@@ -158,7 +158,7 @@ func TestUserManager_GetByID(t *testing.T) {
 
 			require.NoError(t, err)
 			require.Equal(t, dbUser.ID, u.ID)
-			require.Len(t, u.RoleIDs, len(dbUser.RoleIDs))
+			require.Len(t, u.Roles, len(dbUser.RoleIDs))
 		})
 	}
 }
@@ -277,32 +277,151 @@ func TestUserManager_Delete(t *testing.T) {
 	}
 }
 
+func TestUserManager_List(t *testing.T) {
+	t.Parallel()
+
+	dbUsers := []db.User{
+		{
+			ID:       1,
+			Username: "alice",
+			RoleIDs:  []int64{1, 2},
+		},
+		{
+			ID:       2,
+			Username: "bob",
+			RoleIDs:  []int64{2},
+		},
+	}
+
+	tests := []struct {
+		name string
+		mock func(*userRepoMock, *roleProviderMock)
+		err  bool
+	}{
+		{
+			name: "repo error",
+			mock: func(repo *userRepoMock, role *roleProviderMock) {
+				repo.listFn = func(ctx context.Context, limit, offset int) ([]db.User, error) {
+					return nil, errors.New("repo error")
+				}
+			},
+			err: true,
+		},
+		{
+			name: "roles error",
+			mock: func(repo *userRepoMock, role *roleProviderMock) {
+				repo.listFn = func(ctx context.Context, limit, offset int) ([]db.User, error) {
+					return dbUsers, nil
+				}
+
+				role.listFn = func(ctx context.Context) ([]dict.Entity, error) {
+					return nil, errors.New("role error")
+				}
+			},
+			err: true,
+		},
+		{
+			name: "role not found",
+			mock: func(repo *userRepoMock, role *roleProviderMock) {
+				repo.listFn = func(ctx context.Context, limit, offset int) ([]db.User, error) {
+					return dbUsers, nil
+				}
+
+				role.listFn = func(ctx context.Context) ([]dict.Entity, error) {
+					return []dict.Entity{
+						{ID: 1},
+					}, nil
+				}
+			},
+			err: true,
+		},
+		{
+			name: "success",
+			mock: func(repo *userRepoMock, role *roleProviderMock) {
+				repo.listFn = func(ctx context.Context, limit, offset int) ([]db.User, error) {
+					return dbUsers, nil
+				}
+
+				role.listFn = func(ctx context.Context) ([]dict.Entity, error) {
+					return []dict.Entity{
+						{ID: 1},
+						{ID: 2},
+					}, nil
+				}
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			repo := &userRepoMock{}
+			role := &roleProviderMock{}
+
+			tt.mock(repo, role)
+
+			manager := NewUserManager(repo, role)
+
+			users, err := manager.List(t.Context(), 10, 0)
+
+			if tt.err {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			require.Len(t, users, 2)
+			require.Len(t, users[0].Roles, 2)
+			require.Len(t, users[1].Roles, 1)
+		})
+	}
+}
+
 // Mocks
 type userRepoMock struct {
 	createFn  func(context.Context, *db.User) error
 	getByIDFn func(context.Context, int64) (db.User, error)
+	listFn    func(context.Context, int, int) ([]db.User, error)
 	updateFn  func(context.Context, *db.User) error
 	deleteFn  func(context.Context, int64) error
 }
 
-func (m *userRepoMock) Create(ctx context.Context, u *db.User) error { return m.createFn(ctx, u) }
+func (m *userRepoMock) Create(ctx context.Context, u *db.User) error {
+	return m.createFn(ctx, u)
+}
 
 func (m *userRepoMock) GetByID(ctx context.Context, id int64) (db.User, error) {
 	return m.getByIDFn(ctx, id)
 }
 
-func (m *userRepoMock) Update(ctx context.Context, u *db.User) error { return m.updateFn(ctx, u) }
+func (m *userRepoMock) List(ctx context.Context, limit, offset int) ([]db.User, error) {
+	return m.listFn(ctx, limit, offset)
+}
 
-func (m *userRepoMock) Delete(ctx context.Context, id int64) error { return m.deleteFn(ctx, id) }
+func (m *userRepoMock) Update(ctx context.Context, u *db.User) error {
+	return m.updateFn(ctx, u)
+}
+
+func (m *userRepoMock) Delete(ctx context.Context, id int64) error {
+	return m.deleteFn(ctx, id)
+}
 
 type roleProviderMock struct {
 	getByIDFn func(context.Context, dict.EntityID) (dict.Entity, error)
+	listFn    func(context.Context) ([]dict.Entity, error)
 }
 
 func (m *roleProviderMock) GetByID(ctx context.Context, id dict.EntityID) (dict.Entity, error) {
+	if m.getByIDFn == nil {
+		return dict.Entity{}, nil
+	}
 	return m.getByIDFn(ctx, id)
 }
 
 func (m *roleProviderMock) List(ctx context.Context) ([]dict.Entity, error) {
-	return nil, nil
+	if m.listFn == nil {
+		return nil, nil
+	}
+	return m.listFn(ctx)
 }

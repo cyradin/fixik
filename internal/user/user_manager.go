@@ -19,6 +19,7 @@ type userRepo interface {
 	GetByID(ctx context.Context, id int64) (db.User, error)
 	Update(ctx context.Context, u *db.User) error
 	Delete(ctx context.Context, id int64) error
+	List(ctx context.Context, limit, offset int) ([]db.User, error)
 }
 
 type UserManager struct {
@@ -36,18 +37,18 @@ func NewUserManager(
 	}
 }
 
-func (m *UserManager) Create(ctx context.Context, cmd CreateUser) (User, error) {
-	hashed, err := hashPassword(cmd.Password)
+func (m *UserManager) Create(ctx context.Context, u CreateUser) (User, error) {
+	hashed, err := hashPassword(u.Password)
 	if err != nil {
 		return User{}, fmt.Errorf("hash password: %w", err)
 	}
 
 	user := db.User{
-		Username: cmd.Username,
-		Email:    cmd.Email,
+		Username: u.Username,
+		Email:    u.Email,
 		Password: hashed,
-		TeamID:   cmd.TeamID,
-		RoleIDs:  cmd.RoleIDs,
+		TeamID:   u.TeamID,
+		RoleIDs:  u.RoleIDs,
 	}
 
 	if err := m.repo.Create(ctx, &user); err != nil {
@@ -57,26 +58,26 @@ func (m *UserManager) Create(ctx context.Context, cmd CreateUser) (User, error) 
 	return m.GetByID(ctx, user.ID)
 }
 
-func (m *UserManager) Update(ctx context.Context, cmd UpdateUser) (User, error) {
-	user, err := m.repo.GetByID(ctx, cmd.ID)
+func (m *UserManager) Update(ctx context.Context, u UpdateUser) (User, error) {
+	user, err := m.repo.GetByID(ctx, u.ID)
 	if err != nil {
 		return User{}, fmt.Errorf("get user: %w", err)
 	}
 
-	if cmd.Username != nil {
-		user.Username = *cmd.Username
+	if u.Username != nil {
+		user.Username = *u.Username
 	}
 
-	if cmd.Email != nil {
-		user.Email = *cmd.Email
+	if u.Email != nil {
+		user.Email = *u.Email
 	}
 
-	if cmd.TeamID != nil {
-		user.TeamID = *cmd.TeamID
+	if u.TeamID != nil {
+		user.TeamID = *u.TeamID
 	}
 
-	if cmd.Password != nil {
-		hashed, err := hashPassword(*cmd.Password)
+	if u.Password != nil {
+		hashed, err := hashPassword(*u.Password)
 		if err != nil {
 			return User{}, fmt.Errorf("hash password: %w", err)
 		}
@@ -84,8 +85,8 @@ func (m *UserManager) Update(ctx context.Context, cmd UpdateUser) (User, error) 
 		user.Password = hashed
 	}
 
-	if cmd.RoleIDs != nil {
-		user.RoleIDs = *cmd.RoleIDs
+	if u.RoleIDs != nil {
+		user.RoleIDs = *u.RoleIDs
 	}
 
 	if err := m.repo.Update(ctx, &user); err != nil {
@@ -121,10 +122,55 @@ func (m *UserManager) GetByID(ctx context.Context, id int64) (User, error) {
 		Email:     userDB.Email,
 		Password:  userDB.Password,
 		TeamID:    userDB.TeamID,
-		RoleIDs:   roles,
+		Roles:     roles,
 		CreatedAt: userDB.CreatedAt,
 		UpdatedAt: userDB.UpdatedAt,
 	}, nil
+}
+
+func (m *UserManager) List(ctx context.Context, limit, offset int) ([]User, error) {
+	usersDB, err := m.repo.List(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list users: %w", err)
+	}
+
+	roles, err := m.roleProvider.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list roles: %w", err)
+	}
+
+	roleMap := make(map[int64]dict.Entity, len(roles))
+	for _, r := range roles {
+		roleMap[int64(r.ID)] = r
+	}
+
+	users := make([]User, 0, len(usersDB))
+
+	for _, u := range usersDB {
+		userRoles := make([]dict.Entity, 0, len(u.RoleIDs))
+
+		for _, roleID := range u.RoleIDs {
+			role, ok := roleMap[roleID]
+			if !ok {
+				return nil, fmt.Errorf("role %d not found", roleID)
+			}
+
+			userRoles = append(userRoles, role)
+		}
+
+		users = append(users, User{
+			ID:        u.ID,
+			Username:  u.Username,
+			Email:     u.Email,
+			Password:  u.Password,
+			TeamID:    u.TeamID,
+			Roles:     userRoles,
+			CreatedAt: u.CreatedAt,
+			UpdatedAt: u.UpdatedAt,
+		})
+	}
+
+	return users, nil
 }
 
 func hashPassword(password string) (string, error) {

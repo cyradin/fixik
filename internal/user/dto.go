@@ -31,7 +31,7 @@ type User struct {
 	Email     string
 	Password  string //nolint:gosec
 	TeamID    int64
-	RoleIDs   []dict.Entity
+	Roles     []dict.Entity
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
