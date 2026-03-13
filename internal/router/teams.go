@@ -26,7 +26,7 @@ func teamRoutes(c *container.Container) func(r chi.Router) {
 // @Accept json
 // @Produce json
 // @Param request body CreateDictEntityRequest true "Team data"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams [post]
@@ -40,7 +40,7 @@ func createTeam(manager *dict.EntityManager) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Team ID"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams/{id} [get]
@@ -55,7 +55,7 @@ func getTeam(manager *dict.EntityManager) http.HandlerFunc {
 // @Produce json
 // @Param id path int true "Team ID"
 // @Param request body UpdateDictEntityRequest true "Team data"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams/{id} [put]

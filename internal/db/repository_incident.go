@@ -152,3 +152,58 @@ func (r *IncidentRepository) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Incident, error) {
+	const query = `
+		SELECT
+			id,
+			title,
+			description,
+			impact_id,
+			priority_id,
+			status_id,
+			created_at,
+			updated_at,
+			deleted_at
+		FROM incidents
+		WHERE deleted_at IS NULL
+		ORDER BY id DESC
+		LIMIT @limit
+		OFFSET @offset
+	`
+
+	args := pgx.NamedArgs{
+		"limit":  limit,
+		"offset": offset,
+	}
+
+	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, query, args)
+	if err != nil {
+		return nil, fmt.Errorf("db query: %w", err)
+	}
+	defer rows.Close()
+
+	var result []Incident
+
+	for rows.Next() {
+		var i Incident
+
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Description,
+			&i.ImpactID,
+			&i.PriorityID,
+			&i.StatusID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, fmt.Errorf("scan: %w", err)
+		}
+
+		result = append(result, i)
+	}
+
+	return result, nil
+}

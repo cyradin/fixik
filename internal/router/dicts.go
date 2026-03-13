@@ -53,10 +53,10 @@ func (r UpdateDictEntityRequest) Validate() error {
 }
 
 type ListDictEntitiesResponse struct {
-	Items []DictEntityResponse `json:"items"`
+	Items []DictEntity `json:"items"`
 }
 
-type DictEntityResponse struct {
+type DictEntity struct {
 	ID          int64  `json:"id"`
 	Name        string `json:"name"`
 	Code        string `json:"code"`
@@ -64,7 +64,7 @@ type DictEntityResponse struct {
 }
 
 func createDictEntity(manager entityManager) http.HandlerFunc {
-	return handle(func(ctx context.Context, req CreateDictEntityRequest) (DictEntityResponse, error) {
+	return handle(func(ctx context.Context, req CreateDictEntityRequest) (DictEntity, error) {
 		entity := dict.Entity{
 			Name:        req.Name,
 			Code:        req.Code,
@@ -73,10 +73,10 @@ func createDictEntity(manager entityManager) http.HandlerFunc {
 
 		result, err := manager.Create(ctx, entity)
 		if err != nil {
-			return DictEntityResponse{}, err
+			return DictEntity{}, err
 		}
 
-		return toDictEntityResponse(result), nil
+		return toDictEntity(result), nil
 	})
 }
 
@@ -88,13 +88,13 @@ func getDictEntity(manager entityManager) http.HandlerFunc {
 			return
 		}
 
-		handle(func(ctx context.Context, _ NoBody) (DictEntityResponse, error) {
+		handle(func(ctx context.Context, _ NoBody) (DictEntity, error) {
 			result, err := manager.GetByID(ctx, id)
 			if err != nil {
-				return DictEntityResponse{}, err
+				return DictEntity{}, err
 			}
 
-			return toDictEntityResponse(result), nil
+			return toDictEntity(result), nil
 		})(w, r)
 	}
 }
@@ -107,7 +107,7 @@ func updateDictEntity(manager entityManager) http.HandlerFunc {
 			return
 		}
 
-		handle(func(ctx context.Context, req UpdateDictEntityRequest) (DictEntityResponse, error) {
+		handle(func(ctx context.Context, req UpdateDictEntityRequest) (DictEntity, error) {
 			entity := dict.Entity{
 				ID:          id,
 				Name:        req.Name,
@@ -117,10 +117,10 @@ func updateDictEntity(manager entityManager) http.HandlerFunc {
 
 			result, err := manager.Update(ctx, entity)
 			if err != nil {
-				return DictEntityResponse{}, err
+				return DictEntity{}, err
 			}
 
-			return toDictEntityResponse(result), nil
+			return toDictEntity(result), nil
 		})(w, r)
 	}
 }
@@ -150,17 +150,17 @@ func listDictEntities(manager entityManager) http.HandlerFunc {
 			return ListDictEntitiesResponse{}, err
 		}
 
-		resp := make([]DictEntityResponse, 0, len(items))
+		resp := make([]DictEntity, 0, len(items))
 		for _, item := range items {
-			resp = append(resp, toDictEntityResponse(item))
+			resp = append(resp, toDictEntity(item))
 		}
 
 		return ListDictEntitiesResponse{Items: resp}, nil
 	})
 }
 
-func toDictEntityResponse(item dict.Entity) DictEntityResponse {
-	return DictEntityResponse{
+func toDictEntity(item dict.Entity) DictEntity {
+	return DictEntity{
 		ID:          item.ID,
 		Name:        item.Name,
 		Code:        item.Code,

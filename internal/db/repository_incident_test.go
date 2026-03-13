@@ -139,6 +139,62 @@ func (s *IncidentRepositorySuite) TestDelete_NotFound() {
 	s.Require().NoError(err)
 }
 
+func (s *IncidentRepositorySuite) TestList() {
+	ctx := s.T().Context()
+
+	impact := s.createImpact("high", "High")
+	priority := s.createPriority("critical", "Critical")
+	status := s.createStatus("open", "Open")
+
+	incidents := s.loadIncidents([]Incident{
+		{Title: "Incident 1", Description: "Desc 1", ImpactID: impact.ID, PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "Incident 2", Description: "Desc 2", ImpactID: impact.ID, PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "Incident 3", Description: "Desc 3", ImpactID: impact.ID, PriorityID: priority.ID, StatusID: status.ID},
+	})
+
+	s.Run("all", func() {
+		list, err := s.repo.List(ctx, 10, 0)
+		s.Require().NoError(err)
+
+		s.Len(list, 3)
+		s.Equal(incidents[2].Title, list[0].Title)
+		s.Equal(incidents[1].Title, list[1].Title)
+		s.Equal(incidents[0].Title, list[2].Title)
+	})
+
+	s.Run("limit", func() {
+		list, err := s.repo.List(ctx, 2, 0)
+		s.Require().NoError(err)
+
+		s.Len(list, 2)
+		s.Equal(incidents[2].Title, list[0].Title)
+		s.Equal(incidents[1].Title, list[1].Title)
+	})
+
+	s.Run("offset", func() {
+		list, err := s.repo.List(ctx, 2, 1)
+		s.Require().NoError(err)
+
+		s.Len(list, 2)
+		s.Equal(incidents[1].Title, list[0].Title)
+		s.Equal(incidents[0].Title, list[1].Title)
+	})
+
+	s.Run("deleted filtered", func() {
+		err := s.repo.Delete(ctx, incidents[1].ID)
+		s.Require().NoError(err)
+
+		list, err := s.repo.List(ctx, 10, 0)
+		s.Require().NoError(err)
+
+		s.Len(list, 2)
+
+		for _, i := range list {
+			s.NotEqual(incidents[1].ID, i.ID)
+		}
+	})
+}
+
 func (s *IncidentRepositorySuite) loadIncidents(fixtures []Incident) []Incident {
 	s.T().Helper()
 	ctx := s.T().Context()

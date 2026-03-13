@@ -26,7 +26,7 @@ func priorityRoutes(c *container.Container) func(r chi.Router) {
 // @Accept json
 // @Produce json
 // @Param request body CreateDictEntityRequest true "Priority data"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities [post]
@@ -40,7 +40,7 @@ func createPriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Priority ID"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [get]
@@ -55,7 +55,7 @@ func getPriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Produce json
 // @Param id path int true "Priority ID"
 // @Param request body UpdateDictEntityRequest true "Priority data"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [put]

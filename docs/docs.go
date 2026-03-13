@@ -70,7 +70,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -114,7 +114,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -165,7 +165,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -206,6 +206,186 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/router.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/router.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/incidents": {
+            "post": {
+                "description": "Create new incident",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "incidents"
+                ],
+                "summary": "Create incident",
+                "parameters": [
+                    {
+                        "description": "Incident data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/router.CreateIncidentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.IncidentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/router.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/router.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/incidents/{id}": {
+            "get": {
+                "description": "Get incident by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "incidents"
+                ],
+                "summary": "Get incident",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Incident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.IncidentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/router.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/router.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete incident",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "incidents"
+                ],
+                "summary": "Delete incident",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Incident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/router.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/router.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update incident",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "incidents"
+                ],
+                "summary": "Update incident",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Incident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Incident data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/router.UpdateIncidentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.IncidentResponse"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -277,7 +457,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -321,7 +501,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -372,7 +552,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -513,7 +693,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -557,7 +737,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -608,7 +788,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -720,7 +900,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -764,7 +944,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -815,7 +995,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntityResponse"
+                            "$ref": "#/definitions/router.DictEntity"
                         }
                     },
                     "400": {
@@ -1119,6 +1299,26 @@ const docTemplate = `{
                 }
             }
         },
+        "router.CreateIncidentRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "impactId": {
+                    "type": "integer"
+                },
+                "priorityId": {
+                    "type": "integer"
+                },
+                "statusId": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "router.CreateUserRequest": {
             "type": "object",
             "properties": {
@@ -1144,13 +1344,27 @@ const docTemplate = `{
                 }
             }
         },
-        "router.DictEntityResponse": {
+        "router.DictEntity": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "string"
                 },
                 "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "router.DictEntityShort": {
+            "type": "object",
+            "properties": {
+                "code": {
                     "type": "string"
                 },
                 "id": {
@@ -1169,13 +1383,36 @@ const docTemplate = `{
                 }
             }
         },
+        "router.IncidentResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "impact": {
+                    "$ref": "#/definitions/router.DictEntityShort"
+                },
+                "priority": {
+                    "$ref": "#/definitions/router.DictEntityShort"
+                },
+                "status": {
+                    "$ref": "#/definitions/router.DictEntityShort"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "router.ListDictEntitiesResponse": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.DictEntityResponse"
+                        "$ref": "#/definitions/router.DictEntity"
                     }
                 }
             }
@@ -1234,6 +1471,26 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "router.UpdateIncidentRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "impactId": {
+                    "type": "integer"
+                },
+                "priorityId": {
+                    "type": "integer"
+                },
+                "statusId": {
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 }
             }

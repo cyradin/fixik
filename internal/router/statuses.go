@@ -26,7 +26,7 @@ func statusRoutes(c *container.Container) func(r chi.Router) {
 // @Accept json
 // @Produce json
 // @Param request body CreateDictEntityRequest true "Status data"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses [post]
@@ -40,7 +40,7 @@ func createStatus(manager *dict.EntityManager) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Status ID"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [get]
@@ -55,7 +55,7 @@ func getStatus(manager *dict.EntityManager) http.HandlerFunc {
 // @Produce json
 // @Param id path int true "Status ID"
 // @Param request body UpdateDictEntityRequest true "Status data"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [put]

@@ -36,10 +36,10 @@ type CreateIncident struct {
 type UpdateIncident struct {
 	ID IncidentID
 
-	Title       string
-	Description string
+	Title       *string
+	Description *string
 
-	ImpactID   dict.EntityID
-	PriorityID dict.EntityID
-	StatusID   dict.EntityID
+	ImpactID   *dict.EntityID
+	PriorityID *dict.EntityID
+	StatusID   *dict.EntityID
 }

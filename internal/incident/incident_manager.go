@@ -13,6 +13,7 @@ type incidentRepo interface {
 	GetByID(ctx context.Context, id int64) (db.Incident, error)
 	Update(ctx context.Context, i *db.Incident) error
 	Delete(ctx context.Context, id int64) error
+	List(ctx context.Context, limit, offset int) ([]db.Incident, error)
 }
 
 type entityProvider interface {
@@ -82,16 +83,32 @@ func (m *IncidentManager) GetByID(ctx context.Context, id int64) (Incident, erro
 }
 
 func (m *IncidentManager) Update(ctx context.Context, cmd UpdateIncident) (Incident, error) {
-	dbIncident := db.Incident{
-		ID:          cmd.ID,
-		Title:       cmd.Title,
-		Description: cmd.Description,
-		ImpactID:    cmd.ImpactID,
-		StatusID:    cmd.StatusID,
-		PriorityID:  cmd.PriorityID,
+	current, err := m.repo.GetByID(ctx, cmd.ID)
+	if err != nil {
+		return Incident{}, fmt.Errorf("get incident: %w", err)
 	}
 
-	if err := m.repo.Update(ctx, &dbIncident); err != nil {
+	if cmd.Title != nil {
+		current.Title = *cmd.Title
+	}
+
+	if cmd.Description != nil {
+		current.Description = *cmd.Description
+	}
+
+	if cmd.ImpactID != nil {
+		current.ImpactID = *cmd.ImpactID
+	}
+
+	if cmd.StatusID != nil {
+		current.StatusID = *cmd.StatusID
+	}
+
+	if cmd.PriorityID != nil {
+		current.PriorityID = *cmd.PriorityID
+	}
+
+	if err := m.repo.Update(ctx, &current); err != nil {
 		return Incident{}, fmt.Errorf("update incident: %w", err)
 	}
 
@@ -104,6 +121,66 @@ func (m *IncidentManager) Delete(ctx context.Context, id int64) error {
 	}
 
 	return nil
+}
+
+func (m *IncidentManager) List(ctx context.Context, limit, offset int) ([]Incident, error) {
+	rows, err := m.repo.List(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list incidents: %w", err)
+	}
+
+	statuses, err := m.statusProvider.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list statuses: %w", err)
+	}
+
+	impacts, err := m.impactProvider.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list impacts: %w", err)
+	}
+
+	priorities, err := m.priorityProvider.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list priorities: %w", err)
+	}
+
+	statusMap := make(map[int64]dict.Entity, len(statuses))
+	for _, e := range statuses {
+		statusMap[e.ID] = e
+	}
+
+	impactMap := make(map[int64]dict.Entity, len(impacts))
+	for _, e := range impacts {
+		impactMap[e.ID] = e
+	}
+
+	priorityMap := make(map[int64]dict.Entity, len(priorities))
+	for _, e := range priorities {
+		priorityMap[e.ID] = e
+	}
+
+	result := make([]Incident, 0, len(rows))
+
+	for _, r := range rows {
+		status, ok := statusMap[r.StatusID]
+		if !ok {
+			return nil, fmt.Errorf("status %d not found", r.StatusID)
+		}
+
+		impact, ok := impactMap[r.ImpactID]
+		if !ok {
+			return nil, fmt.Errorf("impact %d not found", r.ImpactID)
+		}
+
+		priority, ok := priorityMap[r.PriorityID]
+		if !ok {
+			return nil, fmt.Errorf("priority %d not found", r.PriorityID)
+		}
+
+		result = append(result, m.fromDB(r, status, impact, priority))
+	}
+
+	return result, nil
 }
 
 func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, impact dict.Entity, priority dict.Entity) Incident {

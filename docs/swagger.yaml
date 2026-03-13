@@ -9,6 +9,19 @@ definitions:
       name:
         type: string
     type: object
+  router.CreateIncidentRequest:
+    properties:
+      description:
+        type: string
+      impactId:
+        type: integer
+      priorityId:
+        type: integer
+      statusId:
+        type: integer
+      title:
+        type: string
+    type: object
   router.CreateUserRequest:
     properties:
       email:
@@ -26,11 +39,20 @@ definitions:
       username:
         type: string
     type: object
-  router.DictEntityResponse:
+  router.DictEntity:
     properties:
       code:
         type: string
       description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  router.DictEntityShort:
+    properties:
+      code:
         type: string
       id:
         type: integer
@@ -42,11 +64,26 @@ definitions:
       error:
         type: string
     type: object
+  router.IncidentResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      impact:
+        $ref: '#/definitions/router.DictEntityShort'
+      priority:
+        $ref: '#/definitions/router.DictEntityShort'
+      status:
+        $ref: '#/definitions/router.DictEntityShort'
+      title:
+        type: string
+    type: object
   router.ListDictEntitiesResponse:
     properties:
       items:
         items:
-          $ref: '#/definitions/router.DictEntityResponse'
+          $ref: '#/definitions/router.DictEntity'
         type: array
     type: object
   router.ListRolesResponse:
@@ -85,6 +122,19 @@ definitions:
       id:
         type: integer
       name:
+        type: string
+    type: object
+  router.UpdateIncidentRequest:
+    properties:
+      description:
+        type: string
+      impactId:
+        type: integer
+      priorityId:
+        type: integer
+      statusId:
+        type: integer
+      title:
         type: string
     type: object
   router.UpdateUserRequest:
@@ -164,7 +214,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -219,7 +269,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -253,7 +303,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -265,6 +315,125 @@ paths:
       summary: Update impact
       tags:
       - impacts
+  /incidents:
+    post:
+      consumes:
+      - application/json
+      description: Create new incident
+      parameters:
+      - description: Incident data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/router.CreateIncidentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.IncidentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Create incident
+      tags:
+      - incidents
+  /incidents/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete incident
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Delete incident
+      tags:
+      - incidents
+    get:
+      consumes:
+      - application/json
+      description: Get incident by ID
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.IncidentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Get incident
+      tags:
+      - incidents
+    patch:
+      consumes:
+      - application/json
+      description: Update incident
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Incident data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/router.UpdateIncidentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.IncidentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/router.ErrorResponse'
+      summary: Update incident
+      tags:
+      - incidents
   /priorities:
     get:
       consumes:
@@ -301,7 +470,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -356,7 +525,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -390,7 +559,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -457,7 +626,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -512,7 +681,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -546,7 +715,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -594,7 +763,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -649,7 +818,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:
@@ -683,7 +852,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntityResponse'
+            $ref: '#/definitions/router.DictEntity'
         "400":
           description: Bad Request
           schema:

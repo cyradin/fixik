@@ -29,7 +29,7 @@ func TestCreateDictEntity(t *testing.T) {
 		rr := testRequest(t, createDictEntity(m), http.MethodPost, "/dummy", req)
 		require.Equal(t, http.StatusOK, rr.Code)
 
-		var resp DictEntityResponse
+		var resp DictEntity
 
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
@@ -79,7 +79,7 @@ func TestGetDictEntity(t *testing.T) {
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusOK, rr.Code)
 
-		var resp DictEntityResponse
+		var resp DictEntity
 
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)

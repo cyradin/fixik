@@ -37,18 +37,7 @@ func New(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 		r.Route("/impacts", impactRoutes(c))
 		r.Route("/teams", teamRoutes(c))
 		r.Route("/roles", roleRoutes(c))
-
-		r.Post("/incidents", createIncident)
-		r.Get("/incidents", listIncidents)
-		r.Get("/incidents/{id}", getIncident)
-		r.Put("/incidents/{id}", updateIncident)
-		r.Delete("/incidents/{id}", deleteIncident)
-
-		r.Post("/incidents/{id}/comments", addComment)
-		r.Get("/incidents/{id}/comments", listComments)
-
-		r.Post("/incidents/{id}/assign", assignIncident)
-		r.Post("/incidents/{id}/status", changeStatus)
+		r.Route("/incidents", incidentRoutes(c))
 	})
 
 	return r

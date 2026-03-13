@@ -26,7 +26,7 @@ func impactRoutes(c *container.Container) func(r chi.Router) {
 // @Accept json
 // @Produce json
 // @Param request body CreateDictEntityRequest true "Impact data"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /impacts [post]
@@ -40,7 +40,7 @@ func createImpact(manager *dict.EntityManager) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Impact ID"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /impacts/{id} [get]
@@ -55,7 +55,7 @@ func getImpact(manager *dict.EntityManager) http.HandlerFunc {
 // @Produce json
 // @Param id path int true "Impact ID"
 // @Param request body UpdateDictEntityRequest true "Impact data"
-// @Success 200 {object} DictEntityResponse
+// @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /impacts/{id} [put]
