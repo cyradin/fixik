@@ -12,7 +12,7 @@ import (
 	docs "github.com/cyradin/fixik/docs"
 	"github.com/cyradin/fixik/internal/config"
 	"github.com/cyradin/fixik/internal/container"
-	"github.com/cyradin/fixik/internal/router"
+	"github.com/cyradin/fixik/internal/web"
 	"github.com/cyradin/fixik/pkg/logger"
 )
 
@@ -77,7 +77,7 @@ func run(cfg *config.Config, container *container.Container) error {
 }
 
 func initHTTPServer(ctx context.Context, container *container.Container, cfg *config.Config) *http.Server {
-	r := router.New(container, cfg.HTTPServer.AllowedOrigins)
+	r := web.NewRouter(container, cfg.HTTPServer.AllowedOrigins)
 
 	return &http.Server{
 		Addr:              cfg.HTTPServer.Addr,
@@ -94,7 +94,7 @@ func initHTTPServer(ctx context.Context, container *container.Container, cfg *co
 
 func initHTTPDebugServer(ctx context.Context, container *container.Container, cfg *config.Config) *http.Server {
 	docs.SwaggerInfo.Host = cfg.HTTPDebugServer.SwaggerAddr
-	r := router.NewDebug(container)
+	r := web.NewDebugRouter(container)
 
 	return &http.Server{
 		Addr:              cfg.HTTPDebugServer.Addr,

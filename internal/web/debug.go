@@ -1,4 +1,4 @@
-package router
+package web
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-func NewDebug(container *container.Container) *chi.Mux {
+func NewDebugRouter(container *container.Container) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Get("/livez", livenessHandler)

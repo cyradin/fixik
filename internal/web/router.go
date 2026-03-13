@@ -1,4 +1,4 @@
-package router
+package web
 
 import (
 	"context"
@@ -18,7 +18,7 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-func New(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
+func NewRouter(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
