@@ -1,6 +1,6 @@
 basePath: /api
 definitions:
-  router.CreateDictEntityRequest:
+  web.CreateDictEntityRequest:
     properties:
       code:
         type: string
@@ -9,7 +9,7 @@ definitions:
       name:
         type: string
     type: object
-  router.CreateIncidentRequest:
+  web.CreateIncidentRequest:
     properties:
       description:
         type: string
@@ -22,7 +22,7 @@ definitions:
       title:
         type: string
     type: object
-  router.CreateUserRequest:
+  web.CreateUserRequest:
     properties:
       email:
         type: string
@@ -39,7 +39,7 @@ definitions:
       username:
         type: string
     type: object
-  router.DictEntity:
+  web.DictEntity:
     properties:
       code:
         type: string
@@ -50,7 +50,7 @@ definitions:
       name:
         type: string
     type: object
-  router.DictEntityShort:
+  web.DictEntityShort:
     properties:
       code:
         type: string
@@ -59,48 +59,48 @@ definitions:
       name:
         type: string
     type: object
-  router.ErrorResponse:
+  web.ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  router.IncidentResponse:
+  web.IncidentResponse:
     properties:
       description:
         type: string
       id:
         type: integer
       impact:
-        $ref: '#/definitions/router.DictEntityShort'
+        $ref: '#/definitions/web.DictEntityShort'
       priority:
-        $ref: '#/definitions/router.DictEntityShort'
+        $ref: '#/definitions/web.DictEntityShort'
       status:
-        $ref: '#/definitions/router.DictEntityShort'
+        $ref: '#/definitions/web.DictEntityShort'
       title:
         type: string
     type: object
-  router.ListDictEntitiesResponse:
+  web.ListDictEntitiesResponse:
     properties:
       items:
         items:
-          $ref: '#/definitions/router.DictEntity'
+          $ref: '#/definitions/web.DictEntity'
         type: array
     type: object
-  router.ListRolesResponse:
+  web.ListRolesResponse:
     properties:
       items:
         items:
-          $ref: '#/definitions/router.Role'
+          $ref: '#/definitions/web.Role'
         type: array
     type: object
-  router.ListUsersResponse:
+  web.ListUsersResponse:
     properties:
       items:
         items:
-          $ref: '#/definitions/router.UserResponse'
+          $ref: '#/definitions/web.UserResponse'
         type: array
     type: object
-  router.Role:
+  web.Role:
     properties:
       code:
         enum:
@@ -113,7 +113,7 @@ definitions:
       name:
         type: string
     type: object
-  router.UpdateDictEntityRequest:
+  web.UpdateDictEntityRequest:
     properties:
       code:
         type: string
@@ -124,7 +124,7 @@ definitions:
       name:
         type: string
     type: object
-  router.UpdateIncidentRequest:
+  web.UpdateIncidentRequest:
     properties:
       description:
         type: string
@@ -137,7 +137,7 @@ definitions:
       title:
         type: string
     type: object
-  router.UpdateUserRequest:
+  web.UpdateUserRequest:
     properties:
       email:
         type: string
@@ -154,7 +154,7 @@ definitions:
       username:
         type: string
     type: object
-  router.UserResponse:
+  web.UserResponse:
     properties:
       email:
         type: string
@@ -189,11 +189,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.ListDictEntitiesResponse'
+            $ref: '#/definitions/web.ListDictEntitiesResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: List impacts
       tags:
       - impacts
@@ -207,22 +207,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.CreateDictEntityRequest'
+          $ref: '#/definitions/web.CreateDictEntityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Create impact
       tags:
       - impacts
@@ -245,11 +245,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Delete impact
       tags:
       - impacts
@@ -269,15 +269,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Get impact by ID
       tags:
       - impacts
@@ -296,22 +296,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.UpdateDictEntityRequest'
+          $ref: '#/definitions/web.UpdateDictEntityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Update impact
       tags:
       - impacts
@@ -326,22 +326,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.CreateIncidentRequest'
+          $ref: '#/definitions/web.CreateIncidentRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.IncidentResponse'
+            $ref: '#/definitions/web.IncidentResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Create incident
       tags:
       - incidents
@@ -364,11 +364,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Delete incident
       tags:
       - incidents
@@ -388,15 +388,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.IncidentResponse'
+            $ref: '#/definitions/web.IncidentResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Get incident
       tags:
       - incidents
@@ -415,22 +415,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.UpdateIncidentRequest'
+          $ref: '#/definitions/web.UpdateIncidentRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.IncidentResponse'
+            $ref: '#/definitions/web.IncidentResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Update incident
       tags:
       - incidents
@@ -445,11 +445,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.ListDictEntitiesResponse'
+            $ref: '#/definitions/web.ListDictEntitiesResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: List priorities
       tags:
       - priorities
@@ -463,22 +463,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.CreateDictEntityRequest'
+          $ref: '#/definitions/web.CreateDictEntityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Create status
       tags:
       - priorities
@@ -501,11 +501,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Delete status
       tags:
       - priorities
@@ -525,15 +525,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Get status by ID
       tags:
       - priorities
@@ -552,22 +552,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.UpdateDictEntityRequest'
+          $ref: '#/definitions/web.UpdateDictEntityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Update status
       tags:
       - priorities
@@ -582,11 +582,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.ListRolesResponse'
+            $ref: '#/definitions/web.ListRolesResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: List roles
       tags:
       - roles
@@ -601,11 +601,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.ListDictEntitiesResponse'
+            $ref: '#/definitions/web.ListDictEntitiesResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: List statuses
       tags:
       - statuses
@@ -619,22 +619,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.CreateDictEntityRequest'
+          $ref: '#/definitions/web.CreateDictEntityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Create status
       tags:
       - statuses
@@ -657,11 +657,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Delete status
       tags:
       - statuses
@@ -681,15 +681,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Get status by ID
       tags:
       - statuses
@@ -708,22 +708,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.UpdateDictEntityRequest'
+          $ref: '#/definitions/web.UpdateDictEntityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Update status
       tags:
       - statuses
@@ -738,11 +738,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.ListDictEntitiesResponse'
+            $ref: '#/definitions/web.ListDictEntitiesResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: List teams
       tags:
       - teams
@@ -756,22 +756,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.CreateDictEntityRequest'
+          $ref: '#/definitions/web.CreateDictEntityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Create team
       tags:
       - teams
@@ -794,11 +794,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Delete team
       tags:
       - teams
@@ -818,15 +818,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Get team by ID
       tags:
       - teams
@@ -845,22 +845,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.UpdateDictEntityRequest'
+          $ref: '#/definitions/web.UpdateDictEntityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.DictEntity'
+            $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Update team
       tags:
       - teams
@@ -888,15 +888,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.ListUsersResponse'
+            $ref: '#/definitions/web.ListUsersResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: List users
       tags:
       - users
@@ -910,22 +910,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.CreateUserRequest'
+          $ref: '#/definitions/web.CreateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.UserResponse'
+            $ref: '#/definitions/web.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Create user
       tags:
       - users
@@ -948,11 +948,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Delete user
       tags:
       - users
@@ -972,15 +972,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.UserResponse'
+            $ref: '#/definitions/web.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Get user by ID
       tags:
       - users
@@ -999,22 +999,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/router.UpdateUserRequest'
+          $ref: '#/definitions/web.UpdateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.UserResponse'
+            $ref: '#/definitions/web.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/router.ErrorResponse'
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Update user
       tags:
       - users

@@ -1,3 +1,4 @@
+.PHONY: dist docs frontend
 BINARY_NAME ?= fixik
 COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo dev)
 
@@ -7,6 +8,10 @@ COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo dev)
 	@:
 
 build:
+	make frontend && \
+	make backend
+
+backend:
 	go build \
 		-tags prod \
 		-ldflags "-X main.GitCommit=$(COMMIT)" \
@@ -15,6 +20,22 @@ build:
 
 build-%:
 	@$(MAKE) build BINARY_NAME=$*
+
+frontend:
+	cd frontend && npm run build
+
+frontend-dev:
+	cd frontend && npm run dev
+
+swagger:
+	make backend-swagger && \
+	make frontend-swagger
+
+frontend-swagger:
+	cd frontend && npm run swagger
+
+backend-swagger:
+	go run github.com/swaggo/swag/cmd/swag@v1.16.6 init  -d cmd/fixik,internal/web
 
 test:
 	go test  ./... --race
@@ -40,5 +61,3 @@ migrate-down-all:
 migrate-version:
 	${MIGRATE_COMMAND} -path $(FIXIK_POSTGRES_MIGRATIONS_DIR) -database $(FIXIK_POSTGRES_URL) version
 
-swagger:
-	go run github.com/swaggo/swag/cmd/swag@v1.16.6 init  -d cmd/fixik,internal/router

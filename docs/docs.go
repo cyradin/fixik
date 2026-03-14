@@ -32,13 +32,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -62,7 +62,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateDictEntityRequest"
                         }
                     }
                 ],
@@ -70,19 +70,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -114,19 +114,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -157,7 +157,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
                         }
                     }
                 ],
@@ -165,19 +165,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -210,13 +210,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -242,7 +242,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateIncidentRequest"
+                            "$ref": "#/definitions/web.CreateIncidentRequest"
                         }
                     }
                 ],
@@ -250,19 +250,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.IncidentResponse"
+                            "$ref": "#/definitions/web.IncidentResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -294,19 +294,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.IncidentResponse"
+                            "$ref": "#/definitions/web.IncidentResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -339,13 +339,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -376,7 +376,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateIncidentRequest"
+                            "$ref": "#/definitions/web.UpdateIncidentRequest"
                         }
                     }
                 ],
@@ -384,19 +384,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.IncidentResponse"
+                            "$ref": "#/definitions/web.IncidentResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -419,13 +419,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -449,7 +449,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateDictEntityRequest"
                         }
                     }
                 ],
@@ -457,19 +457,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -501,19 +501,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -544,7 +544,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
                         }
                     }
                 ],
@@ -552,19 +552,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -597,13 +597,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -626,13 +626,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListRolesResponse"
+                            "$ref": "#/definitions/web.ListRolesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -655,13 +655,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -685,7 +685,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateDictEntityRequest"
                         }
                     }
                 ],
@@ -693,19 +693,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -737,19 +737,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -780,7 +780,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
                         }
                     }
                 ],
@@ -788,19 +788,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -833,13 +833,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -862,13 +862,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -892,7 +892,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateDictEntityRequest"
                         }
                     }
                 ],
@@ -900,19 +900,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -944,19 +944,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -987,7 +987,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
                         }
                     }
                 ],
@@ -995,19 +995,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1040,13 +1040,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1087,19 +1087,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListUsersResponse"
+                            "$ref": "#/definitions/web.ListUsersResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1123,7 +1123,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateUserRequest"
+                            "$ref": "#/definitions/web.CreateUserRequest"
                         }
                     }
                 ],
@@ -1131,19 +1131,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.UserResponse"
+                            "$ref": "#/definitions/web.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1175,19 +1175,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.UserResponse"
+                            "$ref": "#/definitions/web.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1220,13 +1220,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1257,7 +1257,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateUserRequest"
+                            "$ref": "#/definitions/web.UpdateUserRequest"
                         }
                     }
                 ],
@@ -1265,19 +1265,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.UserResponse"
+                            "$ref": "#/definitions/web.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1285,7 +1285,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "router.CreateDictEntityRequest": {
+        "web.CreateDictEntityRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1299,7 +1299,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.CreateIncidentRequest": {
+        "web.CreateIncidentRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1319,7 +1319,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.CreateUserRequest": {
+        "web.CreateUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -1344,7 +1344,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.DictEntity": {
+        "web.DictEntity": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1361,7 +1361,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.DictEntityShort": {
+        "web.DictEntityShort": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1375,7 +1375,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.ErrorResponse": {
+        "web.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1383,7 +1383,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.IncidentResponse": {
+        "web.IncidentResponse": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1393,53 +1393,53 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "impact": {
-                    "$ref": "#/definitions/router.DictEntityShort"
+                    "$ref": "#/definitions/web.DictEntityShort"
                 },
                 "priority": {
-                    "$ref": "#/definitions/router.DictEntityShort"
+                    "$ref": "#/definitions/web.DictEntityShort"
                 },
                 "status": {
-                    "$ref": "#/definitions/router.DictEntityShort"
+                    "$ref": "#/definitions/web.DictEntityShort"
                 },
                 "title": {
                     "type": "string"
                 }
             }
         },
-        "router.ListDictEntitiesResponse": {
+        "web.ListDictEntitiesResponse": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.DictEntity"
+                        "$ref": "#/definitions/web.DictEntity"
                     }
                 }
             }
         },
-        "router.ListRolesResponse": {
+        "web.ListRolesResponse": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.Role"
+                        "$ref": "#/definitions/web.Role"
                     }
                 }
             }
         },
-        "router.ListUsersResponse": {
+        "web.ListUsersResponse": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.UserResponse"
+                        "$ref": "#/definitions/web.UserResponse"
                     }
                 }
             }
         },
-        "router.Role": {
+        "web.Role": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1458,7 +1458,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.UpdateDictEntityRequest": {
+        "web.UpdateDictEntityRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1475,7 +1475,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.UpdateIncidentRequest": {
+        "web.UpdateIncidentRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1495,7 +1495,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.UpdateUserRequest": {
+        "web.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -1520,7 +1520,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.UserResponse": {
+        "web.UserResponse": {
             "type": "object",
             "properties": {
                 "email": {

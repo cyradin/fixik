@@ -29,13 +29,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -59,7 +59,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateDictEntityRequest"
                         }
                     }
                 ],
@@ -67,19 +67,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -111,19 +111,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -154,7 +154,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
                         }
                     }
                 ],
@@ -162,19 +162,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -207,13 +207,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -239,7 +239,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateIncidentRequest"
+                            "$ref": "#/definitions/web.CreateIncidentRequest"
                         }
                     }
                 ],
@@ -247,19 +247,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.IncidentResponse"
+                            "$ref": "#/definitions/web.IncidentResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -291,19 +291,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.IncidentResponse"
+                            "$ref": "#/definitions/web.IncidentResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -336,13 +336,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -373,7 +373,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateIncidentRequest"
+                            "$ref": "#/definitions/web.UpdateIncidentRequest"
                         }
                     }
                 ],
@@ -381,19 +381,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.IncidentResponse"
+                            "$ref": "#/definitions/web.IncidentResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -416,13 +416,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -446,7 +446,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateDictEntityRequest"
                         }
                     }
                 ],
@@ -454,19 +454,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -498,19 +498,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -541,7 +541,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
                         }
                     }
                 ],
@@ -549,19 +549,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -594,13 +594,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -623,13 +623,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListRolesResponse"
+                            "$ref": "#/definitions/web.ListRolesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -652,13 +652,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -682,7 +682,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateDictEntityRequest"
                         }
                     }
                 ],
@@ -690,19 +690,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -734,19 +734,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -777,7 +777,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
                         }
                     }
                 ],
@@ -785,19 +785,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -830,13 +830,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -859,13 +859,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -889,7 +889,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateDictEntityRequest"
                         }
                     }
                 ],
@@ -897,19 +897,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -941,19 +941,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -984,7 +984,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
                         }
                     }
                 ],
@@ -992,19 +992,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.DictEntity"
+                            "$ref": "#/definitions/web.DictEntity"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1037,13 +1037,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1084,19 +1084,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListUsersResponse"
+                            "$ref": "#/definitions/web.ListUsersResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1120,7 +1120,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.CreateUserRequest"
+                            "$ref": "#/definitions/web.CreateUserRequest"
                         }
                     }
                 ],
@@ -1128,19 +1128,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.UserResponse"
+                            "$ref": "#/definitions/web.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1172,19 +1172,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.UserResponse"
+                            "$ref": "#/definitions/web.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1217,13 +1217,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1254,7 +1254,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/router.UpdateUserRequest"
+                            "$ref": "#/definitions/web.UpdateUserRequest"
                         }
                     }
                 ],
@@ -1262,19 +1262,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.UserResponse"
+                            "$ref": "#/definitions/web.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/router.ErrorResponse"
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -1282,7 +1282,7 @@
         }
     },
     "definitions": {
-        "router.CreateDictEntityRequest": {
+        "web.CreateDictEntityRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1296,7 +1296,7 @@
                 }
             }
         },
-        "router.CreateIncidentRequest": {
+        "web.CreateIncidentRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1316,7 +1316,7 @@
                 }
             }
         },
-        "router.CreateUserRequest": {
+        "web.CreateUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -1341,7 +1341,7 @@
                 }
             }
         },
-        "router.DictEntity": {
+        "web.DictEntity": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1358,7 +1358,7 @@
                 }
             }
         },
-        "router.DictEntityShort": {
+        "web.DictEntityShort": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1372,7 +1372,7 @@
                 }
             }
         },
-        "router.ErrorResponse": {
+        "web.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1380,7 +1380,7 @@
                 }
             }
         },
-        "router.IncidentResponse": {
+        "web.IncidentResponse": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1390,53 +1390,53 @@
                     "type": "integer"
                 },
                 "impact": {
-                    "$ref": "#/definitions/router.DictEntityShort"
+                    "$ref": "#/definitions/web.DictEntityShort"
                 },
                 "priority": {
-                    "$ref": "#/definitions/router.DictEntityShort"
+                    "$ref": "#/definitions/web.DictEntityShort"
                 },
                 "status": {
-                    "$ref": "#/definitions/router.DictEntityShort"
+                    "$ref": "#/definitions/web.DictEntityShort"
                 },
                 "title": {
                     "type": "string"
                 }
             }
         },
-        "router.ListDictEntitiesResponse": {
+        "web.ListDictEntitiesResponse": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.DictEntity"
+                        "$ref": "#/definitions/web.DictEntity"
                     }
                 }
             }
         },
-        "router.ListRolesResponse": {
+        "web.ListRolesResponse": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.Role"
+                        "$ref": "#/definitions/web.Role"
                     }
                 }
             }
         },
-        "router.ListUsersResponse": {
+        "web.ListUsersResponse": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.UserResponse"
+                        "$ref": "#/definitions/web.UserResponse"
                     }
                 }
             }
         },
-        "router.Role": {
+        "web.Role": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1455,7 +1455,7 @@
                 }
             }
         },
-        "router.UpdateDictEntityRequest": {
+        "web.UpdateDictEntityRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1472,7 +1472,7 @@
                 }
             }
         },
-        "router.UpdateIncidentRequest": {
+        "web.UpdateIncidentRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1492,7 +1492,7 @@
                 }
             }
         },
-        "router.UpdateUserRequest": {
+        "web.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -1517,7 +1517,7 @@
                 }
             }
         },
-        "router.UserResponse": {
+        "web.UserResponse": {
             "type": "object",
             "properties": {
                 "email": {
