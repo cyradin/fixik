@@ -1,4 +1,4 @@
-BINARY_NAME ?= aicoder
+BINARY_NAME ?= fixik
 COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo dev)
 
 -include .env
@@ -8,6 +8,7 @@ COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo dev)
 
 build:
 	go build \
+		-tags prod \
 		-ldflags "-X main.GitCommit=$(COMMIT)" \
 		-o dist/$(BINARY_NAME) \
 		./cmd/$(BINARY_NAME)

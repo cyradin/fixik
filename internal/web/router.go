@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"strconv"
 
@@ -39,6 +40,12 @@ func NewRouter(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 		r.Route("/roles", roleRoutes(c))
 		r.Route("/incidents", incidentRoutes(c))
 	})
+
+	r.Handle("/*", http.FileServer(
+		http.FS(
+			newNoDirFs(getStaticFS()),
+		),
+	))
 
 	return r
 }
@@ -145,4 +152,33 @@ func decodePagination(r *http.Request, minLimit int, maxLimit int) (int, int, er
 	}
 
 	return limit, offset, nil
+}
+
+// noDirFS prevents directory listing with go file server
+type noDirFS struct {
+	fs.FS
+}
+
+func newNoDirFs(fs fs.FS) *noDirFS {
+	return &noDirFS{
+		FS: fs,
+	}
+}
+
+func (n noDirFS) Open(name string) (fs.File, error) {
+	f, err := n.FS.Open(name)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	if info.Name() != "static" && info.IsDir() {
+		return nil, fs.ErrNotExist
+	}
+
+	return f, nil
 }
