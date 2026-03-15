@@ -140,7 +140,7 @@ func (r *UserRepository) Update(ctx context.Context, u *User) error {
 		"username": u.Username,
 		"email":    u.Email,
 		"password": u.Password,
-		"team_id":  u.TeamID,
+		"team_id":  u.TeamID, // nil → NULL
 		"role":     u.Role,
 	}
 

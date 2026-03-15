@@ -54,7 +54,7 @@ type CreateUser struct {
 	Username string
 	Email    string
 	Password string //nolint:gosec
-	TeamID   int64
+	TeamID   *int64
 	Role     RoleType
 }
 
@@ -74,7 +74,7 @@ type User struct {
 	Name      string
 	Username  string
 	Email     string
-	TeamID    int64
+	TeamID    *int64
 	Role      RoleType
 	CreatedAt time.Time
 	UpdatedAt time.Time

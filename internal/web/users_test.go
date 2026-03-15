@@ -24,7 +24,7 @@ func TestCreateUser(t *testing.T) {
 				return user.User{ID: 1, Username: u.Username, Email: u.Email, TeamID: u.TeamID}, nil
 			},
 		}
-		req := CreateUserRequest{Name: "qwe", Username: "abc", Email: "a@b.com", Password: "123456", TeamID: 1, Role: "admin"}
+		req := CreateUserRequest{Name: "qwe", Username: "abc", Email: "a@b.com", Password: "123456", TeamID: new(int64(1)), Role: "admin"}
 		rr := testRequest(t, createUser(m), http.MethodPost, "/users", req)
 		require.Equal(t, http.StatusOK, rr.Code)
 
@@ -52,7 +52,7 @@ func TestCreateUser(t *testing.T) {
 				return user.User{}, errors.New("fail")
 			},
 		}
-		req := CreateUserRequest{Name: "qwe", Username: "abc", Email: "a@b.com", Password: "123456", TeamID: 1, Role: "user"}
+		req := CreateUserRequest{Name: "qwe", Username: "abc", Email: "a@b.com", Password: "123456", TeamID: new(int64(1)), Role: "user"}
 		rr := testRequest(t, createUser(m), http.MethodPost, "/users", req)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
 	})

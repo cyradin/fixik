@@ -31,7 +31,7 @@ type CreateUserRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"` //nolint:gosec
-	TeamID   int64  `json:"teamId"`
+	TeamID   *int64 `json:"teamId"`
 	Role     string `json:"role" enums:"admin,manager,user"`
 }
 
@@ -42,7 +42,7 @@ func (r CreateUserRequest) Validate() error {
 		validation.Field(&r.Username, validation.Required, validation.Length(1, maxUsernameLen)),
 		validation.Field(&r.Email, validation.Required, validation.Length(1, maxEmailLen)),
 		validation.Field(&r.Password, validation.Required, validation.Length(minPasswordLen, maxPasswordLen)),
-		validation.Field(&r.TeamID, validation.Required, validation.Min(1)),
+		validation.Field(&r.TeamID, validation.Min(1)),
 		validation.Field(&r.Role, validation.Required, validation.In(toAnySlice(user.RoleTypes())...)),
 	)
 }
@@ -73,7 +73,7 @@ type UserResponse struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	TeamID   int64  `json:"teamId"`
+	TeamID   *int64 `json:"teamId"`
 	Role     string `json:"role" enums:"admin,manager,user"`
 }
 

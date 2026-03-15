@@ -67,7 +67,12 @@ func (m *UserManager) Update(ctx context.Context, u UpdateUser) (User, error) {
 	}
 
 	if u.TeamID != nil {
-		user.TeamID = *u.TeamID
+		if *u.TeamID == 0 {
+			// удалить команду
+			user.TeamID = nil
+		} else {
+			user.TeamID = u.TeamID
+		}
 	}
 
 	if u.Password != nil {

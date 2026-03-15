@@ -118,7 +118,7 @@ func (s *UserRepositorySuite) TestUpdate() {
 	user.Username = "bob2"
 	user.Email = "bob2@example.com"
 	user.Password = "newpass"
-	user.TeamID = team2.ID
+	user.TeamID = &team2.ID
 	user.Role = RoleAdmin
 
 	oldUpdated := user.UpdatedAt
@@ -132,7 +132,35 @@ func (s *UserRepositorySuite) TestUpdate() {
 	s.Equal("bob2", fromDB.Username)
 	s.Equal("bob2@example.com", fromDB.Email)
 	s.Equal("newpass", fromDB.Password)
-	s.Equal(team2.ID, fromDB.TeamID)
+	s.Equal(&team2.ID, fromDB.TeamID)
+	s.Equal(user.Role, fromDB.Role)
+	s.True(fromDB.UpdatedAt.After(oldUpdated))
+}
+
+func (s *UserRepositorySuite) TestUpdate_RemoveTeam() {
+	team1 := s.createTeam("team1", "Team One")
+
+	user := s.createUser("Боб", "bob", "bob@example.com", "pass", team1.ID, RoleUser)
+
+	user.Name = "Боб2"
+	user.Username = "bob2"
+	user.Email = "bob2@example.com"
+	user.Password = "newpass"
+	user.TeamID = nil
+	user.Role = RoleAdmin
+
+	oldUpdated := user.UpdatedAt
+
+	err := s.repo.Update(s.T().Context(), user)
+	s.Require().NoError(err)
+
+	fromDB, err := s.repo.GetByID(s.T().Context(), user.ID)
+	s.Require().NoError(err)
+	s.Equal("Боб2", fromDB.Name)
+	s.Equal("bob2", fromDB.Username)
+	s.Equal("bob2@example.com", fromDB.Email)
+	s.Equal("newpass", fromDB.Password)
+	s.Nil(fromDB.TeamID)
 	s.Equal(user.Role, fromDB.Role)
 	s.True(fromDB.UpdatedAt.After(oldUpdated))
 }
@@ -156,7 +184,7 @@ func (s *UserRepositorySuite) TestUpdate_NotFound() {
 		Username: "ghost",
 		Email:    "ghost@example.com",
 		Password: "pass",
-		TeamID:   team.ID,
+		TeamID:   &team.ID,
 		Role:     RoleUser,
 	}
 
@@ -184,7 +212,7 @@ func (s *UserRepositorySuite) createUser(name, username, email, password string,
 		Username: username,
 		Email:    email,
 		Password: password,
-		TeamID:   teamID,
+		TeamID:   &teamID,
 		Role:     role,
 	}
 

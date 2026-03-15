@@ -25,7 +25,7 @@ func TestUserManager_Create(t *testing.T) {
 				Username: "alice",
 				Email:    "alice@example.com",
 				Password: "pass",
-				TeamID:   1,
+				TeamID:   new(int64(1)),
 				Role:     RoleUser,
 			},
 			mock: func(m *userRepoMock) {
@@ -40,7 +40,7 @@ func TestUserManager_Create(t *testing.T) {
 						Username: "alice",
 						Email:    "alice@example.com",
 						Password: "hashed",
-						TeamID:   1,
+						TeamID:   new(int64(1)),
 						Role:     RoleUser,
 					}, nil
 				}
@@ -95,7 +95,7 @@ func TestUserManager_GetByID(t *testing.T) {
 		Username: "alice",
 		Email:    "alice@example.com",
 		Password: "hashed",
-		TeamID:   1,
+		TeamID:   new(int64(1)),
 		Role:     RoleAdmin,
 	}
 
@@ -144,7 +144,7 @@ func TestUserManager_GetByID(t *testing.T) {
 				Name:     "Алиса",
 				Username: "alice",
 				Email:    "alice@example.com",
-				TeamID:   1,
+				TeamID:   new(int64(1)),
 				Role:     RoleAdmin,
 			}, u)
 		})

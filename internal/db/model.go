@@ -42,7 +42,7 @@ type User struct {
 	Username  string
 	Email     string
 	Password  string //nolint:gosec
-	TeamID    int64
+	TeamID    *int64
 	Role      Role
 	CreatedAt time.Time
 	UpdatedAt time.Time
