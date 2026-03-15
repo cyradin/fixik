@@ -1,4 +1,4 @@
-CREATE TABLE incident_statuses (
+CREATE TABLE statuses (
     id BIGSERIAL PRIMARY KEY,
     code TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL UNIQUE,
@@ -9,7 +9,7 @@ CREATE TABLE incident_statuses (
 );
 
 ALTER TABLE incidents
-    ADD COLUMN status_id BIGINT REFERENCES incident_statuses(id) NOT NULL,
+    ADD COLUMN status_id BIGINT REFERENCES statuses(id) NOT NULL,
     DROP COLUMN status;
 
 CREATE INDEX idx_incidents_status_id

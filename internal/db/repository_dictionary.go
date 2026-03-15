@@ -20,11 +20,11 @@ func newDictRepository(db *pgxpool.Pool, tableName string) *DictRepository {
 }
 
 func NewPriorityRepository(db *pgxpool.Pool) *DictRepository {
-	return newDictRepository(db, "incident_priorities")
+	return newDictRepository(db, "priorities")
 }
 
 func NewStatusRepository(db *pgxpool.Pool) *DictRepository {
-	return newDictRepository(db, "incident_statuses")
+	return newDictRepository(db, "statuses")
 }
 
 func NewTeamRepository(db *pgxpool.Pool) *DictRepository {

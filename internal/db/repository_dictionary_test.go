@@ -22,7 +22,7 @@ func (s *DictRepositorySuite) SetupTest() {
 	s.repo = NewPriorityRepository(s.Postgres())
 
 	_, err := s.Postgres().Exec(s.T().Context(), `
-		TRUNCATE TABLE incident_priorities RESTART IDENTITY CASCADE;
+		TRUNCATE TABLE priorities RESTART IDENTITY CASCADE;
 	`)
 	s.Require().NoError(err)
 }

@@ -1,4 +1,4 @@
-CREATE TABLE incident_priorities (
+CREATE TABLE priorities (
     id BIGSERIAL PRIMARY KEY,
     code TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL UNIQUE,
@@ -9,7 +9,7 @@ CREATE TABLE incident_priorities (
 );
 
 ALTER TABLE incidents
-    ADD COLUMN priority_id BIGINT REFERENCES incident_priorities(id) NOT NULL,
+    ADD COLUMN priority_id BIGINT REFERENCES priorities(id) NOT NULL,
     DROP COLUMN priority;
 
 CREATE INDEX idx_incidents_priority_id

@@ -3,4 +3,4 @@ ALTER TABLE incidents
     DROP COLUMN status_id;
 
 DROP INDEX IF EXISTS idx_incidents_status_id;
-DROP TABLE IF EXISTS incident_statuses;
+DROP TABLE IF EXISTS statuses;

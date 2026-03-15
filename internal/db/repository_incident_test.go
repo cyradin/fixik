@@ -23,8 +23,8 @@ func (s *IncidentRepositorySuite) SetupTest() {
 
 	_, err := s.Postgres().Exec(s.T().Context(), `
 		TRUNCATE TABLE incidents RESTART IDENTITY CASCADE;
-		TRUNCATE TABLE incident_statuses RESTART IDENTITY CASCADE;
-		TRUNCATE TABLE incident_priorities RESTART IDENTITY CASCADE;
+		TRUNCATE TABLE statuses RESTART IDENTITY CASCADE;
+		TRUNCATE TABLE priorities RESTART IDENTITY CASCADE;
 	`)
 	s.Require().NoError(err)
 }
