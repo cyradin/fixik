@@ -30,6 +30,12 @@ export interface WebCreateUserRequest {
      * @type {string}
      * @memberof WebCreateUserRequest
      */
+    name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WebCreateUserRequest
+     */
     password?: string;
     /**
      * 
@@ -81,6 +87,7 @@ export function WebCreateUserRequestFromJSONTyped(json: any, ignoreDiscriminator
     return {
         
         'email': json['email'] == null ? undefined : json['email'],
+        'name': json['name'] == null ? undefined : json['name'],
         'password': json['password'] == null ? undefined : json['password'],
         'role': json['role'] == null ? undefined : json['role'],
         'teamId': json['teamId'] == null ? undefined : json['teamId'],
@@ -100,6 +107,7 @@ export function WebCreateUserRequestToJSONTyped(value?: WebCreateUserRequest | n
     return {
         
         'email': value['email'],
+        'name': value['name'],
         'password': value['password'],
         'role': value['role'],
         'teamId': value['teamId'],

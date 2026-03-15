@@ -9,6 +9,7 @@ import (
 
 func getStaticFS() fs.FS {
 	fsys := os.DirFS("internal/web")
+
 	sub, err := fs.Sub(fsys, "static")
 	if err != nil {
 		panic(err)

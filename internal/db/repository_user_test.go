@@ -33,12 +33,13 @@ func (s *UserRepositorySuite) SetupTest() {
 func (s *UserRepositorySuite) TestGetByID() {
 	team := s.createTeam("team1", "Team One")
 
-	user := s.createUser("alice", "alice@example.com", "passhash", team.ID, RoleUser)
+	user := s.createUser("Алексей", "alex", "alex@example.com", "passhash", team.ID, RoleUser)
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), user.ID)
 	s.Require().NoError(err)
 
 	s.Equal(user.ID, fromDB.ID)
+	s.Equal(user.Name, fromDB.Name)
 	s.Equal(user.Username, fromDB.Username)
 	s.Equal(user.Email, fromDB.Email)
 	s.Equal(user.Password, fromDB.Password)
@@ -54,9 +55,9 @@ func (s *UserRepositorySuite) TestList() {
 
 	team := s.createTeam("team1", "Team One")
 
-	u1 := s.createUser("u1", "u1@example.com", "pass", team.ID, RoleAdmin)
-	u2 := s.createUser("u2", "u2@example.com", "pass", team.ID, RoleUser)
-	u3 := s.createUser("u3", "u3@example.com", "pass", team.ID, RoleManager)
+	u1 := s.createUser("Александр", "u1", "u1@example.com", "pass", team.ID, RoleAdmin)
+	u2 := s.createUser("Мария", "u2", "u2@example.com", "pass", team.ID, RoleUser)
+	u3 := s.createUser("Иван", "u3", "u3@example.com", "pass", team.ID, RoleManager)
 
 	s.Run("list all", func() {
 		users, err := s.repo.List(ctx, 100, 0)
@@ -111,8 +112,9 @@ func (s *UserRepositorySuite) TestUpdate() {
 	team1 := s.createTeam("team1", "Team One")
 	team2 := s.createTeam("team2", "Team Two")
 
-	user := s.createUser("bob", "bob@example.com", "pass", team1.ID, RoleUser)
+	user := s.createUser("Боб", "bob", "bob@example.com", "pass", team1.ID, RoleUser)
 
+	user.Name = "Боб2"
 	user.Username = "bob2"
 	user.Email = "bob2@example.com"
 	user.Password = "newpass"
@@ -126,6 +128,7 @@ func (s *UserRepositorySuite) TestUpdate() {
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), user.ID)
 	s.Require().NoError(err)
+	s.Equal("Боб2", fromDB.Name)
 	s.Equal("bob2", fromDB.Username)
 	s.Equal("bob2@example.com", fromDB.Email)
 	s.Equal("newpass", fromDB.Password)
@@ -136,7 +139,7 @@ func (s *UserRepositorySuite) TestUpdate() {
 
 func (s *UserRepositorySuite) TestDelete_SoftDelete() {
 	team := s.createTeam("team1", "Team One")
-	user := s.createUser("carol", "carol@example.com", "pass", team.ID, RoleUser)
+	user := s.createUser("Каролина", "carol", "carol@example.com", "pass", team.ID, RoleUser)
 
 	err := s.repo.Delete(s.T().Context(), user.ID)
 	s.Require().NoError(err)
@@ -149,6 +152,7 @@ func (s *UserRepositorySuite) TestUpdate_NotFound() {
 	team := s.createTeam("team1", "Team One")
 	user := &User{
 		ID:       999999,
+		Name:     "Призрак",
 		Username: "ghost",
 		Email:    "ghost@example.com",
 		Password: "pass",
@@ -173,9 +177,10 @@ func (s *UserRepositorySuite) createTeam(code, name string) *Team {
 	return team
 }
 
-func (s *UserRepositorySuite) createUser(username, email, password string, teamID int64, role Role) *User {
+func (s *UserRepositorySuite) createUser(name, username, email, password string, teamID int64, role Role) *User {
 	ctx := s.T().Context()
 	user := &User{
+		Name:     name,
 		Username: username,
 		Email:    email,
 		Password: password,

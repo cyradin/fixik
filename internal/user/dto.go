@@ -50,6 +50,7 @@ func RoleTypes() []RoleType {
 
 // CreateUser
 type CreateUser struct {
+	Name     string
 	Username string
 	Email    string
 	Password string //nolint:gosec
@@ -60,6 +61,7 @@ type CreateUser struct {
 // UpdateUser
 type UpdateUser struct {
 	ID       int64
+	Name     *string
 	Username *string
 	Email    *string
 	Password *string //nolint:gosec
@@ -69,6 +71,7 @@ type UpdateUser struct {
 
 type User struct {
 	ID        int64
+	Name      string
 	Username  string
 	Email     string
 	TeamID    int64

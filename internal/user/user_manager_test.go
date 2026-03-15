@@ -21,6 +21,7 @@ func TestUserManager_Create(t *testing.T) {
 		{
 			name: "success",
 			user: CreateUser{
+				Name:     "Алиса",
 				Username: "alice",
 				Email:    "alice@example.com",
 				Password: "pass",
@@ -35,6 +36,7 @@ func TestUserManager_Create(t *testing.T) {
 				m.getByIDFn = func(ctx context.Context, id int64) (db.User, error) {
 					return db.User{
 						ID:       id,
+						Name:     "Алиса",
 						Username: "alice",
 						Email:    "alice@example.com",
 						Password: "hashed",
@@ -47,6 +49,7 @@ func TestUserManager_Create(t *testing.T) {
 		{
 			name: "repo error",
 			user: CreateUser{
+				Name:     "Боб",
 				Username: "bob",
 			},
 			mock: func(m *userRepoMock) {
@@ -74,6 +77,7 @@ func TestUserManager_Create(t *testing.T) {
 			}
 
 			require.NoError(t, err)
+			require.Equal(t, tt.user.Name, u.Name)
 			require.Equal(t, tt.user.Username, u.Username)
 			require.Equal(t, tt.user.Email, u.Email)
 			require.Equal(t, tt.user.TeamID, u.TeamID)
@@ -87,6 +91,7 @@ func TestUserManager_GetByID(t *testing.T) {
 
 	dbUser := db.User{
 		ID:       1,
+		Name:     "Алиса",
 		Username: "alice",
 		Email:    "alice@example.com",
 		Password: "hashed",
@@ -136,6 +141,7 @@ func TestUserManager_GetByID(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, User{
 				ID:       1,
+				Name:     "Алиса",
 				Username: "alice",
 				Email:    "alice@example.com",
 				TeamID:   1,
@@ -148,6 +154,8 @@ func TestUserManager_GetByID(t *testing.T) {
 func TestUserManager_Update(t *testing.T) {
 	t.Parallel()
 
+	newName := "Новый Боб"
+
 	tests := []struct {
 		name string
 		cmd  UpdateUser
@@ -158,15 +166,16 @@ func TestUserManager_Update(t *testing.T) {
 			name: "success",
 			cmd: UpdateUser{
 				ID:       1,
-				Username: new("new"),
-				Email:    new("new@example.com"),
-				Password: new("newpass"),
-				TeamID:   new(int64(1)),
+				Name:     &newName,
+				Username: new(string),
+				Email:    new(string),
+				Password: new(string),
+				TeamID:   new(int64),
 				Role:     new(RoleManager),
 			},
 			mock: func(m *userRepoMock) {
 				m.getByIDFn = func(ctx context.Context, id int64) (db.User, error) {
-					return db.User{ID: id, Role: RoleManager}, nil
+					return db.User{ID: id, Name: "Боб", Role: RoleManager}, nil
 				}
 				m.updateFn = func(ctx context.Context, u *db.User) error {
 					return nil
@@ -261,11 +270,13 @@ func TestUserManager_List(t *testing.T) {
 	dbUsers := []db.User{
 		{
 			ID:       1,
+			Name:     "Алиса",
 			Username: "alice",
 			Role:     RoleAdmin,
 		},
 		{
 			ID:       2,
+			Name:     "Боб",
 			Username: "bob",
 			Role:     RoleUser,
 		},
@@ -314,6 +325,8 @@ func TestUserManager_List(t *testing.T) {
 
 			require.NoError(t, err)
 			require.Len(t, users, 2)
+			require.Equal(t, "Алиса", users[0].Name)
+			require.Equal(t, "Боб", users[1].Name)
 			require.Equal(t, users[0].ID, int64(1))
 			require.Equal(t, users[1].ID, int64(2))
 		})

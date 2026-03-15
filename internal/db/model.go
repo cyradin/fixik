@@ -38,6 +38,7 @@ type (
 
 type User struct {
 	ID        int64
+	Name      string
 	Username  string
 	Email     string
 	Password  string //nolint:gosec

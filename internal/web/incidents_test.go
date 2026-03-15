@@ -37,6 +37,7 @@ func TestCreateIncident(t *testing.T) {
 		require.Equal(t, http.StatusOK, rr.Code)
 
 		var resp IncidentResponse
+
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
 		require.Equal(t, "db down", resp.Title)
@@ -83,6 +84,7 @@ func TestGetIncident(t *testing.T) {
 			getFn: func(ctx context.Context, id int64) (incident.Incident, error) {
 				i := testIncident("test", "desc")
 				i.ID = id
+
 				return i, nil
 			},
 		}
@@ -98,6 +100,7 @@ func TestGetIncident(t *testing.T) {
 		require.Equal(t, http.StatusOK, rr.Code)
 
 		var resp IncidentResponse
+
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
 		require.Equal(t, int64(1), resp.ID)
@@ -149,6 +152,7 @@ func TestUpdateIncident(t *testing.T) {
 			updateFn: func(ctx context.Context, u incident.UpdateIncident) (incident.Incident, error) {
 				i := testIncident("updated", "desc")
 				i.ID = u.ID
+
 				return i, nil
 			},
 		}
@@ -304,6 +308,7 @@ func TestListIncidents(t *testing.T) {
 		require.Equal(t, http.StatusOK, rr.Code)
 
 		var resp []IncidentResponse
+
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
 		require.Len(t, resp, 2)

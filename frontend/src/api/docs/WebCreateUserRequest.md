@@ -7,6 +7,7 @@
 Name | Type
 ------------ | -------------
 `email` | string
+`name` | string
 `password` | string
 `role` | string
 `teamId` | number
@@ -20,6 +21,7 @@ import type { WebCreateUserRequest } from ''
 // TODO: Update the object below with actual values
 const example = {
   "email": null,
+  "name": null,
   "password": null,
   "role": null,
   "teamId": null,

@@ -204,7 +204,7 @@ func deleteIncident(manager incidentManager) http.HandlerFunc {
 
 func listIncidents(manager incidentManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		limit, offset, err := decodePagination(r, 1, 100)
+		limit, offset, err := decodePagination(r, 1, 100) //nolint:mnd
 		if err != nil {
 			writeError(w, http.StatusBadRequest, err)
 			return
@@ -223,7 +223,6 @@ func listIncidents(manager incidentManager) http.HandlerFunc {
 			}
 
 			return resp, nil
-
 		})(w, r)
 	}
 }

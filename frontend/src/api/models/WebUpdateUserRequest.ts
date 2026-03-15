@@ -30,6 +30,12 @@ export interface WebUpdateUserRequest {
      * @type {string}
      * @memberof WebUpdateUserRequest
      */
+    name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WebUpdateUserRequest
+     */
     password?: string;
     /**
      * 
@@ -81,6 +87,7 @@ export function WebUpdateUserRequestFromJSONTyped(json: any, ignoreDiscriminator
     return {
         
         'email': json['email'] == null ? undefined : json['email'],
+        'name': json['name'] == null ? undefined : json['name'],
         'password': json['password'] == null ? undefined : json['password'],
         'role': json['role'] == null ? undefined : json['role'],
         'teamId': json['teamId'] == null ? undefined : json['teamId'],
@@ -100,6 +107,7 @@ export function WebUpdateUserRequestToJSONTyped(value?: WebUpdateUserRequest | n
     return {
         
         'email': value['email'],
+        'name': value['name'],
         'password': value['password'],
         'role': value['role'],
         'teamId': value['teamId'],

@@ -20,12 +20,13 @@ func NewUserRepository(db *pgxpool.Pool) *UserRepository {
 
 func (r *UserRepository) Create(ctx context.Context, u *User) error {
 	const query = `
-		INSERT INTO users (username, email, password, team_id, role, created_at, updated_at)
-		VALUES (@username, @email, @password, @team_id, @role, now(), now())
+		INSERT INTO users (name, username, email, password, team_id, role, created_at, updated_at)
+		VALUES (@name, @username, @email, @password, @team_id, @role, now(), now())
 		RETURNING id, created_at, updated_at
 	`
 
 	args := pgx.NamedArgs{
+		"name":     u.Name,
 		"username": u.Username,
 		"email":    u.Email,
 		"password": u.Password,
@@ -44,7 +45,7 @@ func (r *UserRepository) Create(ctx context.Context, u *User) error {
 func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 	const query = `
 		SELECT
-			u.id, u.username, u.email, u.password, u.team_id,
+			u.id, u.name, u.username, u.email, u.password, u.team_id,
 			u.role, u.created_at, u.updated_at, u.deleted_at
 		FROM users u
 		WHERE u.id = $1 AND u.deleted_at IS NULL
@@ -55,6 +56,7 @@ func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 
 	err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, id).Scan(
 		&u.ID,
+		&u.Name,
 		&u.Username,
 		&u.Email,
 		&u.Password,
@@ -79,7 +81,7 @@ func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 func (r *UserRepository) List(ctx context.Context, limit, offset int) ([]User, error) {
 	const query = `
 		SELECT
-			u.id, u.username, u.email, u.password, u.team_id,
+			u.id, u.name, u.username, u.email, u.password, u.team_id,
 			u.role, u.created_at, u.updated_at, u.deleted_at
 		FROM users u
 		WHERE u.deleted_at IS NULL
@@ -101,6 +103,7 @@ func (r *UserRepository) List(ctx context.Context, limit, offset int) ([]User, e
 
 		if err := rows.Scan(
 			&u.ID,
+			&u.Name,
 			&u.Username,
 			&u.Email,
 			&u.Password,
@@ -126,13 +129,14 @@ func (r *UserRepository) List(ctx context.Context, limit, offset int) ([]User, e
 func (r *UserRepository) Update(ctx context.Context, u *User) error {
 	const query = `
 		UPDATE users
-		SET username = @username, email = @email, password = @password,
+		SET name = @name, username = @username, email = @email, password = @password,
 		    team_id = @team_id, role = @role, updated_at = now()
 		WHERE id = @id AND deleted_at IS NULL
 	`
 
 	args := pgx.NamedArgs{
 		"id":       u.ID,
+		"name":     u.Name,
 		"username": u.Username,
 		"email":    u.Email,
 		"password": u.Password,

@@ -8,6 +8,7 @@ Name | Type
 ------------ | -------------
 `email` | string
 `id` | number
+`name` | string
 `role` | string
 `teamId` | number
 `username` | string
@@ -21,6 +22,7 @@ import type { WebUserResponse } from ''
 const example = {
   "email": null,
   "id": null,
+  "name": null,
   "role": null,
   "teamId": null,
   "username": null,

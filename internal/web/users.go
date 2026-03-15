@@ -11,10 +11,12 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-const maxUsernameLen = 100
-const maxEmailLen = 255
-const minPasswordLen = 6
-const maxPasswordLen = 255
+const (
+	maxUsernameLen = 100
+	maxEmailLen    = 255
+	minPasswordLen = 6
+	maxPasswordLen = 255
+)
 
 type userManager interface {
 	Create(ctx context.Context, u user.CreateUser) (user.User, error)
@@ -25,6 +27,7 @@ type userManager interface {
 }
 
 type CreateUserRequest struct {
+	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"` //nolint:gosec
@@ -35,6 +38,7 @@ type CreateUserRequest struct {
 func (r CreateUserRequest) Validate() error {
 	return validation.ValidateStruct(
 		&r,
+		validation.Field(&r.Name, validation.Required, validation.Length(1, maxUsernameLen)),
 		validation.Field(&r.Username, validation.Required, validation.Length(1, maxUsernameLen)),
 		validation.Field(&r.Email, validation.Required, validation.Length(1, maxEmailLen)),
 		validation.Field(&r.Password, validation.Required, validation.Length(minPasswordLen, maxPasswordLen)),
@@ -44,6 +48,7 @@ func (r CreateUserRequest) Validate() error {
 }
 
 type UpdateUserRequest struct {
+	Name     *string `json:"name"`
 	Username *string `json:"username"`
 	Email    *string `json:"email"`
 	Password *string `json:"password"` //nolint:gosec
@@ -54,6 +59,7 @@ type UpdateUserRequest struct {
 func (r UpdateUserRequest) Validate() error {
 	return validation.ValidateStruct(
 		&r,
+		validation.Field(&r.Name, validation.Length(1, maxUsernameLen)),
 		validation.Field(&r.Username, validation.Length(1, maxUsernameLen)),
 		validation.Field(&r.Email, validation.Length(1, maxEmailLen)),
 		validation.Field(&r.Password, validation.Length(minPasswordLen, maxPasswordLen)),
@@ -64,6 +70,7 @@ func (r UpdateUserRequest) Validate() error {
 
 type UserResponse struct {
 	ID       int64  `json:"id"`
+	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	TeamID   int64  `json:"teamId"`

@@ -33,6 +33,12 @@ export interface WebUserResponse {
     id?: number;
     /**
      * 
+     * @type {string}
+     * @memberof WebUserResponse
+     */
+    name?: string;
+    /**
+     * 
      * @type {WebUserResponseRoleEnum}
      * @memberof WebUserResponse
      */
@@ -82,6 +88,7 @@ export function WebUserResponseFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'email': json['email'] == null ? undefined : json['email'],
         'id': json['id'] == null ? undefined : json['id'],
+        'name': json['name'] == null ? undefined : json['name'],
         'role': json['role'] == null ? undefined : json['role'],
         'teamId': json['teamId'] == null ? undefined : json['teamId'],
         'username': json['username'] == null ? undefined : json['username'],
@@ -101,6 +108,7 @@ export function WebUserResponseToJSONTyped(value?: WebUserResponse | null, ignor
         
         'email': value['email'],
         'id': value['id'],
+        'name': value['name'],
         'role': value['role'],
         'teamId': value['teamId'],
         'username': value['username'],

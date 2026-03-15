@@ -20,9 +20,7 @@ type UserManager struct {
 	repo userRepo
 }
 
-func NewUserManager(
-	repo userRepo,
-) *UserManager {
+func NewUserManager(repo userRepo) *UserManager {
 	return &UserManager{
 		repo: repo,
 	}
@@ -35,6 +33,7 @@ func (m *UserManager) Create(ctx context.Context, u CreateUser) (User, error) {
 	}
 
 	user := db.User{
+		Name:     u.Name,
 		Username: u.Username,
 		Email:    u.Email,
 		Password: hashed,
@@ -57,6 +56,10 @@ func (m *UserManager) Update(ctx context.Context, u UpdateUser) (User, error) {
 
 	if u.Username != nil {
 		user.Username = *u.Username
+	}
+
+	if u.Name != nil {
+		user.Name = *u.Name
 	}
 
 	if u.Email != nil {
@@ -99,6 +102,7 @@ func (m *UserManager) GetByID(ctx context.Context, id int64) (User, error) {
 
 	return User{
 		ID:        userDB.ID,
+		Name:      userDB.Name,
 		Username:  userDB.Username,
 		Email:     userDB.Email,
 		TeamID:    userDB.TeamID,
@@ -119,6 +123,7 @@ func (m *UserManager) List(ctx context.Context, limit, offset int) ([]User, erro
 	for _, u := range usersDB {
 		users = append(users, User{
 			ID:        u.ID,
+			Name:      u.Name,
 			Username:  u.Username,
 			Email:     u.Email,
 			TeamID:    u.TeamID,
