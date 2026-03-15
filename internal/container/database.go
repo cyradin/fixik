@@ -43,14 +43,6 @@ func (c *Container) StatusRepository() *db.DictRepository {
 	return c.statusRepo
 }
 
-func (c *Container) ImpactRepository() *db.DictRepository {
-	if c.impactRepo == nil {
-		c.impactRepo = db.NewImpactRepository(c.PgPool())
-	}
-
-	return c.impactRepo
-}
-
 func (c *Container) PriorityRepository() *db.DictRepository {
 	if c.priorityRepo == nil {
 		c.priorityRepo = db.NewPriorityRepository(c.PgPool())

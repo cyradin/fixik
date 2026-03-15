@@ -19,7 +19,6 @@ type Container struct {
 	pgPool  *pgxpool.Pool
 
 	statusRepo   *db.DictRepository
-	impactRepo   *db.DictRepository
 	priorityRepo *db.DictRepository
 	teamRepo     *db.DictRepository
 	incidentRepo *db.IncidentRepository
@@ -27,7 +26,6 @@ type Container struct {
 
 	statusManager   *dict.EntityManager
 	priorityManager *dict.EntityManager
-	impactManager   *dict.EntityManager
 	teamManager     *dict.EntityManager
 
 	incidentManager *incident.IncidentManager

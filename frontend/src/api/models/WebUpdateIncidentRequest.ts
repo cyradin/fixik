@@ -30,12 +30,6 @@ export interface WebUpdateIncidentRequest {
      * @type {number}
      * @memberof WebUpdateIncidentRequest
      */
-    impactId?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof WebUpdateIncidentRequest
-     */
     priorityId?: number;
     /**
      * 
@@ -69,7 +63,6 @@ export function WebUpdateIncidentRequestFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'description': json['description'] == null ? undefined : json['description'],
-        'impactId': json['impactId'] == null ? undefined : json['impactId'],
         'priorityId': json['priorityId'] == null ? undefined : json['priorityId'],
         'statusId': json['statusId'] == null ? undefined : json['statusId'],
         'title': json['title'] == null ? undefined : json['title'],
@@ -88,7 +81,6 @@ export function WebUpdateIncidentRequestToJSONTyped(value?: WebUpdateIncidentReq
     return {
         
         'description': value['description'],
-        'impactId': value['impactId'],
         'priorityId': value['priorityId'],
         'statusId': value['statusId'],
         'title': value['title'],

@@ -30,12 +30,6 @@ export interface WebCreateIncidentRequest {
      * @type {number}
      * @memberof WebCreateIncidentRequest
      */
-    impactId?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof WebCreateIncidentRequest
-     */
     priorityId?: number;
     /**
      * 
@@ -69,7 +63,6 @@ export function WebCreateIncidentRequestFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'description': json['description'] == null ? undefined : json['description'],
-        'impactId': json['impactId'] == null ? undefined : json['impactId'],
         'priorityId': json['priorityId'] == null ? undefined : json['priorityId'],
         'statusId': json['statusId'] == null ? undefined : json['statusId'],
         'title': json['title'] == null ? undefined : json['title'],
@@ -88,7 +81,6 @@ export function WebCreateIncidentRequestToJSONTyped(value?: WebCreateIncidentReq
     return {
         
         'description': value['description'],
-        'impactId': value['impactId'],
         'priorityId': value['priorityId'],
         'statusId': value['statusId'],
         'title': value['title'],

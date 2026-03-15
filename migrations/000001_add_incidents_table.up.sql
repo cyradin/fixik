@@ -2,7 +2,6 @@ CREATE TABLE incidents (
     id BIGSERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
-    impact TEXT NOT NULL,
     priority TEXT NOT NULL,
     status TEXT NOT NULL,
 

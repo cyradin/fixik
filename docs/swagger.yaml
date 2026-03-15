@@ -13,8 +13,6 @@ definitions:
     properties:
       description:
         type: string
-      impactId:
-        type: integer
       priorityId:
         type: integer
       statusId:
@@ -70,8 +68,6 @@ definitions:
         type: string
       id:
         type: integer
-      impact:
-        $ref: '#/definitions/web.DictEntityShort'
       priority:
         $ref: '#/definitions/web.DictEntityShort'
       status:
@@ -128,8 +124,6 @@ definitions:
     properties:
       description:
         type: string
-      impactId:
-        type: integer
       priorityId:
         type: integer
       statusId:
@@ -178,143 +172,6 @@ info:
   title: Fixik API
   version: "1.0"
 paths:
-  /impacts:
-    get:
-      consumes:
-      - application/json
-      description: Get all impacts in dictionary
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/web.ListDictEntitiesResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-      summary: List impacts
-      tags:
-      - impacts
-    post:
-      consumes:
-      - application/json
-      description: Create new impact dictionary entry
-      parameters:
-      - description: Impact data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/web.CreateDictEntityRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/web.DictEntity'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-      summary: Create impact
-      tags:
-      - impacts
-  /impacts/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete impact dictionary entry by ID
-      parameters:
-      - description: Impact ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-      summary: Delete impact
-      tags:
-      - impacts
-    get:
-      consumes:
-      - application/json
-      description: Get impact dictionary entry by ID
-      parameters:
-      - description: Impact ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/web.DictEntity'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-      summary: Get impact by ID
-      tags:
-      - impacts
-    put:
-      consumes:
-      - application/json
-      description: Update impact dictionary entry by ID
-      parameters:
-      - description: Impact ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Impact data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/web.UpdateDictEntityRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/web.DictEntity'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-      summary: Update impact
-      tags:
-      - impacts
   /incidents:
     post:
       consumes:

@@ -12,7 +12,6 @@ type Incident struct {
 	Title       string
 	Description string
 
-	ImpactID   int64
 	PriorityID int64
 	StatusID   int64
 
@@ -33,7 +32,6 @@ type DictEntity struct {
 
 type (
 	Priority = DictEntity
-	Impact   = DictEntity
 	Status   = DictEntity
 	Team     = DictEntity
 )

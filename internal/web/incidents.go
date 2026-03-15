@@ -22,7 +22,6 @@ type incidentManager interface {
 type CreateIncidentRequest struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	ImpactID    int64  `json:"impactId"`
 	StatusID    int64  `json:"statusId"`
 	PriorityID  int64  `json:"priorityId"`
 }
@@ -32,7 +31,6 @@ func (r CreateIncidentRequest) Validate() error {
 		&r,
 		validation.Field(&r.Title, validation.Required),
 		validation.Field(&r.Description, validation.Required),
-		validation.Field(&r.ImpactID, validation.Required, validation.Min(1)),
 		validation.Field(&r.StatusID, validation.Required, validation.Min(1)),
 		validation.Field(&r.PriorityID, validation.Required, validation.Min(1)),
 	)
@@ -41,7 +39,6 @@ func (r CreateIncidentRequest) Validate() error {
 type UpdateIncidentRequest struct {
 	Title       *string `json:"title"`
 	Description *string `json:"description"`
-	ImpactID    *int64  `json:"impactId"`
 	StatusID    *int64  `json:"statusId"`
 	PriorityID  *int64  `json:"priorityId"`
 }
@@ -51,7 +48,6 @@ func (r UpdateIncidentRequest) Validate() error {
 		&r,
 		validation.Field(&r.Title),
 		validation.Field(&r.Description),
-		validation.Field(&r.ImpactID, validation.Min(1)),
 		validation.Field(&r.StatusID, validation.Min(1)),
 		validation.Field(&r.PriorityID, validation.Min(1)),
 	)
@@ -61,7 +57,6 @@ type IncidentResponse struct {
 	ID          int64           `json:"id"`
 	Title       string          `json:"title"`
 	Description string          `json:"description"`
-	Impact      DictEntityShort `json:"impact"`
 	Status      DictEntityShort `json:"status"`
 	Priority    DictEntityShort `json:"priority"`
 }
@@ -103,7 +98,6 @@ func createIncident(manager incidentManager) http.HandlerFunc {
 		i, err := manager.Create(ctx, incident.CreateIncident{
 			Title:       req.Title,
 			Description: req.Description,
-			ImpactID:    req.ImpactID,
 			StatusID:    req.StatusID,
 			PriorityID:  req.PriorityID,
 		})
@@ -172,7 +166,6 @@ func updateIncident(manager incidentManager) http.HandlerFunc {
 				ID:          id,
 				Title:       req.Title,
 				Description: req.Description,
-				ImpactID:    req.ImpactID,
 				StatusID:    req.StatusID,
 				PriorityID:  req.PriorityID,
 			})
@@ -240,11 +233,6 @@ func toIncidentResponse(i incident.Incident) IncidentResponse {
 		ID:          i.ID,
 		Title:       i.Title,
 		Description: i.Description,
-		Impact: DictEntityShort{
-			ID:   i.Impact.ID,
-			Code: i.Impact.Code,
-			Name: i.Impact.Name,
-		},
 		Status: DictEntityShort{
 			ID:   i.Status.ID,
 			Code: i.Status.Code,

@@ -19,10 +19,10 @@ func TestDictRepositorySuite(t *testing.T) {
 }
 
 func (s *DictRepositorySuite) SetupTest() {
-	s.repo = NewImpactRepository(s.Postgres())
+	s.repo = NewPriorityRepository(s.Postgres())
 
 	_, err := s.Postgres().Exec(s.T().Context(), `
-		TRUNCATE TABLE incident_impacts RESTART IDENTITY CASCADE;
+		TRUNCATE TABLE incident_priorities RESTART IDENTITY CASCADE;
 	`)
 	s.Require().NoError(err)
 }
@@ -33,7 +33,7 @@ func (s *DictRepositorySuite) TestCreate() {
 	e := &DictEntity{
 		Code:        "high",
 		Name:        "High",
-		Description: "High impact level",
+		Description: "High priority level",
 	}
 
 	err := s.repo.Create(ctx, e)
@@ -45,7 +45,7 @@ func (s *DictRepositorySuite) TestCreate() {
 }
 
 func (s *DictRepositorySuite) TestGetByID_Found() {
-	e := s.createEntity("medium", "Medium", "Medium impact level")
+	e := s.createEntity("medium", "Medium", "Medium priority level")
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), e.ID)
 	s.Require().NoError(err)
@@ -62,8 +62,8 @@ func (s *DictRepositorySuite) TestGetByID_NotFound() {
 }
 
 func (s *DictRepositorySuite) TestList() {
-	e1 := s.createEntity("low", "Low", "Low impact")
-	e2 := s.createEntity("critical", "Critical", "Critical impact")
+	e1 := s.createEntity("low", "Low", "Low priority")
+	e2 := s.createEntity("critical", "Critical", "Critical priority")
 
 	list, err := s.repo.List(s.T().Context())
 	s.Require().NoError(err)
@@ -73,11 +73,11 @@ func (s *DictRepositorySuite) TestList() {
 }
 
 func (s *DictRepositorySuite) TestUpdate() {
-	e := s.createEntity("pending", "Pending", "Pending impact")
+	e := s.createEntity("pending", "Pending", "Pending priority")
 
 	e.Code = "waiting"
 	e.Name = "Waiting"
-	e.Description = "Waiting impact"
+	e.Description = "Waiting priority"
 	err := s.repo.Update(s.T().Context(), e)
 	s.Require().NoError(err)
 
@@ -89,7 +89,7 @@ func (s *DictRepositorySuite) TestUpdate() {
 }
 
 func (s *DictRepositorySuite) TestDelete() {
-	e := s.createEntity("obsolete", "Obsolete", "Obsolete impact")
+	e := s.createEntity("obsolete", "Obsolete", "Obsolete priority")
 
 	err := s.repo.Delete(s.T().Context(), e.ID)
 	s.Require().NoError(err)

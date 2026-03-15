@@ -35,7 +35,6 @@ func NewRouter(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 
 		r.Route("/statuses", statusRoutes(c))
 		r.Route("/priorities", priorityRoutes(c))
-		r.Route("/impacts", impactRoutes(c))
 		r.Route("/teams", teamRoutes(c))
 		r.Route("/roles", roleRoutes(c))
 		r.Route("/incidents", incidentRoutes(c))

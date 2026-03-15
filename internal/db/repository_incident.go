@@ -23,14 +23,12 @@ func (r *IncidentRepository) Create(ctx context.Context, i *Incident) error {
 		INSERT INTO incidents (
 			title,
 			description,
-			impact_id,
 			priority_id,
 			status_id
 		)
 		VALUES (
 			@title,
 			@description,
-			@impact_id,
 			@priority_id,
 			@status_id
 		)
@@ -40,7 +38,6 @@ func (r *IncidentRepository) Create(ctx context.Context, i *Incident) error {
 	args := pgx.NamedArgs{
 		"title":       i.Title,
 		"description": i.Description,
-		"impact_id":   i.ImpactID,
 		"priority_id": i.PriorityID,
 		"status_id":   i.StatusID,
 	}
@@ -62,7 +59,6 @@ func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, e
 			id,
 			title,
 			description,
-			impact_id,
 			priority_id,
 			status_id,
 			created_at,
@@ -83,7 +79,6 @@ func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, e
 		&incident.ID,
 		&incident.Title,
 		&incident.Description,
-		&incident.ImpactID,
 		&incident.PriorityID,
 		&incident.StatusID,
 		&incident.CreatedAt,
@@ -107,7 +102,6 @@ func (r *IncidentRepository) Update(ctx context.Context, i *Incident) error {
 		SET
 			title = @title,
 			description = @description,
-			impact_id = @impact_id,
 			priority_id = @priority_id,
 			status_id = @status_id,
 			updated_at = now()
@@ -120,7 +114,6 @@ func (r *IncidentRepository) Update(ctx context.Context, i *Incident) error {
 		"id":          i.ID,
 		"title":       i.Title,
 		"description": i.Description,
-		"impact_id":   i.ImpactID,
 		"priority_id": i.PriorityID,
 		"status_id":   i.StatusID,
 	}
@@ -159,7 +152,6 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Inc
 			id,
 			title,
 			description,
-			impact_id,
 			priority_id,
 			status_id,
 			created_at,
@@ -192,7 +184,6 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Inc
 			&i.ID,
 			&i.Title,
 			&i.Description,
-			&i.ImpactID,
 			&i.PriorityID,
 			&i.StatusID,
 			&i.CreatedAt,

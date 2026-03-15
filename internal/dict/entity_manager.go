@@ -25,10 +25,6 @@ func newEntityManager(repo entityRepo) *EntityManager {
 	}
 }
 
-func NewImpactManager(repo entityRepo) *EntityManager {
-	return newEntityManager(repo)
-}
-
 func NewPriorityManager(repo entityRepo) *EntityManager {
 	return newEntityManager(repo)
 }

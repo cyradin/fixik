@@ -29,7 +29,6 @@ func TestCreateIncident(t *testing.T) {
 		req := CreateIncidentRequest{
 			Title:       "db down",
 			Description: "database unavailable",
-			ImpactID:    1,
 			StatusID:    1,
 			PriorityID:  1,
 		}
@@ -65,7 +64,6 @@ func TestCreateIncident(t *testing.T) {
 		req := CreateIncidentRequest{
 			Title:       "db down",
 			Description: "database unavailable",
-			ImpactID:    1,
 			StatusID:    1,
 			PriorityID:  1,
 		}
@@ -359,11 +357,6 @@ func testIncident(title, desc string) incident.Incident {
 		ID:          1,
 		Title:       title,
 		Description: desc,
-		Impact: dict.Entity{
-			ID:   1,
-			Code: "high",
-			Name: "High",
-		},
 		Status: dict.Entity{
 			ID:   1,
 			Code: "open",

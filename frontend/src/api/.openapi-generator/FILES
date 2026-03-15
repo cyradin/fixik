@@ -1,4 +1,4 @@
-apis/ImpactsApi.ts
+.openapi-generator-ignore
 apis/IncidentsApi.ts
 apis/PrioritiesApi.ts
 apis/RolesApi.ts
@@ -6,7 +6,6 @@ apis/StatusesApi.ts
 apis/TeamsApi.ts
 apis/UsersApi.ts
 apis/index.ts
-docs/ImpactsApi.md
 docs/IncidentsApi.md
 docs/PrioritiesApi.md
 docs/RolesApi.md

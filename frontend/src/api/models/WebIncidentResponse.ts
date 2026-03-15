@@ -44,12 +44,6 @@ export interface WebIncidentResponse {
      * @type {WebDictEntityShort}
      * @memberof WebIncidentResponse
      */
-    impact?: WebDictEntityShort;
-    /**
-     * 
-     * @type {WebDictEntityShort}
-     * @memberof WebIncidentResponse
-     */
     priority?: WebDictEntityShort;
     /**
      * 
@@ -84,7 +78,6 @@ export function WebIncidentResponseFromJSONTyped(json: any, ignoreDiscriminator:
         
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
-        'impact': json['impact'] == null ? undefined : WebDictEntityShortFromJSON(json['impact']),
         'priority': json['priority'] == null ? undefined : WebDictEntityShortFromJSON(json['priority']),
         'status': json['status'] == null ? undefined : WebDictEntityShortFromJSON(json['status']),
         'title': json['title'] == null ? undefined : json['title'],
@@ -104,7 +97,6 @@ export function WebIncidentResponseToJSONTyped(value?: WebIncidentResponse | nul
         
         'description': value['description'],
         'id': value['id'],
-        'impact': WebDictEntityShortToJSON(value['impact']),
         'priority': WebDictEntityShortToJSON(value['priority']),
         'status': WebDictEntityShortToJSON(value['status']),
         'title': value['title'],

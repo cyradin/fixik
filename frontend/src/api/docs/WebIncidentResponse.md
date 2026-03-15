@@ -8,7 +8,6 @@ Name | Type
 ------------ | -------------
 `description` | string
 `id` | number
-`impact` | [WebDictEntityShort](WebDictEntityShort.md)
 `priority` | [WebDictEntityShort](WebDictEntityShort.md)
 `status` | [WebDictEntityShort](WebDictEntityShort.md)
 `title` | string
@@ -22,7 +21,6 @@ import type { WebIncidentResponse } from ''
 const example = {
   "description": null,
   "id": null,
-  "impact": null,
   "priority": null,
   "status": null,
   "title": null,

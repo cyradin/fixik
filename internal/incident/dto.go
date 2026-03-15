@@ -13,7 +13,6 @@ type Incident struct {
 	Title       string
 	Description string
 
-	Impact   dict.Entity
 	Priority dict.Entity
 	Status   dict.Entity
 
@@ -25,7 +24,6 @@ type CreateIncident struct {
 	Title       string
 	Description string
 
-	ImpactID   dict.EntityID
 	PriorityID dict.EntityID
 	StatusID   dict.EntityID
 
@@ -39,7 +37,6 @@ type UpdateIncident struct {
 	Title       *string
 	Description *string
 
-	ImpactID   *dict.EntityID
 	PriorityID *dict.EntityID
 	StatusID   *dict.EntityID
 }

@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './ImpactsApi';
 export * from './IncidentsApi';
 export * from './PrioritiesApi';
 export * from './RolesApi';

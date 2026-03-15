@@ -19,10 +19,6 @@ func newDictRepository(db *pgxpool.Pool, tableName string) *DictRepository {
 	return &DictRepository{db: db, tableName: tableName}
 }
 
-func NewImpactRepository(db *pgxpool.Pool) *DictRepository {
-	return newDictRepository(db, "incident_impacts")
-}
-
 func NewPriorityRepository(db *pgxpool.Pool) *DictRepository {
 	return newDictRepository(db, "incident_priorities")
 }

@@ -25,7 +25,6 @@ func (s *IncidentRepositorySuite) SetupTest() {
 		TRUNCATE TABLE incidents RESTART IDENTITY CASCADE;
 		TRUNCATE TABLE incident_statuses RESTART IDENTITY CASCADE;
 		TRUNCATE TABLE incident_priorities RESTART IDENTITY CASCADE;
-		TRUNCATE TABLE incident_impacts RESTART IDENTITY CASCADE;
 	`)
 	s.Require().NoError(err)
 }
@@ -33,14 +32,12 @@ func (s *IncidentRepositorySuite) SetupTest() {
 func (s *IncidentRepositorySuite) TestCreate() {
 	ctx := s.T().Context()
 
-	impact := s.createImpact("high", "High")
 	priority := s.createPriority("critical", "Critical")
 	status := s.createStatus("open", "Open")
 
 	inc := &Incident{
 		Title:       "DB down",
 		Description: "Database unavailable",
-		ImpactID:    impact.ID,
 		PriorityID:  priority.ID,
 		StatusID:    status.ID,
 	}
@@ -53,12 +50,11 @@ func (s *IncidentRepositorySuite) TestCreate() {
 }
 
 func (s *IncidentRepositorySuite) TestGetByID_Found() {
-	impact := s.createImpact("medium", "Medium")
 	priority := s.createPriority("medium", "Medium")
 	status := s.createStatus("open", "Open")
 
 	inc := s.loadIncidents([]Incident{
-		{Title: "Service down", Description: "Manual insert", ImpactID: impact.ID, PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "Service down", Description: "Manual insert", PriorityID: priority.ID, StatusID: status.ID},
 	})[0]
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), inc.ID)
@@ -66,7 +62,6 @@ func (s *IncidentRepositorySuite) TestGetByID_Found() {
 	s.Equal(inc.ID, fromDB.ID)
 	s.Equal(inc.Title, fromDB.Title)
 	s.Equal(inc.Description, fromDB.Description)
-	s.Equal(inc.ImpactID, fromDB.ImpactID)
 	s.Equal(inc.PriorityID, fromDB.PriorityID)
 	s.Equal(inc.StatusID, fromDB.StatusID)
 }
@@ -78,13 +73,12 @@ func (s *IncidentRepositorySuite) TestGetByID_NotFound() {
 }
 
 func (s *IncidentRepositorySuite) TestUpdate_Found() {
-	impact := s.createImpact("medium", "Medium")
 	priority := s.createPriority("medium", "Medium")
 	status := s.createStatus("open", "Open")
 	newStatus := s.createStatus("in_progress", "In Progress")
 
 	inc := s.loadIncidents([]Incident{
-		{Title: "Service unavailable", Description: "Initial description", ImpactID: impact.ID, PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "Service unavailable", Description: "Initial description", PriorityID: priority.ID, StatusID: status.ID},
 	})[0]
 
 	oldUpdatedAt := inc.UpdatedAt
@@ -102,14 +96,12 @@ func (s *IncidentRepositorySuite) TestUpdate_Found() {
 }
 
 func (s *IncidentRepositorySuite) TestUpdate_NotFound() {
-	impact := s.createImpact("low", "Low")
 	priority := s.createPriority("low", "Low")
 	status := s.createStatus("closed", "Closed")
 
 	inc := &Incident{
 		ID:         999999,
 		Title:      "Nonexistent",
-		ImpactID:   impact.ID,
 		PriorityID: priority.ID,
 		StatusID:   status.ID,
 	}
@@ -118,12 +110,11 @@ func (s *IncidentRepositorySuite) TestUpdate_NotFound() {
 }
 
 func (s *IncidentRepositorySuite) TestDelete_Found() {
-	impact := s.createImpact("low", "Low")
 	priority := s.createPriority("low", "Low")
 	status := s.createStatus("open", "Open")
 
 	inc := s.loadIncidents([]Incident{
-		{Title: "Temp incident", Description: "To be deleted", ImpactID: impact.ID, PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "Temp incident", Description: "To be deleted", PriorityID: priority.ID, StatusID: status.ID},
 	})[0]
 
 	err := s.repo.Delete(s.T().Context(), inc.ID)
@@ -142,14 +133,13 @@ func (s *IncidentRepositorySuite) TestDelete_NotFound() {
 func (s *IncidentRepositorySuite) TestList() {
 	ctx := s.T().Context()
 
-	impact := s.createImpact("high", "High")
 	priority := s.createPriority("critical", "Critical")
 	status := s.createStatus("open", "Open")
 
 	incidents := s.loadIncidents([]Incident{
-		{Title: "Incident 1", Description: "Desc 1", ImpactID: impact.ID, PriorityID: priority.ID, StatusID: status.ID},
-		{Title: "Incident 2", Description: "Desc 2", ImpactID: impact.ID, PriorityID: priority.ID, StatusID: status.ID},
-		{Title: "Incident 3", Description: "Desc 3", ImpactID: impact.ID, PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "Incident 1", Description: "Desc 1", PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "Incident 2", Description: "Desc 2", PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "Incident 3", Description: "Desc 3", PriorityID: priority.ID, StatusID: status.ID},
 	})
 
 	s.Run("all", func() {
@@ -202,10 +192,10 @@ func (s *IncidentRepositorySuite) loadIncidents(fixtures []Incident) []Incident 
 	inserted := make([]Incident, len(fixtures))
 	for i, inc := range fixtures {
 		row := s.Postgres().QueryRow(ctx,
-			`INSERT INTO incidents (title, description, impact_id, priority_id, status_id)
-             VALUES ($1, $2, $3, $4, $5)
+			`INSERT INTO incidents (title, description, priority_id, status_id)
+             VALUES ($1, $2, $3, $4)
              RETURNING id, created_at, updated_at`,
-			inc.Title, inc.Description, inc.ImpactID, inc.PriorityID, inc.StatusID,
+			inc.Title, inc.Description, inc.PriorityID, inc.StatusID,
 		)
 		err := row.Scan(&inc.ID, &inc.CreatedAt, &inc.UpdatedAt)
 		s.Require().NoError(err)
@@ -244,19 +234,4 @@ func (s *IncidentRepositorySuite) createPriority(code, name string) *Priority {
 	s.NotZero(priority.ID)
 
 	return priority
-}
-
-func (s *IncidentRepositorySuite) createImpact(code, name string) *Impact {
-	ctx := s.T().Context()
-	ir := NewImpactRepository(s.Postgres())
-
-	impact := &Impact{
-		Code: code,
-		Name: name,
-	}
-	err := ir.Create(ctx, impact)
-	s.Require().NoError(err)
-	s.NotZero(impact.ID)
-
-	return impact
 }

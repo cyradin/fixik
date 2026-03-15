@@ -23,20 +23,17 @@ type entityProvider interface {
 
 type IncidentManager struct {
 	repo             incidentRepo
-	impactProvider   entityProvider
 	statusProvider   entityProvider
 	priorityProvider entityProvider
 }
 
 func NewIncidentManager(
 	repo incidentRepo,
-	impactProvider entityProvider,
 	statusProvider entityProvider,
 	priorityProvider entityProvider,
 ) *IncidentManager {
 	return &IncidentManager{
 		repo:             repo,
-		impactProvider:   impactProvider,
 		statusProvider:   statusProvider,
 		priorityProvider: priorityProvider,
 	}
@@ -46,7 +43,6 @@ func (m *IncidentManager) Create(ctx context.Context, cmd CreateIncident) (Incid
 	dbIncident := db.Incident{
 		Title:       cmd.Title,
 		Description: cmd.Description,
-		ImpactID:    cmd.ImpactID,
 		StatusID:    cmd.StatusID,
 		PriorityID:  cmd.PriorityID,
 	}
@@ -69,17 +65,12 @@ func (m *IncidentManager) GetByID(ctx context.Context, id int64) (Incident, erro
 		return Incident{}, fmt.Errorf("get status: %w", err)
 	}
 
-	impact, err := m.impactProvider.GetByID(ctx, result.ImpactID)
-	if err != nil {
-		return Incident{}, fmt.Errorf("get impact: %w", err)
-	}
-
 	priority, err := m.priorityProvider.GetByID(ctx, result.PriorityID)
 	if err != nil {
 		return Incident{}, fmt.Errorf("get priority: %w", err)
 	}
 
-	return m.fromDB(result, status, impact, priority), nil
+	return m.fromDB(result, status, priority), nil
 }
 
 func (m *IncidentManager) Update(ctx context.Context, cmd UpdateIncident) (Incident, error) {
@@ -94,10 +85,6 @@ func (m *IncidentManager) Update(ctx context.Context, cmd UpdateIncident) (Incid
 
 	if cmd.Description != nil {
 		current.Description = *cmd.Description
-	}
-
-	if cmd.ImpactID != nil {
-		current.ImpactID = *cmd.ImpactID
 	}
 
 	if cmd.StatusID != nil {
@@ -134,11 +121,6 @@ func (m *IncidentManager) List(ctx context.Context, limit, offset int) ([]Incide
 		return nil, fmt.Errorf("list statuses: %w", err)
 	}
 
-	impacts, err := m.impactProvider.List(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("list impacts: %w", err)
-	}
-
 	priorities, err := m.priorityProvider.List(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("list priorities: %w", err)
@@ -147,11 +129,6 @@ func (m *IncidentManager) List(ctx context.Context, limit, offset int) ([]Incide
 	statusMap := make(map[int64]dict.Entity, len(statuses))
 	for _, e := range statuses {
 		statusMap[e.ID] = e
-	}
-
-	impactMap := make(map[int64]dict.Entity, len(impacts))
-	for _, e := range impacts {
-		impactMap[e.ID] = e
 	}
 
 	priorityMap := make(map[int64]dict.Entity, len(priorities))
@@ -167,28 +144,22 @@ func (m *IncidentManager) List(ctx context.Context, limit, offset int) ([]Incide
 			return nil, fmt.Errorf("status %d not found", r.StatusID)
 		}
 
-		impact, ok := impactMap[r.ImpactID]
-		if !ok {
-			return nil, fmt.Errorf("impact %d not found", r.ImpactID)
-		}
-
 		priority, ok := priorityMap[r.PriorityID]
 		if !ok {
 			return nil, fmt.Errorf("priority %d not found", r.PriorityID)
 		}
 
-		result = append(result, m.fromDB(r, status, impact, priority))
+		result = append(result, m.fromDB(r, status, priority))
 	}
 
 	return result, nil
 }
 
-func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, impact dict.Entity, priority dict.Entity) Incident {
+func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, priority dict.Entity) Incident {
 	return Incident{
 		ID:          incident.ID,
 		Title:       incident.Title,
 		Description: incident.Description,
-		Impact:      impact,
 		Status:      status,
 		Priority:    priority,
 	}

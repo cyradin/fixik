@@ -7,7 +7,6 @@
 Name | Type
 ------------ | -------------
 `description` | string
-`impactId` | number
 `priorityId` | number
 `statusId` | number
 `title` | string
@@ -20,7 +19,6 @@ import type { WebCreateIncidentRequest } from ''
 // TODO: Update the object below with actual values
 const example = {
   "description": null,
-  "impactId": null,
   "priorityId": null,
   "statusId": null,
   "title": null,

@@ -14,16 +14,6 @@ func (c *Container) StatusManager() *dict.EntityManager {
 	return c.statusManager
 }
 
-func (c *Container) ImpactManager() *dict.EntityManager {
-	if c.impactManager == nil {
-		c.impactManager = dict.NewImpactManager(
-			c.ImpactRepository(),
-		)
-	}
-
-	return c.impactManager
-}
-
 func (c *Container) PriorityManager() *dict.EntityManager {
 	if c.priorityManager == nil {
 		c.priorityManager = dict.NewPriorityManager(
