@@ -23,8 +23,9 @@ func TestEntityManager_Create(t *testing.T) {
 		{
 			name: "success",
 			entity: Entity{
-				Code: "open",
-				Name: "Open",
+				Code:        "open",
+				Name:        "Open",
+				Description: "description",
 			},
 			mock: func(m *statusRepoMock) {
 				m.createFn = func(ctx context.Context, s *db.DictEntity) error {
@@ -68,6 +69,7 @@ func TestEntityManager_Create(t *testing.T) {
 			require.Equal(t, int64(1), res.ID)
 			require.Equal(t, tt.entity.Code, res.Code)
 			require.Equal(t, tt.entity.Name, res.Name)
+			require.Equal(t, tt.entity.Description, res.Description)
 		})
 	}
 }
@@ -90,16 +92,18 @@ func TestEntityManager_GetByID(t *testing.T) {
 			mock: func(m *statusRepoMock) {
 				m.getByIDFn = func(ctx context.Context, id int64) (db.DictEntity, error) {
 					return db.DictEntity{
-						ID:   id,
-						Code: "open",
-						Name: "Open",
+						ID:          id,
+						Code:        "open",
+						Name:        "Open",
+						Description: "description",
 					}, nil
 				}
 			},
 			want: Entity{
-				ID:   1,
-				Code: "open",
-				Name: "Open",
+				ID:          1,
+				Code:        "open",
+				Name:        "Open",
+				Description: "description",
 			},
 		},
 		{

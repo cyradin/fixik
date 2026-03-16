@@ -92,18 +92,20 @@ func (m *EntityManager) Delete(ctx context.Context, id EntityID) error {
 	return nil
 }
 
-func (m *EntityManager) toDB(status Entity) db.DictEntity {
+func (m *EntityManager) toDB(entity Entity) db.DictEntity {
 	return db.DictEntity{
-		ID:   status.ID,
-		Name: status.Name,
-		Code: status.Code,
+		ID:          entity.ID,
+		Name:        entity.Name,
+		Code:        entity.Code,
+		Description: entity.Description,
 	}
 }
 
-func (m *EntityManager) fromDB(status db.DictEntity) Entity {
+func (m *EntityManager) fromDB(entity db.DictEntity) Entity {
 	return Entity{
-		ID:   status.ID,
-		Name: status.Name,
-		Code: status.Code,
+		ID:          entity.ID,
+		Name:        entity.Name,
+		Code:        entity.Code,
+		Description: entity.Description,
 	}
 }
