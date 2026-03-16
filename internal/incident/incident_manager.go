@@ -6,6 +6,7 @@ import (
 
 	"github.com/cyradin/fixik/internal/db"
 	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/user"
 )
 
 type incidentRepo interface {
@@ -21,30 +22,43 @@ type entityProvider interface {
 	List(ctx context.Context) ([]dict.Entity, error)
 }
 
+type userProvider interface {
+	GetByID(ctx context.Context, id int64) (user.User, error)
+	GetByIDMany(ctx context.Context, ids []int64) ([]user.User, error)
+}
+
 type IncidentManager struct {
 	repo             incidentRepo
 	statusProvider   entityProvider
 	priorityProvider entityProvider
+	teamProvider     entityProvider
+	userProvider     userProvider
 }
 
 func NewIncidentManager(
 	repo incidentRepo,
 	statusProvider entityProvider,
 	priorityProvider entityProvider,
+	teamProvider entityProvider,
+	userProvider userProvider,
 ) *IncidentManager {
 	return &IncidentManager{
 		repo:             repo,
 		statusProvider:   statusProvider,
 		priorityProvider: priorityProvider,
+		teamProvider:     teamProvider,
+		userProvider:     userProvider,
 	}
 }
 
-func (m *IncidentManager) Create(ctx context.Context, cmd CreateIncident) (Incident, error) {
+func (m *IncidentManager) Create(ctx context.Context, incident CreateIncident) (Incident, error) {
 	dbIncident := db.Incident{
-		Title:       cmd.Title,
-		Description: cmd.Description,
-		StatusID:    cmd.StatusID,
-		PriorityID:  cmd.PriorityID,
+		Title:       incident.Title,
+		Description: incident.Description,
+		StatusID:    incident.StatusID,
+		PriorityID:  incident.PriorityID,
+		TeamID:      incident.TeamID,
+		UserID:      incident.UserID,
 	}
 
 	if err := m.repo.Create(ctx, &dbIncident); err != nil {
@@ -70,36 +84,75 @@ func (m *IncidentManager) GetByID(ctx context.Context, id int64) (Incident, erro
 		return Incident{}, fmt.Errorf("get priority: %w", err)
 	}
 
-	return m.fromDB(result, status, priority), nil
+	var team *dict.Entity
+
+	if result.TeamID != nil {
+		t, err := m.teamProvider.GetByID(ctx, *result.TeamID)
+		if err != nil {
+			return Incident{}, fmt.Errorf("get team: %w", err)
+		}
+
+		team = &t
+	}
+
+	var user *user.User
+
+	if result.UserID != nil {
+		u, err := m.userProvider.GetByID(ctx, *result.UserID)
+		if err != nil {
+			return Incident{}, fmt.Errorf("get user: %w", err)
+		}
+
+		user = &u
+	}
+
+	return m.fromDB(result, status, priority, team, user), nil
 }
 
-func (m *IncidentManager) Update(ctx context.Context, cmd UpdateIncident) (Incident, error) {
-	current, err := m.repo.GetByID(ctx, cmd.ID)
+func (m *IncidentManager) Update(ctx context.Context, incident UpdateIncident) (Incident, error) {
+	current, err := m.repo.GetByID(ctx, incident.ID)
 	if err != nil {
 		return Incident{}, fmt.Errorf("get incident: %w", err)
 	}
 
-	if cmd.Title != nil {
-		current.Title = *cmd.Title
+	if incident.Title != nil {
+		current.Title = *incident.Title
 	}
 
-	if cmd.Description != nil {
-		current.Description = *cmd.Description
+	if incident.Description != nil {
+		current.Description = *incident.Description
 	}
 
-	if cmd.StatusID != nil {
-		current.StatusID = *cmd.StatusID
+	if incident.StatusID != nil {
+		current.StatusID = *incident.StatusID
 	}
 
-	if cmd.PriorityID != nil {
-		current.PriorityID = *cmd.PriorityID
+	if incident.PriorityID != nil {
+		current.PriorityID = *incident.PriorityID
+	}
+
+	if incident.TeamID != nil {
+		if *incident.TeamID == 0 {
+			// удалить команду
+			incident.TeamID = nil
+		} else {
+			current.TeamID = incident.TeamID
+		}
+	}
+
+	if incident.UserID != nil {
+		if *incident.UserID == 0 {
+			incident.UserID = nil
+		} else {
+			current.UserID = incident.UserID
+		}
 	}
 
 	if err := m.repo.Update(ctx, &current); err != nil {
 		return Incident{}, fmt.Errorf("update incident: %w", err)
 	}
 
-	return m.GetByID(ctx, cmd.ID)
+	return m.GetByID(ctx, incident.ID)
 }
 
 func (m *IncidentManager) Delete(ctx context.Context, id int64) error {
@@ -116,51 +169,160 @@ func (m *IncidentManager) List(ctx context.Context, limit, offset int) ([]Incide
 		return nil, fmt.Errorf("list incidents: %w", err)
 	}
 
-	statuses, err := m.statusProvider.List(ctx)
+	userIDs := make([]int64, 0, len(rows))
+	userIDSet := make(map[int64]struct{})
+
+	for _, r := range rows {
+		if r.UserID != nil {
+			id := *r.UserID
+			if _, exists := userIDSet[id]; !exists {
+				userIDs = append(userIDs, id)
+				userIDSet[id] = struct{}{}
+			}
+		}
+	}
+
+	usersMap := make(map[int64]user.User)
+
+	if len(userIDs) > 0 {
+		users, err := m.userProvider.GetByIDMany(ctx, userIDs)
+		if err != nil {
+			return nil, fmt.Errorf("get users: %w", err)
+		}
+
+		for _, u := range users {
+			usersMap[u.ID] = u
+		}
+	}
+
+	statusMap, err := m.loadStatuses(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("list statuses: %w", err)
+		return nil, err
 	}
 
-	priorities, err := m.priorityProvider.List(ctx)
+	priorityMap, err := m.loadPriorities(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("list priorities: %w", err)
+		return nil, err
 	}
 
-	statusMap := make(map[int64]dict.Entity, len(statuses))
-	for _, e := range statuses {
-		statusMap[e.ID] = e
-	}
-
-	priorityMap := make(map[int64]dict.Entity, len(priorities))
-	for _, e := range priorities {
-		priorityMap[e.ID] = e
+	teamMap, err := m.loadTeams(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	result := make([]Incident, 0, len(rows))
 
 	for _, r := range rows {
-		status, ok := statusMap[r.StatusID]
-		if !ok {
-			return nil, fmt.Errorf("status %d not found", r.StatusID)
+		item, err := m.transformFromDB(
+			r,
+			statusMap,
+			priorityMap,
+			teamMap,
+			usersMap,
+		)
+		if err != nil {
+			return nil, err
 		}
 
-		priority, ok := priorityMap[r.PriorityID]
-		if !ok {
-			return nil, fmt.Errorf("priority %d not found", r.PriorityID)
-		}
-
-		result = append(result, m.fromDB(r, status, priority))
+		result = append(result, item)
 	}
 
 	return result, nil
 }
 
-func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, priority dict.Entity) Incident {
+func (m *IncidentManager) loadStatuses(ctx context.Context) (map[int64]dict.Entity, error) {
+	items, err := m.statusProvider.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list statuses: %w", err)
+	}
+
+	result := make(map[int64]dict.Entity, len(items))
+	for _, e := range items {
+		result[e.ID] = e
+	}
+
+	return result, nil
+}
+
+func (m *IncidentManager) loadPriorities(ctx context.Context) (map[int64]dict.Entity, error) {
+	items, err := m.priorityProvider.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list priorities: %w", err)
+	}
+
+	result := make(map[int64]dict.Entity, len(items))
+	for _, e := range items {
+		result[e.ID] = e
+	}
+
+	return result, nil
+}
+
+func (m *IncidentManager) loadTeams(ctx context.Context) (map[int64]dict.Entity, error) {
+	items, err := m.teamProvider.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list teams: %w", err)
+	}
+
+	result := make(map[int64]dict.Entity, len(items))
+	for _, e := range items {
+		result[e.ID] = e
+	}
+
+	return result, nil
+}
+
+func (m *IncidentManager) transformFromDB(
+	r db.Incident,
+	statusMap map[int64]dict.Entity,
+	priorityMap map[int64]dict.Entity,
+	teamMap map[int64]dict.Entity,
+	userMap map[int64]user.User,
+) (Incident, error) {
+	status, ok := statusMap[r.StatusID]
+	if !ok {
+		return Incident{}, fmt.Errorf("status %d not found", r.StatusID)
+	}
+
+	priority, ok := priorityMap[r.PriorityID]
+	if !ok {
+		return Incident{}, fmt.Errorf("priority %d not found", r.PriorityID)
+	}
+
+	var team *dict.Entity
+
+	if r.TeamID != nil {
+		t, ok := teamMap[*r.TeamID]
+		if !ok {
+			return Incident{}, fmt.Errorf("team %d not found", *r.TeamID)
+		}
+
+		team = &t
+	}
+
+	var user *user.User
+
+	if r.UserID != nil {
+		u, ok := userMap[*r.UserID]
+
+		if !ok {
+			return Incident{}, fmt.Errorf("user %d not found", *r.UserID)
+		}
+
+		user = &u
+	}
+
+	return m.fromDB(r, status, priority, team, user), nil
+}
+
+func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, priority dict.Entity, team *dict.Entity, user *user.User) Incident {
 	return Incident{
 		ID:          incident.ID,
 		Title:       incident.Title,
 		Description: incident.Description,
 		Status:      status,
 		Priority:    priority,
+		Team:        team,
+		User:        user,
 	}
 }

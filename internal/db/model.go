@@ -7,6 +7,7 @@ import (
 
 var ErrNotFound = fmt.Errorf("not found")
 
+// модель
 type Incident struct {
 	ID          int64
 	Title       string
@@ -14,6 +15,9 @@ type Incident struct {
 
 	PriorityID int64
 	StatusID   int64
+
+	TeamID *int64
+	UserID *int64
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

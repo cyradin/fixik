@@ -8,6 +8,8 @@ func (c *Container) IncidentManager() *incident.IncidentManager {
 			c.IncidentRepository(),
 			c.StatusManager(),
 			c.PriorityManager(),
+			c.TeamManager(),
+			c.UserManager(),
 		)
 	}
 

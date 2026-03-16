@@ -8,9 +8,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var ErrNotFound = db.ErrNotFound
+
 type userRepo interface {
 	Create(ctx context.Context, u *db.User) error
 	GetByID(ctx context.Context, id int64) (db.User, error)
+	GetByIDMany(ctx context.Context, ids []int64) ([]db.User, error)
 	Update(ctx context.Context, u *db.User) error
 	Delete(ctx context.Context, id int64) error
 	List(ctx context.Context, limit, offset int) ([]db.User, error)
@@ -105,16 +108,22 @@ func (m *UserManager) GetByID(ctx context.Context, id int64) (User, error) {
 		return User{}, fmt.Errorf("get user: %w", err)
 	}
 
-	return User{
-		ID:        userDB.ID,
-		Name:      userDB.Name,
-		Username:  userDB.Username,
-		Email:     userDB.Email,
-		TeamID:    userDB.TeamID,
-		Role:      userDB.Role,
-		CreatedAt: userDB.CreatedAt,
-		UpdatedAt: userDB.UpdatedAt,
-	}, nil
+	return m.fromDB(userDB), nil
+}
+
+func (m *UserManager) GetByIDMany(ctx context.Context, ids []int64) ([]User, error) {
+	usersDB, err := m.repo.GetByIDMany(ctx, ids)
+	if err != nil {
+		return nil, fmt.Errorf("get user: %w", err)
+	}
+
+	users := make([]User, 0, len(usersDB))
+
+	for _, u := range usersDB {
+		users = append(users, m.fromDB(u))
+	}
+
+	return users, nil
 }
 
 func (m *UserManager) List(ctx context.Context, limit, offset int) ([]User, error) {
@@ -126,19 +135,23 @@ func (m *UserManager) List(ctx context.Context, limit, offset int) ([]User, erro
 	users := make([]User, 0, len(usersDB))
 
 	for _, u := range usersDB {
-		users = append(users, User{
-			ID:        u.ID,
-			Name:      u.Name,
-			Username:  u.Username,
-			Email:     u.Email,
-			TeamID:    u.TeamID,
-			Role:      u.Role,
-			CreatedAt: u.CreatedAt,
-			UpdatedAt: u.UpdatedAt,
-		})
+		users = append(users, m.fromDB(u))
 	}
 
 	return users, nil
+}
+
+func (m *UserManager) fromDB(u db.User) User {
+	return User{
+		ID:        u.ID,
+		Name:      u.Name,
+		Username:  u.Username,
+		Email:     u.Email,
+		TeamID:    u.TeamID,
+		Role:      u.Role,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+	}
 }
 
 func hashPassword(password string) (string, error) {

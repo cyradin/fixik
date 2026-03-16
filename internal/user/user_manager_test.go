@@ -151,6 +151,86 @@ func TestUserManager_GetByID(t *testing.T) {
 	}
 }
 
+func TestUserManager_GetByIDMany(t *testing.T) {
+	t.Parallel()
+
+	dbUsers := []db.User{
+		{ID: 1, Name: "Алиса", Username: "alice", Role: RoleAdmin, TeamID: new(int64(1))},
+		{ID: 2, Name: "Боб", Username: "bob", Role: RoleUser, TeamID: new(int64(2))},
+		{ID: 3, Name: "Каролина", Username: "carol", Role: RoleManager, TeamID: new(int64(3))},
+	}
+
+	tests := []struct {
+		name string
+		ids  []int64
+		mock func(*userRepoMock)
+		err  bool
+		want []User
+	}{
+		{
+			name: "success all",
+			ids:  []int64{1, 2, 3},
+			mock: func(m *userRepoMock) {
+				m.getByIDManyFn = func(ctx context.Context, ids []int64) ([]db.User, error) {
+					return dbUsers, nil
+				}
+			},
+			want: []User{
+				{ID: 1, Name: "Алиса", Username: "alice", Role: RoleAdmin, TeamID: new(int64(1))},
+				{ID: 2, Name: "Боб", Username: "bob", Role: RoleUser, TeamID: new(int64(2))},
+				{ID: 3, Name: "Каролина", Username: "carol", Role: RoleManager, TeamID: new(int64(3))},
+			},
+		},
+		{
+			name: "repo error",
+			ids:  []int64{1, 2},
+			mock: func(m *userRepoMock) {
+				m.getByIDManyFn = func(ctx context.Context, ids []int64) ([]db.User, error) {
+					return nil, errors.New("db error")
+				}
+			},
+			err: true,
+		},
+		{
+			name: "empty input",
+			ids:  []int64{},
+			mock: func(m *userRepoMock) {
+				m.getByIDManyFn = func(ctx context.Context, ids []int64) ([]db.User, error) {
+					return []db.User{}, nil
+				}
+			},
+			want: []User{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			repo := &userRepoMock{}
+			tt.mock(repo)
+
+			manager := NewUserManager(repo)
+			users, err := manager.GetByIDMany(t.Context(), tt.ids)
+
+			if tt.err {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+
+			for i := range users {
+				require.Equal(t, tt.want[i].ID, users[i].ID)
+				require.Equal(t, tt.want[i].Name, users[i].Name)
+				require.Equal(t, tt.want[i].Username, users[i].Username)
+				require.Equal(t, tt.want[i].Role, users[i].Role)
+				require.Equal(t, tt.want[i].TeamID, users[i].TeamID)
+			}
+		})
+	}
+}
+
 func TestUserManager_Update(t *testing.T) {
 	t.Parallel()
 
@@ -335,11 +415,12 @@ func TestUserManager_List(t *testing.T) {
 
 // Mocks
 type userRepoMock struct {
-	createFn  func(context.Context, *db.User) error
-	getByIDFn func(context.Context, int64) (db.User, error)
-	listFn    func(context.Context, int, int) ([]db.User, error)
-	updateFn  func(context.Context, *db.User) error
-	deleteFn  func(context.Context, int64) error
+	createFn      func(context.Context, *db.User) error
+	getByIDFn     func(context.Context, int64) (db.User, error)
+	getByIDManyFn func(context.Context, []int64) ([]db.User, error)
+	listFn        func(context.Context, int, int) ([]db.User, error)
+	updateFn      func(context.Context, *db.User) error
+	deleteFn      func(context.Context, int64) error
 }
 
 func (m *userRepoMock) Create(ctx context.Context, u *db.User) error {
@@ -360,4 +441,8 @@ func (m *userRepoMock) Update(ctx context.Context, u *db.User) error {
 
 func (m *userRepoMock) Delete(ctx context.Context, id int64) error {
 	return m.deleteFn(ctx, id)
+}
+
+func (m *userRepoMock) GetByIDMany(ctx context.Context, ids []int64) ([]db.User, error) {
+	return m.getByIDManyFn(ctx, ids)
 }

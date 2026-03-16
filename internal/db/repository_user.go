@@ -78,6 +78,55 @@ func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 	return u, nil
 }
 
+func (r *UserRepository) GetByIDMany(ctx context.Context, ids []int64) ([]User, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
+	query := `
+		SELECT
+			u.id, u.name, u.username, u.email, u.password, u.team_id,
+			u.role, u.created_at, u.updated_at, u.deleted_at
+		FROM users u
+		WHERE u.deleted_at IS NULL AND u.id = ANY($1)
+		GROUP BY u.id
+	`
+
+	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, query, ids)
+	if err != nil {
+		return nil, fmt.Errorf("db query: %w", err)
+	}
+	defer rows.Close()
+
+	users := make([]User, 0, len(ids))
+
+	for rows.Next() {
+		var u User
+		if err := rows.Scan(
+			&u.ID,
+			&u.Name,
+			&u.Username,
+			&u.Email,
+			&u.Password,
+			&u.TeamID,
+			&u.Role,
+			&u.CreatedAt,
+			&u.UpdatedAt,
+			&u.DeletedAt,
+		); err != nil {
+			return nil, fmt.Errorf("scan: %w", err)
+		}
+
+		users = append(users, u)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
+	return users, nil
+}
+
 func (r *UserRepository) List(ctx context.Context, limit, offset int) ([]User, error) {
 	const query = `
 		SELECT

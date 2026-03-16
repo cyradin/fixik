@@ -50,6 +50,41 @@ func (s *UserRepositorySuite) TestGetByID() {
 	s.Nil(fromDB.DeletedAt)
 }
 
+func (s *UserRepositorySuite) TestGetByIDMany() {
+	ctx := s.T().Context()
+
+	team := s.createTeam("team1", "Team One")
+
+	u1 := s.createUser("Александр", "u1", "u1@example.com", "pass", team.ID, RoleAdmin)
+	u2 := s.createUser("Мария", "u2", "u2@example.com", "pass", team.ID, RoleUser)
+	u3 := s.createUser("Иван", "u3", "u3@example.com", "pass", team.ID, RoleManager)
+
+	s.Run("get multiple users", func() {
+		ids := []int64{u1.ID, u2.ID, u3.ID}
+		users, err := s.repo.GetByIDMany(ctx, ids)
+		s.Require().NoError(err)
+		s.Len(users, 3)
+		s.Equal(users, []User{*u1, *u2, *u3})
+	})
+
+	s.Run("empty slice returns empty slice", func() {
+		usersMap, err := s.repo.GetByIDMany(ctx, []int64{})
+		s.Require().NoError(err)
+		s.Empty(usersMap)
+	})
+
+	s.Run("deleted users are skipped", func() {
+		err := s.repo.Delete(ctx, u2.ID)
+		s.Require().NoError(err)
+
+		ids := []int64{u1.ID, u2.ID, u3.ID}
+		users, err := s.repo.GetByIDMany(ctx, ids)
+		s.Require().NoError(err)
+		s.Len(users, 2)
+		s.Equal(users, []User{*u1, *u3})
+	})
+}
+
 func (s *UserRepositorySuite) TestList() {
 	ctx := s.T().Context()
 

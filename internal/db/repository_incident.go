@@ -24,13 +24,17 @@ func (r *IncidentRepository) Create(ctx context.Context, i *Incident) error {
 			title,
 			description,
 			priority_id,
-			status_id
+			status_id,
+			team_id,
+			user_id
 		)
 		VALUES (
 			@title,
 			@description,
 			@priority_id,
-			@status_id
+			@status_id,
+			@team_id,
+			@user_id
 		)
 		RETURNING id, created_at, updated_at
 	`
@@ -40,6 +44,8 @@ func (r *IncidentRepository) Create(ctx context.Context, i *Incident) error {
 		"description": i.Description,
 		"priority_id": i.PriorityID,
 		"status_id":   i.StatusID,
+		"team_id":     i.TeamID,
+		"user_id":     i.UserID,
 	}
 
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(
@@ -61,6 +67,8 @@ func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, e
 			description,
 			priority_id,
 			status_id,
+			team_id,
+			user_id,
 			created_at,
 			updated_at,
 			deleted_at
@@ -69,21 +77,21 @@ func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, e
 		  AND deleted_at IS NULL
 	`
 
-	args := pgx.NamedArgs{
-		"id": id,
-	}
+	args := pgx.NamedArgs{"id": id}
 
-	var incident Incident
+	var i Incident
 
 	err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(
-		&incident.ID,
-		&incident.Title,
-		&incident.Description,
-		&incident.PriorityID,
-		&incident.StatusID,
-		&incident.CreatedAt,
-		&incident.UpdatedAt,
-		&incident.DeletedAt,
+		&i.ID,
+		&i.Title,
+		&i.Description,
+		&i.PriorityID,
+		&i.StatusID,
+		&i.TeamID,
+		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -93,7 +101,7 @@ func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, e
 		return Incident{}, fmt.Errorf("db query: %w", err)
 	}
 
-	return incident, nil
+	return i, nil
 }
 
 func (r *IncidentRepository) Update(ctx context.Context, i *Incident) error {
@@ -104,6 +112,8 @@ func (r *IncidentRepository) Update(ctx context.Context, i *Incident) error {
 			description = @description,
 			priority_id = @priority_id,
 			status_id = @status_id,
+			team_id = @team_id,
+			user_id = @user_id,
 			updated_at = now()
 		WHERE id = @id
 		  AND deleted_at IS NULL
@@ -116,6 +126,8 @@ func (r *IncidentRepository) Update(ctx context.Context, i *Incident) error {
 		"description": i.Description,
 		"priority_id": i.PriorityID,
 		"status_id":   i.StatusID,
+		"team_id":     i.TeamID,
+		"user_id":     i.UserID,
 	}
 
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(&i.UpdatedAt); err != nil {
@@ -145,7 +157,6 @@ func (r *IncidentRepository) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
-
 func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Incident, error) {
 	const query = `
 		SELECT
@@ -154,6 +165,8 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Inc
 			description,
 			priority_id,
 			status_id,
+			team_id,
+			user_id,
 			created_at,
 			updated_at,
 			deleted_at
@@ -179,13 +192,14 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Inc
 
 	for rows.Next() {
 		var i Incident
-
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
 			&i.Description,
 			&i.PriorityID,
 			&i.StatusID,
+			&i.TeamID,
+			&i.UserID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
