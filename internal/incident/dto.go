@@ -17,8 +17,9 @@ type Incident struct {
 	Priority dict.Entity
 	Status   dict.Entity
 
-	Team *dict.Entity
-	User *user.User
+	Team   *dict.Entity
+	User   *user.User
+	Author *user.User
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -31,11 +32,9 @@ type CreateIncident struct {
 	PriorityID dict.EntityID
 	StatusID   dict.EntityID
 
-	TeamID *int64
-	UserID *int64
-
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	TeamID   *int64
+	UserID   *int64
+	AuthorID *int64
 }
 
 type UpdateIncident struct {
@@ -44,8 +43,9 @@ type UpdateIncident struct {
 	Title       *string
 	Description *string
 
-	TeamID *int64
-	UserID *int64
+	TeamID   *int64
+	UserID   *int64
+	AuthorID *int64
 
 	PriorityID *dict.EntityID
 	StatusID   *dict.EntityID

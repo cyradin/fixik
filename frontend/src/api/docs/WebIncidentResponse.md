@@ -6,11 +6,14 @@
 
 Name | Type
 ------------ | -------------
+`author` | [WebUserResponse](WebUserResponse.md)
 `description` | string
 `id` | number
 `priority` | [WebDictEntityShort](WebDictEntityShort.md)
 `status` | [WebDictEntityShort](WebDictEntityShort.md)
+`team` | [WebDictEntityShort](WebDictEntityShort.md)
 `title` | string
+`user` | [WebUserResponse](WebUserResponse.md)
 
 ## Example
 
@@ -19,11 +22,14 @@ import type { WebIncidentResponse } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "author": null,
   "description": null,
   "id": null,
   "priority": null,
   "status": null,
+  "team": null,
   "title": null,
+  "user": null,
 } satisfies WebIncidentResponse
 
 console.log(example)

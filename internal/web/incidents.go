@@ -24,6 +24,9 @@ type CreateIncidentRequest struct {
 	Description string `json:"description"`
 	StatusID    int64  `json:"statusId"`
 	PriorityID  int64  `json:"priorityId"`
+	TeamID      *int64 `json:"teamId"`
+	UserID      *int64 `json:"userId"`
+	AuthorID    *int64 `json:"authorId"`
 }
 
 func (r CreateIncidentRequest) Validate() error {
@@ -33,6 +36,9 @@ func (r CreateIncidentRequest) Validate() error {
 		validation.Field(&r.Description, validation.Required),
 		validation.Field(&r.StatusID, validation.Required, validation.Min(1)),
 		validation.Field(&r.PriorityID, validation.Required, validation.Min(1)),
+		validation.Field(&r.TeamID, validation.Min(1)),
+		validation.Field(&r.UserID, validation.Min(1)),
+		validation.Field(&r.AuthorID, validation.Min(1)),
 	)
 }
 
@@ -41,6 +47,9 @@ type UpdateIncidentRequest struct {
 	Description *string `json:"description"`
 	StatusID    *int64  `json:"statusId"`
 	PriorityID  *int64  `json:"priorityId"`
+	TeamID      *int64  `json:"teamId"`
+	UserID      *int64  `json:"userId"`
+	AuthorID    *int64  `json:"authorId"`
 }
 
 func (r UpdateIncidentRequest) Validate() error {
@@ -50,15 +59,21 @@ func (r UpdateIncidentRequest) Validate() error {
 		validation.Field(&r.Description),
 		validation.Field(&r.StatusID, validation.Min(1)),
 		validation.Field(&r.PriorityID, validation.Min(1)),
+		validation.Field(&r.TeamID, validation.Min(1)),
+		validation.Field(&r.UserID, validation.Min(1)),
+		validation.Field(&r.AuthorID, validation.Min(1)),
 	)
 }
 
 type IncidentResponse struct {
-	ID          int64           `json:"id"`
-	Title       string          `json:"title"`
-	Description string          `json:"description"`
-	Status      DictEntityShort `json:"status"`
-	Priority    DictEntityShort `json:"priority"`
+	ID          int64            `json:"id"`
+	Title       string           `json:"title"`
+	Description string           `json:"description"`
+	Status      DictEntityShort  `json:"status"`
+	Priority    DictEntityShort  `json:"priority"`
+	Team        *DictEntityShort `json:"team"`
+	User        *UserResponse    `json:"user"`
+	Author      *UserResponse    `json:"author"`
 }
 
 type DictEntityShort struct {
@@ -71,11 +86,11 @@ func incidentRoutes(c *container.Container) func(r chi.Router) {
 	incidentManager := c.IncidentManager()
 
 	return func(r chi.Router) {
-		r.Post("/incidents", createIncident(incidentManager))
-		r.Get("/incidents", listIncidents(incidentManager))
-		r.Get("/incidents/{id}", getIncident(incidentManager))
-		r.Patch("/incidents/{id}", updateIncident(incidentManager))
-		r.Delete("/incidents/{id}", deleteIncident(incidentManager))
+		r.Post("/", createIncident(incidentManager))
+		r.Get("/", listIncidents(incidentManager))
+		r.Get("/{id}", getIncident(incidentManager))
+		r.Patch("/{id}", updateIncident(incidentManager))
+		r.Delete("/{id}", deleteIncident(incidentManager))
 	}
 }
 
@@ -100,6 +115,9 @@ func createIncident(manager incidentManager) http.HandlerFunc {
 			Description: req.Description,
 			StatusID:    req.StatusID,
 			PriorityID:  req.PriorityID,
+			TeamID:      req.TeamID,
+			UserID:      req.UserID,
+			AuthorID:    req.AuthorID,
 		})
 		if err != nil {
 			return IncidentResponse{}, err
@@ -168,6 +186,9 @@ func updateIncident(manager incidentManager) http.HandlerFunc {
 				Description: req.Description,
 				StatusID:    req.StatusID,
 				PriorityID:  req.PriorityID,
+				TeamID:      req.TeamID,
+				UserID:      req.UserID,
+				AuthorID:    req.AuthorID,
 			})
 			if err != nil {
 				return IncidentResponse{}, err
@@ -228,6 +249,28 @@ func listIncidents(manager incidentManager) http.HandlerFunc {
 }
 
 func toIncidentResponse(i incident.Incident) IncidentResponse {
+	var (
+		team   *DictEntityShort
+		user   *UserResponse
+		author *UserResponse
+	)
+
+	if i.Team != nil {
+		team = &DictEntityShort{
+			ID:   i.Team.ID,
+			Code: i.Team.Code,
+			Name: i.Team.Name,
+		}
+	}
+
+	if i.User != nil {
+		user = new(toUserResponse(*i.User))
+	}
+
+	if i.Author != nil {
+		author = new(toUserResponse(*i.Author))
+	}
+
 	return IncidentResponse{
 		ID:          i.ID,
 		Title:       i.Title,
@@ -242,5 +285,8 @@ func toIncidentResponse(i incident.Incident) IncidentResponse {
 			Code: i.Priority.Code,
 			Name: i.Priority.Name,
 		},
+		Team:   team,
+		User:   user,
+		Author: author,
 	}
 }

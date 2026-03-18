@@ -6,10 +6,13 @@
 
 Name | Type
 ------------ | -------------
+`authorId` | number
 `description` | string
 `priorityId` | number
 `statusId` | number
+`teamId` | number
 `title` | string
+`userId` | number
 
 ## Example
 
@@ -18,10 +21,13 @@ import type { WebCreateIncidentRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "authorId": null,
   "description": null,
   "priorityId": null,
   "statusId": null,
+  "teamId": null,
   "title": null,
+  "userId": null,
 } satisfies WebCreateIncidentRequest
 
 console.log(example)

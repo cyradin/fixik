@@ -103,6 +103,7 @@ func TestIncidentManager_GetByID(t *testing.T) {
 		StatusID:    1,
 		PriorityID:  2,
 		UserID:      new(int64(100)),
+		AuthorID:    new(int64(100)),
 	}
 
 	tests := []struct {
@@ -222,6 +223,7 @@ func TestIncidentManager_GetByID(t *testing.T) {
 			require.Equal(t, dict.EntityID(1), res.Status.ID)
 			require.Equal(t, dict.EntityID(2), res.Priority.ID)
 			require.Equal(t, int64(100), res.User.ID)
+			require.Equal(t, int64(100), res.Author.ID)
 		})
 	}
 }
@@ -287,6 +289,27 @@ func TestIncidentManager_Update(t *testing.T) {
 			cmd: UpdateIncident{
 				ID:     1,
 				UserID: new(int64(0)),
+			},
+			mock: func(m *incidentRepoMock) {
+				m.updateFn = func(ctx context.Context, i *db.Incident) error {
+					return nil
+				}
+				m.getByIDFn = func(ctx context.Context, id int64) (db.Incident, error) {
+					return db.Incident{
+						ID:          id,
+						Title:       "new",
+						Description: "desc",
+						StatusID:    1,
+						PriorityID:  2,
+					}, nil
+				}
+			},
+		},
+		{
+			name: "success, delete author",
+			cmd: UpdateIncident{
+				ID:       1,
+				AuthorID: new(int64(0)),
 			},
 			mock: func(m *incidentRepoMock) {
 				m.updateFn = func(ctx context.Context, i *db.Incident) error {

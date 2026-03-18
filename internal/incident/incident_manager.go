@@ -95,7 +95,7 @@ func (m *IncidentManager) GetByID(ctx context.Context, id int64) (Incident, erro
 		team = &t
 	}
 
-	var user *user.User
+	var usr *user.User
 
 	if result.UserID != nil {
 		u, err := m.userProvider.GetByID(ctx, *result.UserID)
@@ -103,10 +103,21 @@ func (m *IncidentManager) GetByID(ctx context.Context, id int64) (Incident, erro
 			return Incident{}, fmt.Errorf("get user: %w", err)
 		}
 
-		user = &u
+		usr = &u
 	}
 
-	return m.fromDB(result, status, priority, team, user), nil
+	var author *user.User
+
+	if result.AuthorID != nil {
+		u, err := m.userProvider.GetByID(ctx, *result.AuthorID)
+		if err != nil {
+			return Incident{}, fmt.Errorf("get user: %w", err)
+		}
+
+		author = &u
+	}
+
+	return m.fromDB(result, status, priority, team, usr, author), nil
 }
 
 func (m *IncidentManager) Update(ctx context.Context, incident UpdateIncident) (Incident, error) {
@@ -145,6 +156,14 @@ func (m *IncidentManager) Update(ctx context.Context, incident UpdateIncident) (
 			incident.UserID = nil
 		} else {
 			current.UserID = incident.UserID
+		}
+	}
+
+	if incident.AuthorID != nil {
+		if *incident.AuthorID == 0 {
+			incident.AuthorID = nil
+		} else {
+			current.AuthorID = incident.AuthorID
 		}
 	}
 
@@ -300,7 +319,7 @@ func (m *IncidentManager) transformFromDB(
 		team = &t
 	}
 
-	var user *user.User
+	var usr *user.User
 
 	if r.UserID != nil {
 		u, ok := userMap[*r.UserID]
@@ -309,13 +328,25 @@ func (m *IncidentManager) transformFromDB(
 			return Incident{}, fmt.Errorf("user %d not found", *r.UserID)
 		}
 
-		user = &u
+		usr = &u
 	}
 
-	return m.fromDB(r, status, priority, team, user), nil
+	var author *user.User
+
+	if r.AuthorID != nil {
+		u, ok := userMap[*r.AuthorID]
+
+		if !ok {
+			return Incident{}, fmt.Errorf("user %d not found", *r.AuthorID)
+		}
+
+		author = &u
+	}
+
+	return m.fromDB(r, status, priority, team, usr, author), nil
 }
 
-func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, priority dict.Entity, team *dict.Entity, user *user.User) Incident {
+func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, priority dict.Entity, team *dict.Entity, user *user.User, author *user.User) Incident {
 	return Incident{
 		ID:          incident.ID,
 		Title:       incident.Title,
@@ -324,5 +355,6 @@ func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, prior
 		Priority:    priority,
 		Team:        team,
 		User:        user,
+		Author:      author,
 	}
 }

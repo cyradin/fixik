@@ -40,6 +40,7 @@ func (s *IncidentRepositorySuite) TestCreate() {
 	status := s.createStatus("open", "Open")
 	team := s.createTeam("dev", "Dev Team")
 	user := s.createUser("Alice", "alice", "alice@test.com", team.ID)
+	author := s.createUser("Bob", "bob", "bob@test.com", team.ID)
 
 	inc := &Incident{
 		Title:       "DB down",
@@ -48,6 +49,7 @@ func (s *IncidentRepositorySuite) TestCreate() {
 		StatusID:    status.ID,
 		TeamID:      &team.ID,
 		UserID:      &user.ID,
+		AuthorID:    &author.ID,
 	}
 
 	err := s.repo.Create(ctx, inc)
@@ -57,13 +59,15 @@ func (s *IncidentRepositorySuite) TestCreate() {
 	s.NotZero(inc.UpdatedAt)
 	s.Equal(&team.ID, inc.TeamID)
 	s.Equal(&user.ID, inc.UserID)
+	s.Equal(&author.ID, inc.AuthorID)
 }
 
 func (s *IncidentRepositorySuite) TestGetByID_Found() {
 	priority := s.createPriority("medium", "Medium")
 	status := s.createStatus("open", "Open")
 	team := s.createTeam("ops", "Ops Team")
-	user := s.createUser("Bob", "bob", "bob@test.com", team.ID)
+	user := s.createUser("Alice", "alice", "alice@test.com", team.ID)
+	author := s.createUser("Bob", "bob", "bob@test.com", team.ID)
 
 	inc := s.loadIncidents([]Incident{
 		{
@@ -73,6 +77,7 @@ func (s *IncidentRepositorySuite) TestGetByID_Found() {
 			StatusID:    status.ID,
 			TeamID:      &team.ID,
 			UserID:      &user.ID,
+			AuthorID:    &author.ID,
 		},
 	})[0]
 
@@ -81,6 +86,7 @@ func (s *IncidentRepositorySuite) TestGetByID_Found() {
 	s.Equal(inc.ID, fromDB.ID)
 	s.Equal(inc.TeamID, fromDB.TeamID)
 	s.Equal(inc.UserID, fromDB.UserID)
+	s.Equal(inc.AuthorID, fromDB.AuthorID)
 }
 
 func (s *IncidentRepositorySuite) TestGetByID_NotFound() {
@@ -95,6 +101,7 @@ func (s *IncidentRepositorySuite) TestUpdate_Found() {
 	newStatus := s.createStatus("in_progress", "In Progress")
 	team := s.createTeam("team1", "Team 1")
 	user := s.createUser("Charlie", "charlie", "charlie@test.com", team.ID)
+	author := s.createUser("Bob", "bob", "bob@test.com", team.ID)
 
 	inc := s.loadIncidents([]Incident{
 		{
@@ -114,6 +121,7 @@ func (s *IncidentRepositorySuite) TestUpdate_Found() {
 	newTeam := s.createTeam("team2", "Team 2")
 	inc.TeamID = &newTeam.ID
 	inc.UserID = nil
+	inc.AuthorID = &author.ID
 
 	err := s.repo.Update(s.T().Context(), &inc)
 	s.Require().NoError(err)
@@ -124,6 +132,7 @@ func (s *IncidentRepositorySuite) TestUpdate_Found() {
 	s.Equal("Updated title", fromDB.Title)
 	s.Equal(newStatus.ID, fromDB.StatusID)
 	s.Equal(&newTeam.ID, fromDB.TeamID)
+	s.Equal(&author.ID, fromDB.AuthorID)
 	s.Nil(fromDB.UserID)
 }
 
@@ -232,10 +241,10 @@ func (s *IncidentRepositorySuite) loadIncidents(fixtures []Incident) []Incident 
 		}
 
 		row := s.Postgres().QueryRow(ctx,
-			`INSERT INTO incidents (title, description, priority_id, status_id, team_id, user_id)
-             VALUES ($1, $2, $3, $4, $5, $6)
+			`INSERT INTO incidents (title, description, priority_id, status_id, team_id, user_id, author_id)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
              RETURNING id, created_at, updated_at`,
-			inc.Title, inc.Description, inc.PriorityID, inc.StatusID, inc.TeamID, inc.UserID,
+			inc.Title, inc.Description, inc.PriorityID, inc.StatusID, inc.TeamID, inc.UserID, inc.AuthorID,
 		)
 		err := row.Scan(&inc.ID, &inc.CreatedAt, &inc.UpdatedAt)
 		s.Require().NoError(err)

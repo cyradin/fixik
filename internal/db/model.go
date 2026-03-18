@@ -16,8 +16,9 @@ type Incident struct {
 	PriorityID int64
 	StatusID   int64
 
-	TeamID *int64
-	UserID *int64
+	TeamID   *int64
+	UserID   *int64
+	AuthorID *int64
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

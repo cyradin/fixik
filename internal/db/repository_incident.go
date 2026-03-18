@@ -26,7 +26,8 @@ func (r *IncidentRepository) Create(ctx context.Context, i *Incident) error {
 			priority_id,
 			status_id,
 			team_id,
-			user_id
+			user_id,
+			author_id
 		)
 		VALUES (
 			@title,
@@ -34,7 +35,8 @@ func (r *IncidentRepository) Create(ctx context.Context, i *Incident) error {
 			@priority_id,
 			@status_id,
 			@team_id,
-			@user_id
+			@user_id,
+			@author_id
 		)
 		RETURNING id, created_at, updated_at
 	`
@@ -46,6 +48,7 @@ func (r *IncidentRepository) Create(ctx context.Context, i *Incident) error {
 		"status_id":   i.StatusID,
 		"team_id":     i.TeamID,
 		"user_id":     i.UserID,
+		"author_id":   i.AuthorID,
 	}
 
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(
@@ -69,6 +72,7 @@ func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, e
 			status_id,
 			team_id,
 			user_id,
+			author_id,
 			created_at,
 			updated_at,
 			deleted_at
@@ -89,6 +93,7 @@ func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, e
 		&i.StatusID,
 		&i.TeamID,
 		&i.UserID,
+		&i.AuthorID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
@@ -114,6 +119,7 @@ func (r *IncidentRepository) Update(ctx context.Context, i *Incident) error {
 			status_id = @status_id,
 			team_id = @team_id,
 			user_id = @user_id,
+			author_id = @author_id,
 			updated_at = now()
 		WHERE id = @id
 		  AND deleted_at IS NULL
@@ -128,6 +134,7 @@ func (r *IncidentRepository) Update(ctx context.Context, i *Incident) error {
 		"status_id":   i.StatusID,
 		"team_id":     i.TeamID,
 		"user_id":     i.UserID,
+		"author_id":   i.AuthorID,
 	}
 
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(&i.UpdatedAt); err != nil {
@@ -157,6 +164,7 @@ func (r *IncidentRepository) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
+
 func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Incident, error) {
 	const query = `
 		SELECT
@@ -167,6 +175,7 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Inc
 			status_id,
 			team_id,
 			user_id,
+			author_id,
 			created_at,
 			updated_at,
 			deleted_at
@@ -200,6 +209,7 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Inc
 			&i.StatusID,
 			&i.TeamID,
 			&i.UserID,
+			&i.AuthorID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,

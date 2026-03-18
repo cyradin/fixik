@@ -21,6 +21,12 @@ import { mapValues } from '../runtime';
 export interface WebCreateIncidentRequest {
     /**
      * 
+     * @type {number}
+     * @memberof WebCreateIncidentRequest
+     */
+    authorId?: number;
+    /**
+     * 
      * @type {string}
      * @memberof WebCreateIncidentRequest
      */
@@ -39,10 +45,22 @@ export interface WebCreateIncidentRequest {
     statusId?: number;
     /**
      * 
+     * @type {number}
+     * @memberof WebCreateIncidentRequest
+     */
+    teamId?: number;
+    /**
+     * 
      * @type {string}
      * @memberof WebCreateIncidentRequest
      */
     title?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WebCreateIncidentRequest
+     */
+    userId?: number;
 }
 
 /**
@@ -62,10 +80,13 @@ export function WebCreateIncidentRequestFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
+        'authorId': json['authorId'] == null ? undefined : json['authorId'],
         'description': json['description'] == null ? undefined : json['description'],
         'priorityId': json['priorityId'] == null ? undefined : json['priorityId'],
         'statusId': json['statusId'] == null ? undefined : json['statusId'],
+        'teamId': json['teamId'] == null ? undefined : json['teamId'],
         'title': json['title'] == null ? undefined : json['title'],
+        'userId': json['userId'] == null ? undefined : json['userId'],
     };
 }
 
@@ -80,10 +101,13 @@ export function WebCreateIncidentRequestToJSONTyped(value?: WebCreateIncidentReq
 
     return {
         
+        'authorId': value['authorId'],
         'description': value['description'],
         'priorityId': value['priorityId'],
         'statusId': value['statusId'],
+        'teamId': value['teamId'],
         'title': value['title'],
+        'userId': value['userId'],
     };
 }
 

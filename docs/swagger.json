@@ -1092,6 +1092,9 @@
         "web.CreateIncidentRequest": {
             "type": "object",
             "properties": {
+                "authorId": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1101,8 +1104,14 @@
                 "statusId": {
                     "type": "integer"
                 },
+                "teamId": {
+                    "type": "integer"
+                },
                 "title": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
         },
@@ -1176,6 +1185,9 @@
         "web.IncidentResponse": {
             "type": "object",
             "properties": {
+                "author": {
+                    "$ref": "#/definitions/web.UserResponse"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1188,8 +1200,14 @@
                 "status": {
                     "$ref": "#/definitions/web.DictEntityShort"
                 },
+                "team": {
+                    "$ref": "#/definitions/web.DictEntityShort"
+                },
                 "title": {
                     "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/web.UserResponse"
                 }
             }
         },
@@ -1265,6 +1283,9 @@
         "web.UpdateIncidentRequest": {
             "type": "object",
             "properties": {
+                "authorId": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1274,8 +1295,14 @@
                 "statusId": {
                     "type": "integer"
                 },
+                "teamId": {
+                    "type": "integer"
+                },
                 "title": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
         },

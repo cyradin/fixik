@@ -21,6 +21,12 @@ import { mapValues } from '../runtime';
 export interface WebUpdateIncidentRequest {
     /**
      * 
+     * @type {number}
+     * @memberof WebUpdateIncidentRequest
+     */
+    authorId?: number;
+    /**
+     * 
      * @type {string}
      * @memberof WebUpdateIncidentRequest
      */
@@ -39,10 +45,22 @@ export interface WebUpdateIncidentRequest {
     statusId?: number;
     /**
      * 
+     * @type {number}
+     * @memberof WebUpdateIncidentRequest
+     */
+    teamId?: number;
+    /**
+     * 
      * @type {string}
      * @memberof WebUpdateIncidentRequest
      */
     title?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WebUpdateIncidentRequest
+     */
+    userId?: number;
 }
 
 /**
@@ -62,10 +80,13 @@ export function WebUpdateIncidentRequestFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
+        'authorId': json['authorId'] == null ? undefined : json['authorId'],
         'description': json['description'] == null ? undefined : json['description'],
         'priorityId': json['priorityId'] == null ? undefined : json['priorityId'],
         'statusId': json['statusId'] == null ? undefined : json['statusId'],
+        'teamId': json['teamId'] == null ? undefined : json['teamId'],
         'title': json['title'] == null ? undefined : json['title'],
+        'userId': json['userId'] == null ? undefined : json['userId'],
     };
 }
 
@@ -80,10 +101,13 @@ export function WebUpdateIncidentRequestToJSONTyped(value?: WebUpdateIncidentReq
 
     return {
         
+        'authorId': value['authorId'],
         'description': value['description'],
         'priorityId': value['priorityId'],
         'statusId': value['statusId'],
+        'teamId': value['teamId'],
         'title': value['title'],
+        'userId': value['userId'],
     };
 }
 

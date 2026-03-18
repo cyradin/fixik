@@ -1095,6 +1095,9 @@ const docTemplate = `{
         "web.CreateIncidentRequest": {
             "type": "object",
             "properties": {
+                "authorId": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1104,8 +1107,14 @@ const docTemplate = `{
                 "statusId": {
                     "type": "integer"
                 },
+                "teamId": {
+                    "type": "integer"
+                },
                 "title": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
         },
@@ -1179,6 +1188,9 @@ const docTemplate = `{
         "web.IncidentResponse": {
             "type": "object",
             "properties": {
+                "author": {
+                    "$ref": "#/definitions/web.UserResponse"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1191,8 +1203,14 @@ const docTemplate = `{
                 "status": {
                     "$ref": "#/definitions/web.DictEntityShort"
                 },
+                "team": {
+                    "$ref": "#/definitions/web.DictEntityShort"
+                },
                 "title": {
                     "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/web.UserResponse"
                 }
             }
         },
@@ -1268,6 +1286,9 @@ const docTemplate = `{
         "web.UpdateIncidentRequest": {
             "type": "object",
             "properties": {
+                "authorId": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1277,8 +1298,14 @@ const docTemplate = `{
                 "statusId": {
                     "type": "integer"
                 },
+                "teamId": {
+                    "type": "integer"
+                },
                 "title": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
         },

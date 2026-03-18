@@ -20,6 +20,13 @@ import {
     WebDictEntityShortToJSON,
     WebDictEntityShortToJSONTyped,
 } from './WebDictEntityShort';
+import type { WebUserResponse } from './WebUserResponse';
+import {
+    WebUserResponseFromJSON,
+    WebUserResponseFromJSONTyped,
+    WebUserResponseToJSON,
+    WebUserResponseToJSONTyped,
+} from './WebUserResponse';
 
 /**
  * 
@@ -27,6 +34,12 @@ import {
  * @interface WebIncidentResponse
  */
 export interface WebIncidentResponse {
+    /**
+     * 
+     * @type {WebUserResponse}
+     * @memberof WebIncidentResponse
+     */
+    author?: WebUserResponse;
     /**
      * 
      * @type {string}
@@ -53,10 +66,22 @@ export interface WebIncidentResponse {
     status?: WebDictEntityShort;
     /**
      * 
+     * @type {WebDictEntityShort}
+     * @memberof WebIncidentResponse
+     */
+    team?: WebDictEntityShort;
+    /**
+     * 
      * @type {string}
      * @memberof WebIncidentResponse
      */
     title?: string;
+    /**
+     * 
+     * @type {WebUserResponse}
+     * @memberof WebIncidentResponse
+     */
+    user?: WebUserResponse;
 }
 
 /**
@@ -76,11 +101,14 @@ export function WebIncidentResponseFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
+        'author': json['author'] == null ? undefined : WebUserResponseFromJSON(json['author']),
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
         'priority': json['priority'] == null ? undefined : WebDictEntityShortFromJSON(json['priority']),
         'status': json['status'] == null ? undefined : WebDictEntityShortFromJSON(json['status']),
+        'team': json['team'] == null ? undefined : WebDictEntityShortFromJSON(json['team']),
         'title': json['title'] == null ? undefined : json['title'],
+        'user': json['user'] == null ? undefined : WebUserResponseFromJSON(json['user']),
     };
 }
 
@@ -95,11 +123,14 @@ export function WebIncidentResponseToJSONTyped(value?: WebIncidentResponse | nul
 
     return {
         
+        'author': WebUserResponseToJSON(value['author']),
         'description': value['description'],
         'id': value['id'],
         'priority': WebDictEntityShortToJSON(value['priority']),
         'status': WebDictEntityShortToJSON(value['status']),
+        'team': WebDictEntityShortToJSON(value['team']),
         'title': value['title'],
+        'user': WebUserResponseToJSON(value['user']),
     };
 }
 
