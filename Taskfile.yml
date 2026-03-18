@@ -68,3 +68,7 @@ tasks:
   migrate-create:
     cmds:
       - "{{.MIGRATE_COMMAND}} create -ext sql -seq -dir $FIXIK_POSTGRES_MIGRATIONS_DIR {{.CLI_ARGS}}"
+
+  migrate-force:
+    cmds:
+      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL force {{.CLI_ARGS}}"

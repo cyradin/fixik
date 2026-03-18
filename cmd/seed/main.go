@@ -291,14 +291,16 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 }
 
 func createIncidents(ctx context.Context, c *container.Container, teamIDs map[string]int64) error {
-	users, err := c.UserManager().List(ctx, 100, 0)
+	users, err := c.UserManager().List(ctx, 100, 0) //nolint:mnd
 	if err != nil {
 		return fmt.Errorf("list users: %w", err)
 	}
 
-	var frontendUsers []int64
-	var backendUsers []int64
-	var infraUsers []int64
+	var (
+		frontendUsers []int64
+		backendUsers  []int64
+		infraUsers    []int64
+	)
 
 	for _, u := range users {
 		if u.TeamID == nil {
