@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+vars:
+  COMMIT:
+    sh: git rev-parse --short HEAD 2>/dev/null || echo dev
+  BINARY_NAME: fixik
+  MIGRATE_COMMAND: go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
+
+dotenv: ['.env']
+
+tasks:
+  build:
+    deps: [build-frontend, build-backend]
+  
+  build-frontend:
+    cmds:
+      - cd frontend && npm run build
+
+  build-backend:
+    cmds:
+      - go build
+          -tags prod
+          -ldflags "-X main.GitCommit={{.COMMIT}}"
+          -o dist/{{.BINARY_NAME}}
+          ./cmd/{{.BINARY_NAME}}
+
+  dev:
+    cmds:
+      - cd frontend && npm run dev
+
+  swagger:
+    deps: [swagger-backend, swagger-frontend]
+
+  swagger-backend:
+    cmds:
+      - go run github.com/swaggo/swag/cmd/swag@v1.16.6 init  -d cmd/fixik,internal/web
+  
+  swagger-frontend:
+    cmds:
+      - cd frontend && npm run swagger
+
+  test:
+    cmds:
+      - go test ./... --race
+
+  lint:
+    cmds:
+      - go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10.1 run
+
+  migrate:
+    cmds:
+      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL up"
+
+  migrate-down:
+    cmds:
+      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL down 1"
+
+  migrate-down-all:
+    cmds:
+      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL down"
+
+  migrate-version:
+    cmds:
+      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL version"
+
+  migrate-create:
+    cmds:
+      - "{{.MIGRATE_COMMAND}} create -ext sql -seq -dir $FIXIK_POSTGRES_MIGRATIONS_DIR {{.CLI_ARGS}}"
