@@ -165,8 +165,8 @@ func (r *IncidentRepository) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Incident, error) {
-	const query = `
+func (r *IncidentRepository) List(ctx context.Context, limit, offset int) (IncidentListResult, error) {
+	const listQuery = `
 		SELECT
 			id,
 			title,
@@ -186,18 +186,24 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Inc
 		OFFSET @offset
 	`
 
+	const countQuery = `
+		SELECT COUNT(*)
+		FROM incidents
+		WHERE deleted_at IS NULL
+	`
+
 	args := pgx.NamedArgs{
 		"limit":  limit,
 		"offset": offset,
 	}
 
-	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, query, args)
+	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, listQuery, args)
 	if err != nil {
-		return nil, fmt.Errorf("db query: %w", err)
+		return IncidentListResult{}, fmt.Errorf("db list query: %w", err)
 	}
 	defer rows.Close()
 
-	var result []Incident
+	var items []Incident
 
 	for rows.Next() {
 		var i Incident
@@ -214,11 +220,21 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) ([]Inc
 			&i.UpdatedAt,
 			&i.DeletedAt,
 		); err != nil {
-			return nil, fmt.Errorf("scan: %w", err)
+			return IncidentListResult{}, fmt.Errorf("scan: %w", err)
 		}
 
-		result = append(result, i)
+		items = append(items, i)
 	}
 
-	return result, nil
+	var total int
+	if err := transaction.FromContext(ctx, r.db).
+		QueryRow(ctx, countQuery).
+		Scan(&total); err != nil {
+		return IncidentListResult{}, fmt.Errorf("db count query: %w", err)
+	}
+
+	return IncidentListResult{
+		Items: items,
+		Total: total,
+	}, nil
 }

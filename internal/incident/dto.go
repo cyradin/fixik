@@ -25,6 +25,11 @@ type Incident struct {
 	UpdatedAt time.Time
 }
 
+type IncidentList struct {
+	Items []Incident
+	Total int
+}
+
 type CreateIncident struct {
 	Title       string
 	Description string

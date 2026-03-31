@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   WebCreateIncidentRequest,
   WebErrorResponse,
+  WebIncidentListResponse,
   WebIncidentResponse,
   WebUpdateIncidentRequest,
 } from '../models/index';
@@ -25,11 +26,18 @@ import {
     WebCreateIncidentRequestToJSON,
     WebErrorResponseFromJSON,
     WebErrorResponseToJSON,
+    WebIncidentListResponseFromJSON,
+    WebIncidentListResponseToJSON,
     WebIncidentResponseFromJSON,
     WebIncidentResponseToJSON,
     WebUpdateIncidentRequestFromJSON,
     WebUpdateIncidentRequestToJSON,
 } from '../models/index';
+
+export interface IncidentsGetRequest {
+    limit?: number;
+    offset?: number;
+}
 
 export interface IncidentsIdDeleteRequest {
     id: number;
@@ -52,6 +60,53 @@ export interface IncidentsPostRequest {
  * 
  */
 export class IncidentsApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for incidentsGet without sending the request
+     */
+    async incidentsGetRequestOpts(requestParameters: IncidentsGetRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/incidents`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get all incidents with pagination
+     * List incidents
+     */
+    async incidentsGetRaw(requestParameters: IncidentsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebIncidentListResponse>> {
+        const requestOptions = await this.incidentsGetRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebIncidentListResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Get all incidents with pagination
+     * List incidents
+     */
+    async incidentsGet(requestParameters: IncidentsGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebIncidentListResponse> {
+        const response = await this.incidentsGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for incidentsIdDelete without sending the request

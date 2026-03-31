@@ -295,10 +295,13 @@ func TestListIncidents(t *testing.T) {
 		t.Parallel()
 
 		m := &mockIncidentManager{
-			listFn: func(ctx context.Context, limit, offset int) ([]incident.Incident, error) {
-				return []incident.Incident{
-					testIncident("a", "a"),
-					testIncident("b", "b"),
+			listFn: func(ctx context.Context, limit, offset int) (incident.IncidentList, error) {
+				return incident.IncidentList{
+					Items: []incident.Incident{
+						testIncident("a", "a"),
+						testIncident("b", "b"),
+					},
+					Total: 2,
 				}, nil
 			},
 		}
@@ -307,19 +310,23 @@ func TestListIncidents(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, rr.Code)
 
-		var resp []IncidentResponse
+		var resp IncidentListResponse
 
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
-		require.Len(t, resp, 2)
+
+		require.Len(t, resp.Items, 2)
+		require.Equal(t, 2, resp.Pagination.Total)
+		require.Equal(t, 10, resp.Pagination.Limit)
+		require.Equal(t, 0, resp.Pagination.Offset)
 	})
 
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
 		m := &mockIncidentManager{
-			listFn: func(ctx context.Context, limit, offset int) ([]incident.Incident, error) {
-				return nil, errors.New("fail")
+			listFn: func(ctx context.Context, limit, offset int) (incident.IncidentList, error) {
+				return incident.IncidentList{}, errors.New("fail")
 			},
 		}
 
@@ -334,7 +341,7 @@ type mockIncidentManager struct {
 	getFn    func(ctx context.Context, id int64) (incident.Incident, error)
 	updateFn func(ctx context.Context, i incident.UpdateIncident) (incident.Incident, error)
 	deleteFn func(ctx context.Context, id int64) error
-	listFn   func(ctx context.Context, limit, offset int) ([]incident.Incident, error)
+	listFn   func(ctx context.Context, limit, offset int) (incident.IncidentList, error)
 }
 
 func (m *mockIncidentManager) Create(ctx context.Context, i incident.CreateIncident) (incident.Incident, error) {
@@ -353,7 +360,7 @@ func (m *mockIncidentManager) Delete(ctx context.Context, id int64) error {
 	return m.deleteFn(ctx, id)
 }
 
-func (m *mockIncidentManager) List(ctx context.Context, limit, offset int) ([]incident.Incident, error) {
+func (m *mockIncidentManager) List(ctx context.Context, limit, offset int) (incident.IncidentList, error) {
 	return m.listFn(ctx, limit, offset)
 }
 

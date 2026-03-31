@@ -16,6 +16,55 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/incidents": {
+            "get": {
+                "description": "Get all incidents with pagination",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "incidents"
+                ],
+                "summary": "List incidents",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.IncidentListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create new incident",
                 "consumes": [
@@ -1185,6 +1234,20 @@ const docTemplate = `{
                 }
             }
         },
+        "web.IncidentListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IncidentResponse"
+                    }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/web.Pagination"
+                }
+            }
+        },
         "web.IncidentResponse": {
             "type": "object",
             "properties": {
@@ -1244,6 +1307,20 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/web.UserResponse"
                     }
+                }
+            }
+        },
+        "web.Pagination": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "offset": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },

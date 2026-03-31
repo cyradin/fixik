@@ -17,10 +17,12 @@ docs/WebCreateUserRequest.md
 docs/WebDictEntity.md
 docs/WebDictEntityShort.md
 docs/WebErrorResponse.md
+docs/WebIncidentListResponse.md
 docs/WebIncidentResponse.md
 docs/WebListDictEntitiesResponse.md
 docs/WebListRolesResponse.md
 docs/WebListUsersResponse.md
+docs/WebPagination.md
 docs/WebRole.md
 docs/WebUpdateDictEntityRequest.md
 docs/WebUpdateIncidentRequest.md
@@ -33,10 +35,12 @@ models/WebCreateUserRequest.ts
 models/WebDictEntity.ts
 models/WebDictEntityShort.ts
 models/WebErrorResponse.ts
+models/WebIncidentListResponse.ts
 models/WebIncidentResponse.ts
 models/WebListDictEntitiesResponse.ts
 models/WebListRolesResponse.ts
 models/WebListUsersResponse.ts
+models/WebPagination.ts
 models/WebRole.ts
 models/WebUpdateDictEntityRequest.ts
 models/WebUpdateIncidentRequest.ts

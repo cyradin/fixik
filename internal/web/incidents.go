@@ -15,7 +15,7 @@ type incidentManager interface {
 	Create(ctx context.Context, i incident.CreateIncident) (incident.Incident, error)
 	GetByID(ctx context.Context, id int64) (incident.Incident, error)
 	Update(ctx context.Context, i incident.UpdateIncident) (incident.Incident, error)
-	List(ctx context.Context, limit, offset int) ([]incident.Incident, error)
+	List(ctx context.Context, limit, offset int) (incident.IncidentList, error)
 	Delete(ctx context.Context, id int64) error
 }
 
@@ -74,6 +74,17 @@ type IncidentResponse struct {
 	Team        *DictEntityShort `json:"team"`
 	User        *UserResponse    `json:"user"`
 	Author      *UserResponse    `json:"author"`
+}
+
+type IncidentListResponse struct {
+	Items      []IncidentResponse `json:"items"`
+	Pagination Pagination         `json:"pagination"`
+}
+
+type Pagination struct {
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+	Total  int `json:"total"`
 }
 
 type DictEntityShort struct {
@@ -223,6 +234,17 @@ func deleteIncident(manager incidentManager) http.HandlerFunc {
 	}
 }
 
+// @Summary List incidents
+// @Description Get all incidents with pagination
+// @Tags incidents
+// @Accept json
+// @Produce json
+// @Param limit query int false "Limit" default(100)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {object} IncidentListResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /incidents [get]
 func listIncidents(manager incidentManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		limit, offset, err := decodePagination(r, 1, 100) //nolint:mnd
@@ -231,19 +253,26 @@ func listIncidents(manager incidentManager) http.HandlerFunc {
 			return
 		}
 
-		handle(func(ctx context.Context, _ NoBody) ([]IncidentResponse, error) {
-			items, err := manager.List(ctx, limit, offset)
+		handle(func(ctx context.Context, _ NoBody) (IncidentListResponse, error) {
+			listResult, err := manager.List(ctx, limit, offset)
 			if err != nil {
-				return nil, err
+				return IncidentListResponse{}, err
 			}
 
-			resp := make([]IncidentResponse, len(items))
+			respItems := make([]IncidentResponse, len(listResult.Items))
 
-			for i, item := range items {
-				resp[i] = toIncidentResponse(item)
+			for i, item := range listResult.Items {
+				respItems[i] = toIncidentResponse(item)
 			}
 
-			return resp, nil
+			return IncidentListResponse{
+				Items: respItems,
+				Pagination: Pagination{
+					Limit:  limit,
+					Offset: offset,
+					Total:  listResult.Total,
+				},
+			}, nil
 		})(w, r)
 	}
 }

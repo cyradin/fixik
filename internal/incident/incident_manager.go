@@ -14,7 +14,7 @@ type incidentRepo interface {
 	GetByID(ctx context.Context, id int64) (db.Incident, error)
 	Update(ctx context.Context, i *db.Incident) error
 	Delete(ctx context.Context, id int64) error
-	List(ctx context.Context, limit, offset int) ([]db.Incident, error)
+	List(ctx context.Context, limit, offset int) (db.IncidentListResult, error)
 }
 
 type entityProvider interface {
@@ -144,7 +144,6 @@ func (m *IncidentManager) Update(ctx context.Context, incident UpdateIncident) (
 
 	if incident.TeamID != nil {
 		if *incident.TeamID == 0 {
-			// удалить команду
 			incident.TeamID = nil
 		} else {
 			current.TeamID = incident.TeamID
@@ -182,16 +181,16 @@ func (m *IncidentManager) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (m *IncidentManager) List(ctx context.Context, limit, offset int) ([]Incident, error) {
-	rows, err := m.repo.List(ctx, limit, offset)
+func (m *IncidentManager) List(ctx context.Context, limit, offset int) (IncidentList, error) {
+	listResult, err := m.repo.List(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("list incidents: %w", err)
+		return IncidentList{}, fmt.Errorf("list incidents: %w", err)
 	}
 
-	userIDs := make([]int64, 0, len(rows))
+	userIDs := make([]int64, 0, len(listResult.Items))
 	userIDSet := make(map[int64]struct{})
 
-	for _, r := range rows {
+	for _, r := range listResult.Items {
 		if r.UserID != nil {
 			id := *r.UserID
 			if _, exists := userIDSet[id]; !exists {
@@ -206,7 +205,7 @@ func (m *IncidentManager) List(ctx context.Context, limit, offset int) ([]Incide
 	if len(userIDs) > 0 {
 		users, err := m.userProvider.GetByIDMany(ctx, userIDs)
 		if err != nil {
-			return nil, fmt.Errorf("get users: %w", err)
+			return IncidentList{}, fmt.Errorf("get users: %w", err)
 		}
 
 		for _, u := range users {
@@ -216,22 +215,22 @@ func (m *IncidentManager) List(ctx context.Context, limit, offset int) ([]Incide
 
 	statusMap, err := m.loadStatuses(ctx)
 	if err != nil {
-		return nil, err
+		return IncidentList{}, err
 	}
 
 	priorityMap, err := m.loadPriorities(ctx)
 	if err != nil {
-		return nil, err
+		return IncidentList{}, err
 	}
 
 	teamMap, err := m.loadTeams(ctx)
 	if err != nil {
-		return nil, err
+		return IncidentList{}, err
 	}
 
-	result := make([]Incident, 0, len(rows))
+	items := make([]Incident, 0, len(listResult.Items))
 
-	for _, r := range rows {
+	for _, r := range listResult.Items {
 		item, err := m.transformFromDB(
 			r,
 			statusMap,
@@ -240,13 +239,16 @@ func (m *IncidentManager) List(ctx context.Context, limit, offset int) ([]Incide
 			usersMap,
 		)
 		if err != nil {
-			return nil, err
+			return IncidentList{}, err
 		}
 
-		result = append(result, item)
+		items = append(items, item)
 	}
 
-	return result, nil
+	return IncidentList{
+		Items: items,
+		Total: listResult.Total,
+	}, nil
 }
 
 func (m *IncidentManager) loadStatuses(ctx context.Context) (map[int64]dict.Entity, error) {

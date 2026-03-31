@@ -7,7 +7,6 @@ import (
 
 var ErrNotFound = fmt.Errorf("not found")
 
-// модель
 type Incident struct {
 	ID          int64
 	Title       string
@@ -23,6 +22,11 @@ type Incident struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
+}
+
+type IncidentListResult struct {
+	Items []Incident
+	Total int
 }
 
 type DictEntity struct {

@@ -186,39 +186,50 @@ func (s *IncidentRepositorySuite) TestList() {
 	})
 
 	s.Run("all", func() {
-		list, err := s.repo.List(ctx, 10, 0)
+		res, err := s.repo.List(ctx, 10, 0)
 		s.Require().NoError(err)
-		s.Len(list, 3)
-		s.Equal(incidents[2].Title, list[0].Title)
-		s.Equal(incidents[1].Title, list[1].Title)
-		s.Equal(incidents[0].Title, list[2].Title)
+
+		s.Len(res.Items, 3)
+		s.Equal(3, res.Total)
+
+		s.Equal(incidents[2].Title, res.Items[0].Title)
+		s.Equal(incidents[1].Title, res.Items[1].Title)
+		s.Equal(incidents[0].Title, res.Items[2].Title)
 	})
 
 	s.Run("limit", func() {
-		list, err := s.repo.List(ctx, 2, 0)
+		res, err := s.repo.List(ctx, 2, 0)
 		s.Require().NoError(err)
-		s.Len(list, 2)
-		s.Equal(incidents[2].Title, list[0].Title)
-		s.Equal(incidents[1].Title, list[1].Title)
+
+		s.Len(res.Items, 2)
+		s.Equal(3, res.Total)
+
+		s.Equal(incidents[2].Title, res.Items[0].Title)
+		s.Equal(incidents[1].Title, res.Items[1].Title)
 	})
 
 	s.Run("offset", func() {
-		list, err := s.repo.List(ctx, 2, 1)
+		res, err := s.repo.List(ctx, 2, 1)
 		s.Require().NoError(err)
-		s.Len(list, 2)
-		s.Equal(incidents[1].Title, list[0].Title)
-		s.Equal(incidents[0].Title, list[1].Title)
+
+		s.Len(res.Items, 2)
+		s.Equal(3, res.Total)
+
+		s.Equal(incidents[1].Title, res.Items[0].Title)
+		s.Equal(incidents[0].Title, res.Items[1].Title)
 	})
 
 	s.Run("deleted filtered", func() {
 		err := s.repo.Delete(ctx, incidents[1].ID)
 		s.Require().NoError(err)
 
-		list, err := s.repo.List(ctx, 10, 0)
+		res, err := s.repo.List(ctx, 10, 0)
 		s.Require().NoError(err)
-		s.Len(list, 2)
 
-		for _, i := range list {
+		s.Len(res.Items, 2)
+		s.Equal(2, res.Total)
+
+		for _, i := range res.Items {
 			s.NotEqual(incidents[1].ID, i.ID)
 		}
 	})

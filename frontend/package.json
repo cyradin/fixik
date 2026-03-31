@@ -13,7 +13,7 @@
     "vue": "^3.5.30"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.30.2",
+    "@openapitools/openapi-generator-cli": "^2.31.0",
     "@vitejs/plugin-vue": "^6.0.5",
     "vite": "^8.0.0"
   }

@@ -470,8 +470,8 @@ func TestIncidentManager_List(t *testing.T) {
 				priority *entityProviderMock,
 				user *userProviderMock,
 			) {
-				repo.listFn = func(context.Context, int, int) ([]db.Incident, error) {
-					return nil, errors.New("repo error")
+				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
+					return db.IncidentListResult{}, errors.New("repo error")
 				}
 			},
 			err: true,
@@ -484,8 +484,11 @@ func TestIncidentManager_List(t *testing.T) {
 				priority *entityProviderMock,
 				user *userProviderMock,
 			) {
-				repo.listFn = func(context.Context, int, int) ([]db.Incident, error) {
-					return dbIncidents, nil
+				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
+					return db.IncidentListResult{
+						Items: dbIncidents,
+						Total: 2,
+					}, nil
 				}
 
 				status.listFn = func(context.Context) ([]dict.Entity, error) {
@@ -502,8 +505,11 @@ func TestIncidentManager_List(t *testing.T) {
 				priority *entityProviderMock,
 				user *userProviderMock,
 			) {
-				repo.listFn = func(context.Context, int, int) ([]db.Incident, error) {
-					return dbIncidents, nil
+				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
+					return db.IncidentListResult{
+						Items: dbIncidents,
+						Total: 2,
+					}, nil
 				}
 
 				status.listFn = func(context.Context) ([]dict.Entity, error) {
@@ -524,8 +530,11 @@ func TestIncidentManager_List(t *testing.T) {
 				priority *entityProviderMock,
 				up *userProviderMock,
 			) {
-				repo.listFn = func(context.Context, int, int) ([]db.Incident, error) {
-					return dbIncidents, nil
+				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
+					return db.IncidentListResult{
+						Items: dbIncidents,
+						Total: 2,
+					}, nil
 				}
 
 				status.listFn = func(context.Context) ([]dict.Entity, error) {
@@ -570,11 +579,15 @@ func TestIncidentManager_List(t *testing.T) {
 			}
 
 			require.NoError(t, err)
-			require.Len(t, res, 2)
-			require.Equal(t, dict.EntityID(1), res[0].Status.ID)
-			require.Equal(t, dict.EntityID(2), res[0].Priority.ID)
-			require.Equal(t, int64(100), res[0].User.ID)
-			require.Equal(t, int64(101), res[1].User.ID)
+
+			require.Len(t, res.Items, 2)
+
+			require.Equal(t, 2, res.Total)
+
+			require.Equal(t, dict.EntityID(1), res.Items[0].Status.ID)
+			require.Equal(t, dict.EntityID(2), res.Items[0].Priority.ID)
+			require.Equal(t, int64(100), res.Items[0].User.ID)
+			require.Equal(t, int64(101), res.Items[1].User.ID)
 		})
 	}
 }
@@ -584,7 +597,7 @@ type incidentRepoMock struct {
 	getByIDFn func(context.Context, int64) (db.Incident, error)
 	updateFn  func(context.Context, *db.Incident) error
 	deleteFn  func(context.Context, int64) error
-	listFn    func(context.Context, int, int) ([]db.Incident, error)
+	listFn    func(context.Context, int, int) (db.IncidentListResult, error)
 }
 
 func (m *incidentRepoMock) Create(ctx context.Context, i *db.Incident) error {
@@ -603,7 +616,7 @@ func (m *incidentRepoMock) Delete(ctx context.Context, id int64) error {
 	return m.deleteFn(ctx, id)
 }
 
-func (m *incidentRepoMock) List(ctx context.Context, limit, offset int) ([]db.Incident, error) {
+func (m *incidentRepoMock) List(ctx context.Context, limit, offset int) (db.IncidentListResult, error) {
 	return m.listFn(ctx, limit, offset)
 }
 
