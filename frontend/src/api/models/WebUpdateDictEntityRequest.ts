@@ -24,31 +24,42 @@ export interface WebUpdateDictEntityRequest {
      * @type {string}
      * @memberof WebUpdateDictEntityRequest
      */
-    code?: string;
+    code: string;
     /**
      * 
      * @type {string}
      * @memberof WebUpdateDictEntityRequest
      */
-    description?: string;
+    description: string;
     /**
      * 
      * @type {number}
      * @memberof WebUpdateDictEntityRequest
      */
-    id?: number;
+    id: number;
     /**
      * 
      * @type {string}
      * @memberof WebUpdateDictEntityRequest
      */
-    name?: string;
+    name: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WebUpdateDictEntityRequest
+     */
+    sort: number;
 }
 
 /**
  * Check if a given object implements the WebUpdateDictEntityRequest interface.
  */
 export function instanceOfWebUpdateDictEntityRequest(value: object): value is WebUpdateDictEntityRequest {
+    if (!('code' in value) || value['code'] === undefined) return false;
+    if (!('description' in value) || value['description'] === undefined) return false;
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('sort' in value) || value['sort'] === undefined) return false;
     return true;
 }
 
@@ -62,10 +73,11 @@ export function WebUpdateDictEntityRequestFromJSONTyped(json: any, ignoreDiscrim
     }
     return {
         
-        'code': json['code'] == null ? undefined : json['code'],
-        'description': json['description'] == null ? undefined : json['description'],
-        'id': json['id'] == null ? undefined : json['id'],
-        'name': json['name'] == null ? undefined : json['name'],
+        'code': json['code'],
+        'description': json['description'],
+        'id': json['id'],
+        'name': json['name'],
+        'sort': json['sort'],
     };
 }
 
@@ -84,6 +96,7 @@ export function WebUpdateDictEntityRequestToJSONTyped(value?: WebUpdateDictEntit
         'description': value['description'],
         'id': value['id'],
         'name': value['name'],
+        'sort': value['sort'],
     };
 }
 

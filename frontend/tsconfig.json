@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "src/*"
+            ]
+        },
+        "types": [
+            "vite/client"
+        ],
+        "strict": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "target": "esnext",
+        "jsx": "preserve"
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "src/**/*.vue"
+    ]
+}

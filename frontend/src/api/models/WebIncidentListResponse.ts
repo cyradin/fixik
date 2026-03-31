@@ -39,19 +39,21 @@ export interface WebIncidentListResponse {
      * @type {Array<WebIncidentResponse>}
      * @memberof WebIncidentListResponse
      */
-    items?: Array<WebIncidentResponse>;
+    items: Array<WebIncidentResponse>;
     /**
      * 
      * @type {WebPagination}
      * @memberof WebIncidentListResponse
      */
-    pagination?: WebPagination;
+    pagination: WebPagination;
 }
 
 /**
  * Check if a given object implements the WebIncidentListResponse interface.
  */
 export function instanceOfWebIncidentListResponse(value: object): value is WebIncidentListResponse {
+    if (!('items' in value) || value['items'] === undefined) return false;
+    if (!('pagination' in value) || value['pagination'] === undefined) return false;
     return true;
 }
 
@@ -65,8 +67,8 @@ export function WebIncidentListResponseFromJSONTyped(json: any, ignoreDiscrimina
     }
     return {
         
-        'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(WebIncidentResponseFromJSON)),
-        'pagination': json['pagination'] == null ? undefined : WebPaginationFromJSON(json['pagination']),
+        'items': ((json['items'] as Array<any>).map(WebIncidentResponseFromJSON)),
+        'pagination': WebPaginationFromJSON(json['pagination']),
     };
 }
 
@@ -81,7 +83,7 @@ export function WebIncidentListResponseToJSONTyped(value?: WebIncidentListRespon
 
     return {
         
-        'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(WebIncidentResponseToJSON)),
+        'items': ((value['items'] as Array<any>).map(WebIncidentResponseToJSON)),
         'pagination': WebPaginationToJSON(value['pagination']),
     };
 }

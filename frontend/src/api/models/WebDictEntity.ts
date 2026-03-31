@@ -24,31 +24,42 @@ export interface WebDictEntity {
      * @type {string}
      * @memberof WebDictEntity
      */
-    code?: string;
+    code: string;
     /**
      * 
      * @type {string}
      * @memberof WebDictEntity
      */
-    description?: string;
+    description: string;
     /**
      * 
      * @type {number}
      * @memberof WebDictEntity
      */
-    id?: number;
+    id: number;
     /**
      * 
      * @type {string}
      * @memberof WebDictEntity
      */
-    name?: string;
+    name: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WebDictEntity
+     */
+    sort: number;
 }
 
 /**
  * Check if a given object implements the WebDictEntity interface.
  */
 export function instanceOfWebDictEntity(value: object): value is WebDictEntity {
+    if (!('code' in value) || value['code'] === undefined) return false;
+    if (!('description' in value) || value['description'] === undefined) return false;
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('sort' in value) || value['sort'] === undefined) return false;
     return true;
 }
 
@@ -62,10 +73,11 @@ export function WebDictEntityFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'code': json['code'] == null ? undefined : json['code'],
-        'description': json['description'] == null ? undefined : json['description'],
-        'id': json['id'] == null ? undefined : json['id'],
-        'name': json['name'] == null ? undefined : json['name'],
+        'code': json['code'],
+        'description': json['description'],
+        'id': json['id'],
+        'name': json['name'],
+        'sort': json['sort'],
     };
 }
 
@@ -84,6 +96,7 @@ export function WebDictEntityToJSONTyped(value?: WebDictEntity | null, ignoreDis
         'description': value['description'],
         'id': value['id'],
         'name': value['name'],
+        'sort': value['sort'],
     };
 }
 

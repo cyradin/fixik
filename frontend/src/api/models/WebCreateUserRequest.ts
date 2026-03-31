@@ -24,25 +24,25 @@ export interface WebCreateUserRequest {
      * @type {string}
      * @memberof WebCreateUserRequest
      */
-    email?: string;
+    email: string;
     /**
      * 
      * @type {string}
      * @memberof WebCreateUserRequest
      */
-    name?: string;
+    name: string;
     /**
      * 
      * @type {string}
      * @memberof WebCreateUserRequest
      */
-    password?: string;
+    password: string;
     /**
      * 
      * @type {WebCreateUserRequestRoleEnum}
      * @memberof WebCreateUserRequest
      */
-    role?: WebCreateUserRequestRoleEnum;
+    role: WebCreateUserRequestRoleEnum;
     /**
      * 
      * @type {number}
@@ -54,7 +54,7 @@ export interface WebCreateUserRequest {
      * @type {string}
      * @memberof WebCreateUserRequest
      */
-    username?: string;
+    username: string;
 }
 
 
@@ -73,6 +73,11 @@ export type WebCreateUserRequestRoleEnum = typeof WebCreateUserRequestRoleEnum[k
  * Check if a given object implements the WebCreateUserRequest interface.
  */
 export function instanceOfWebCreateUserRequest(value: object): value is WebCreateUserRequest {
+    if (!('email' in value) || value['email'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('password' in value) || value['password'] === undefined) return false;
+    if (!('role' in value) || value['role'] === undefined) return false;
+    if (!('username' in value) || value['username'] === undefined) return false;
     return true;
 }
 
@@ -86,12 +91,12 @@ export function WebCreateUserRequestFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         
-        'email': json['email'] == null ? undefined : json['email'],
-        'name': json['name'] == null ? undefined : json['name'],
-        'password': json['password'] == null ? undefined : json['password'],
-        'role': json['role'] == null ? undefined : json['role'],
+        'email': json['email'],
+        'name': json['name'],
+        'password': json['password'],
+        'role': json['role'],
         'teamId': json['teamId'] == null ? undefined : json['teamId'],
-        'username': json['username'] == null ? undefined : json['username'],
+        'username': json['username'],
     };
 }
 

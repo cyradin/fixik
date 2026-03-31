@@ -32,13 +32,14 @@ export interface WebListUsersResponse {
      * @type {Array<WebUserResponse>}
      * @memberof WebListUsersResponse
      */
-    items?: Array<WebUserResponse>;
+    items: Array<WebUserResponse>;
 }
 
 /**
  * Check if a given object implements the WebListUsersResponse interface.
  */
 export function instanceOfWebListUsersResponse(value: object): value is WebListUsersResponse {
+    if (!('items' in value) || value['items'] === undefined) return false;
     return true;
 }
 
@@ -52,7 +53,7 @@ export function WebListUsersResponseFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         
-        'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(WebUserResponseFromJSON)),
+        'items': ((json['items'] as Array<any>).map(WebUserResponseFromJSON)),
     };
 }
 
@@ -67,7 +68,7 @@ export function WebListUsersResponseToJSONTyped(value?: WebListUsersResponse | n
 
     return {
         
-        'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(WebUserResponseToJSON)),
+        'items': ((value['items'] as Array<any>).map(WebUserResponseToJSON)),
     };
 }
 

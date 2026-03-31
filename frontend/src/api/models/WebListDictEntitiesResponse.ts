@@ -32,13 +32,14 @@ export interface WebListDictEntitiesResponse {
      * @type {Array<WebDictEntity>}
      * @memberof WebListDictEntitiesResponse
      */
-    items?: Array<WebDictEntity>;
+    items: Array<WebDictEntity>;
 }
 
 /**
  * Check if a given object implements the WebListDictEntitiesResponse interface.
  */
 export function instanceOfWebListDictEntitiesResponse(value: object): value is WebListDictEntitiesResponse {
+    if (!('items' in value) || value['items'] === undefined) return false;
     return true;
 }
 
@@ -52,7 +53,7 @@ export function WebListDictEntitiesResponseFromJSONTyped(json: any, ignoreDiscri
     }
     return {
         
-        'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(WebDictEntityFromJSON)),
+        'items': ((json['items'] as Array<any>).map(WebDictEntityFromJSON)),
     };
 }
 
@@ -67,7 +68,7 @@ export function WebListDictEntitiesResponseToJSONTyped(value?: WebListDictEntiti
 
     return {
         
-        'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(WebDictEntityToJSON)),
+        'items': ((value['items'] as Array<any>).map(WebDictEntityToJSON)),
     };
 }
 

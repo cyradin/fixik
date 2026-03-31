@@ -24,25 +24,28 @@ export interface WebDictEntityShort {
      * @type {string}
      * @memberof WebDictEntityShort
      */
-    code?: string;
+    code: string;
     /**
      * 
      * @type {number}
      * @memberof WebDictEntityShort
      */
-    id?: number;
+    id: number;
     /**
      * 
      * @type {string}
      * @memberof WebDictEntityShort
      */
-    name?: string;
+    name: string;
 }
 
 /**
  * Check if a given object implements the WebDictEntityShort interface.
  */
 export function instanceOfWebDictEntityShort(value: object): value is WebDictEntityShort {
+    if (!('code' in value) || value['code'] === undefined) return false;
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
     return true;
 }
 
@@ -56,9 +59,9 @@ export function WebDictEntityShortFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'code': json['code'] == null ? undefined : json['code'],
-        'id': json['id'] == null ? undefined : json['id'],
-        'name': json['name'] == null ? undefined : json['name'],
+        'code': json['code'],
+        'id': json['id'],
+        'name': json['name'],
     };
 }
 

@@ -10,7 +10,10 @@
     "swagger": "npm install @openapitools/openapi-generator-cli -D && openapi-generator-cli generate -i ../docs/swagger.json -g typescript-fetch -o src/api"
   },
   "dependencies": {
-    "vue": "^3.5.30"
+    "element-plus": "^2.13.6",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.30",
+    "vue3-smooth-dnd": "^0.0.6"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.31.0",

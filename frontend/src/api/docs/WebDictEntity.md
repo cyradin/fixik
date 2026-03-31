@@ -10,6 +10,7 @@ Name | Type
 `description` | string
 `id` | number
 `name` | string
+`sort` | number
 
 ## Example
 
@@ -22,6 +23,7 @@ const example = {
   "description": null,
   "id": null,
   "name": null,
+  "sort": null,
 } satisfies WebDictEntity
 
 console.log(example)

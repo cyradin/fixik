@@ -24,25 +24,35 @@ export interface WebCreateDictEntityRequest {
      * @type {string}
      * @memberof WebCreateDictEntityRequest
      */
-    code?: string;
+    code: string;
     /**
      * 
      * @type {string}
      * @memberof WebCreateDictEntityRequest
      */
-    description?: string;
+    description: string;
     /**
      * 
      * @type {string}
      * @memberof WebCreateDictEntityRequest
      */
-    name?: string;
+    name: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WebCreateDictEntityRequest
+     */
+    sort: number;
 }
 
 /**
  * Check if a given object implements the WebCreateDictEntityRequest interface.
  */
 export function instanceOfWebCreateDictEntityRequest(value: object): value is WebCreateDictEntityRequest {
+    if (!('code' in value) || value['code'] === undefined) return false;
+    if (!('description' in value) || value['description'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('sort' in value) || value['sort'] === undefined) return false;
     return true;
 }
 
@@ -56,9 +66,10 @@ export function WebCreateDictEntityRequestFromJSONTyped(json: any, ignoreDiscrim
     }
     return {
         
-        'code': json['code'] == null ? undefined : json['code'],
-        'description': json['description'] == null ? undefined : json['description'],
-        'name': json['name'] == null ? undefined : json['name'],
+        'code': json['code'],
+        'description': json['description'],
+        'name': json['name'],
+        'sort': json['sort'],
     };
 }
 
@@ -76,6 +87,7 @@ export function WebCreateDictEntityRequestToJSONTyped(value?: WebCreateDictEntit
         'code': value['code'],
         'description': value['description'],
         'name': value['name'],
+        'sort': value['sort'],
     };
 }
 

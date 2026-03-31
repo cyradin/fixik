@@ -24,25 +24,25 @@ export interface WebUserResponse {
      * @type {string}
      * @memberof WebUserResponse
      */
-    email?: string;
+    email: string;
     /**
      * 
      * @type {number}
      * @memberof WebUserResponse
      */
-    id?: number;
+    id: number;
     /**
      * 
      * @type {string}
      * @memberof WebUserResponse
      */
-    name?: string;
+    name: string;
     /**
      * 
      * @type {WebUserResponseRoleEnum}
      * @memberof WebUserResponse
      */
-    role?: WebUserResponseRoleEnum;
+    role: WebUserResponseRoleEnum;
     /**
      * 
      * @type {number}
@@ -54,7 +54,7 @@ export interface WebUserResponse {
      * @type {string}
      * @memberof WebUserResponse
      */
-    username?: string;
+    username: string;
 }
 
 
@@ -73,6 +73,11 @@ export type WebUserResponseRoleEnum = typeof WebUserResponseRoleEnum[keyof typeo
  * Check if a given object implements the WebUserResponse interface.
  */
 export function instanceOfWebUserResponse(value: object): value is WebUserResponse {
+    if (!('email' in value) || value['email'] === undefined) return false;
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('role' in value) || value['role'] === undefined) return false;
+    if (!('username' in value) || value['username'] === undefined) return false;
     return true;
 }
 
@@ -86,12 +91,12 @@ export function WebUserResponseFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
-        'email': json['email'] == null ? undefined : json['email'],
-        'id': json['id'] == null ? undefined : json['id'],
-        'name': json['name'] == null ? undefined : json['name'],
-        'role': json['role'] == null ? undefined : json['role'],
+        'email': json['email'],
+        'id': json['id'],
+        'name': json['name'],
+        'role': json['role'],
         'teamId': json['teamId'] == null ? undefined : json['teamId'],
-        'username': json['username'] == null ? undefined : json['username'],
+        'username': json['username'],
     };
 }
 

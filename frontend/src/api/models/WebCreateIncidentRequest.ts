@@ -30,19 +30,19 @@ export interface WebCreateIncidentRequest {
      * @type {string}
      * @memberof WebCreateIncidentRequest
      */
-    description?: string;
+    description: string;
     /**
      * 
      * @type {number}
      * @memberof WebCreateIncidentRequest
      */
-    priorityId?: number;
+    priorityId: number;
     /**
      * 
      * @type {number}
      * @memberof WebCreateIncidentRequest
      */
-    statusId?: number;
+    statusId: number;
     /**
      * 
      * @type {number}
@@ -54,7 +54,7 @@ export interface WebCreateIncidentRequest {
      * @type {string}
      * @memberof WebCreateIncidentRequest
      */
-    title?: string;
+    title: string;
     /**
      * 
      * @type {number}
@@ -67,6 +67,10 @@ export interface WebCreateIncidentRequest {
  * Check if a given object implements the WebCreateIncidentRequest interface.
  */
 export function instanceOfWebCreateIncidentRequest(value: object): value is WebCreateIncidentRequest {
+    if (!('description' in value) || value['description'] === undefined) return false;
+    if (!('priorityId' in value) || value['priorityId'] === undefined) return false;
+    if (!('statusId' in value) || value['statusId'] === undefined) return false;
+    if (!('title' in value) || value['title'] === undefined) return false;
     return true;
 }
 
@@ -81,11 +85,11 @@ export function WebCreateIncidentRequestFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'authorId': json['authorId'] == null ? undefined : json['authorId'],
-        'description': json['description'] == null ? undefined : json['description'],
-        'priorityId': json['priorityId'] == null ? undefined : json['priorityId'],
-        'statusId': json['statusId'] == null ? undefined : json['statusId'],
+        'description': json['description'],
+        'priorityId': json['priorityId'],
+        'statusId': json['statusId'],
         'teamId': json['teamId'] == null ? undefined : json['teamId'],
-        'title': json['title'] == null ? undefined : json['title'],
+        'title': json['title'],
         'userId': json['userId'] == null ? undefined : json['userId'],
     };
 }

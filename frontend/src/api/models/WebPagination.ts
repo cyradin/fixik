@@ -24,25 +24,28 @@ export interface WebPagination {
      * @type {number}
      * @memberof WebPagination
      */
-    limit?: number;
+    limit: number;
     /**
      * 
      * @type {number}
      * @memberof WebPagination
      */
-    offset?: number;
+    offset: number;
     /**
      * 
      * @type {number}
      * @memberof WebPagination
      */
-    total?: number;
+    total: number;
 }
 
 /**
  * Check if a given object implements the WebPagination interface.
  */
 export function instanceOfWebPagination(value: object): value is WebPagination {
+    if (!('limit' in value) || value['limit'] === undefined) return false;
+    if (!('offset' in value) || value['offset'] === undefined) return false;
+    if (!('total' in value) || value['total'] === undefined) return false;
     return true;
 }
 
@@ -56,9 +59,9 @@ export function WebPaginationFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'limit': json['limit'] == null ? undefined : json['limit'],
-        'offset': json['offset'] == null ? undefined : json['offset'],
-        'total': json['total'] == null ? undefined : json['total'],
+        'limit': json['limit'],
+        'offset': json['offset'],
+        'total': json['total'],
     };
 }
 

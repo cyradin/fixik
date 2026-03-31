@@ -45,25 +45,25 @@ export interface WebIncidentResponse {
      * @type {string}
      * @memberof WebIncidentResponse
      */
-    description?: string;
+    description: string;
     /**
      * 
      * @type {number}
      * @memberof WebIncidentResponse
      */
-    id?: number;
+    id: number;
     /**
      * 
      * @type {WebDictEntityShort}
      * @memberof WebIncidentResponse
      */
-    priority?: WebDictEntityShort;
+    priority: WebDictEntityShort;
     /**
      * 
      * @type {WebDictEntityShort}
      * @memberof WebIncidentResponse
      */
-    status?: WebDictEntityShort;
+    status: WebDictEntityShort;
     /**
      * 
      * @type {WebDictEntityShort}
@@ -75,7 +75,7 @@ export interface WebIncidentResponse {
      * @type {string}
      * @memberof WebIncidentResponse
      */
-    title?: string;
+    title: string;
     /**
      * 
      * @type {WebUserResponse}
@@ -88,6 +88,11 @@ export interface WebIncidentResponse {
  * Check if a given object implements the WebIncidentResponse interface.
  */
 export function instanceOfWebIncidentResponse(value: object): value is WebIncidentResponse {
+    if (!('description' in value) || value['description'] === undefined) return false;
+    if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('priority' in value) || value['priority'] === undefined) return false;
+    if (!('status' in value) || value['status'] === undefined) return false;
+    if (!('title' in value) || value['title'] === undefined) return false;
     return true;
 }
 
@@ -102,12 +107,12 @@ export function WebIncidentResponseFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'author': json['author'] == null ? undefined : WebUserResponseFromJSON(json['author']),
-        'description': json['description'] == null ? undefined : json['description'],
-        'id': json['id'] == null ? undefined : json['id'],
-        'priority': json['priority'] == null ? undefined : WebDictEntityShortFromJSON(json['priority']),
-        'status': json['status'] == null ? undefined : WebDictEntityShortFromJSON(json['status']),
+        'description': json['description'],
+        'id': json['id'],
+        'priority': WebDictEntityShortFromJSON(json['priority']),
+        'status': WebDictEntityShortFromJSON(json['status']),
         'team': json['team'] == null ? undefined : WebDictEntityShortFromJSON(json['team']),
-        'title': json['title'] == null ? undefined : json['title'],
+        'title': json['title'],
         'user': json['user'] == null ? undefined : WebUserResponseFromJSON(json['user']),
     };
 }

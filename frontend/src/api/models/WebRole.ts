@@ -24,19 +24,19 @@ export interface WebRole {
      * @type {WebRoleCodeEnum}
      * @memberof WebRole
      */
-    code?: WebRoleCodeEnum;
+    code: WebRoleCodeEnum;
     /**
      * 
      * @type {string}
      * @memberof WebRole
      */
-    description?: string;
+    description: string;
     /**
      * 
      * @type {string}
      * @memberof WebRole
      */
-    name?: string;
+    name: string;
 }
 
 
@@ -55,6 +55,9 @@ export type WebRoleCodeEnum = typeof WebRoleCodeEnum[keyof typeof WebRoleCodeEnu
  * Check if a given object implements the WebRole interface.
  */
 export function instanceOfWebRole(value: object): value is WebRole {
+    if (!('code' in value) || value['code'] === undefined) return false;
+    if (!('description' in value) || value['description'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
     return true;
 }
 
@@ -68,9 +71,9 @@ export function WebRoleFromJSONTyped(json: any, ignoreDiscriminator: boolean): W
     }
     return {
         
-        'code': json['code'] == null ? undefined : json['code'],
-        'description': json['description'] == null ? undefined : json['description'],
-        'name': json['name'] == null ? undefined : json['name'],
+        'code': json['code'],
+        'description': json['description'],
+        'name': json['name'],
     };
 }
 
