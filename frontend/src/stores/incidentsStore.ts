@@ -13,12 +13,19 @@ export interface Priority {
     name: string
 }
 
+export interface IncidentUser {
+    id: number
+    name: string
+    username: string
+}
+
 export interface Incident {
     id: number
     title: string
     description: string
     status: IncidentStatus
     priority: Priority
+    user: IncidentUser | null
 }
 
 interface IncidentsState {
@@ -54,6 +61,13 @@ export const useIncidentsStore = defineStore('incidents', {
                                 code: item.status.code,
                                 name: item.status.name,
                             },
+                            user: item.user
+                                ? {
+                                    id: item.user.id,
+                                    name: item.user.name,
+                                    username: item.user.username,
+                                }
+                                : null,
                         }))
                     )
 
