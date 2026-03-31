@@ -20,10 +20,10 @@ type incidentManager interface {
 }
 
 type CreateIncidentRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	StatusID    int64  `json:"statusId"`
-	PriorityID  int64  `json:"priorityId"`
+	Title       string `json:"title" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	StatusID    int64  `json:"statusId" validate:"required"`
+	PriorityID  int64  `json:"priorityId" validate:"required"`
 	TeamID      *int64 `json:"teamId"`
 	UserID      *int64 `json:"userId"`
 	AuthorID    *int64 `json:"authorId"`
@@ -66,31 +66,31 @@ func (r UpdateIncidentRequest) Validate() error {
 }
 
 type IncidentResponse struct {
-	ID          int64            `json:"id"`
-	Title       string           `json:"title"`
-	Description string           `json:"description"`
-	Status      DictEntityShort  `json:"status"`
-	Priority    DictEntityShort  `json:"priority"`
+	ID          int64            `json:"id" validate:"required"`
+	Title       string           `json:"title" validate:"required"`
+	Description string           `json:"description" validate:"required"`
+	Status      DictEntityShort  `json:"status" validate:"required"`
+	Priority    DictEntityShort  `json:"priority" validate:"required"`
 	Team        *DictEntityShort `json:"team"`
 	User        *UserResponse    `json:"user"`
 	Author      *UserResponse    `json:"author"`
 }
 
 type IncidentListResponse struct {
-	Items      []IncidentResponse `json:"items"`
-	Pagination Pagination         `json:"pagination"`
+	Items      []IncidentResponse `json:"items" validate:"required"`
+	Pagination Pagination         `json:"pagination" validate:"required"`
 }
 
 type Pagination struct {
-	Limit  int `json:"limit"`
-	Offset int `json:"offset"`
-	Total  int `json:"total"`
+	Limit  int `json:"limit" validate:"required"`
+	Offset int `json:"offset" validate:"required"`
+	Total  int `json:"total" validate:"required"`
 }
 
 type DictEntityShort struct {
-	ID   int64  `json:"id"`
-	Code string `json:"code"`
-	Name string `json:"name"`
+	ID   int64  `json:"id" validate:"required"`
+	Code string `json:"code" validate:"required"`
+	Name string `json:"name" validate:"required"`
 }
 
 func incidentRoutes(c *container.Container) func(r chi.Router) {

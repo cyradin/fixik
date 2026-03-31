@@ -27,12 +27,12 @@ type userManager interface {
 }
 
 type CreateUserRequest struct {
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"` //nolint:gosec
+	Name     string `json:"name" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"` //nolint:gosec
 	TeamID   *int64 `json:"teamId"`
-	Role     string `json:"role" enums:"admin,manager,user"`
+	Role     string `json:"role" enums:"admin,manager,user" validate:"required"`
 }
 
 func (r CreateUserRequest) Validate() error {
@@ -69,16 +69,16 @@ func (r UpdateUserRequest) Validate() error {
 }
 
 type UserResponse struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	ID       int64  `json:"id" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Email    string `json:"email" validate:"required"`
 	TeamID   *int64 `json:"teamId"`
-	Role     string `json:"role" enums:"admin,manager,user"`
+	Role     string `json:"role" enums:"admin,manager,user" validate:"required"`
 }
 
 type ListUsersResponse struct {
-	Items []UserResponse `json:"items"`
+	Items []UserResponse `json:"items" validate:"required"`
 }
 
 func userRoutes(c *container.Container) func(r chi.Router) {

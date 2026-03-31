@@ -1126,6 +1126,12 @@
     "definitions": {
         "web.CreateDictEntityRequest": {
             "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name",
+                "sort"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1135,11 +1141,20 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
                 }
             }
         },
         "web.CreateIncidentRequest": {
             "type": "object",
+            "required": [
+                "description",
+                "priorityId",
+                "statusId",
+                "title"
+            ],
             "properties": {
                 "authorId": {
                     "type": "integer"
@@ -1166,6 +1181,13 @@
         },
         "web.CreateUserRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "role",
+                "username"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -1194,6 +1216,13 @@
         },
         "web.DictEntity": {
             "type": "object",
+            "required": [
+                "code",
+                "description",
+                "id",
+                "name",
+                "sort"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1206,11 +1235,19 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
                 }
             }
         },
         "web.DictEntityShort": {
             "type": "object",
+            "required": [
+                "code",
+                "id",
+                "name"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1233,6 +1270,10 @@
         },
         "web.IncidentListResponse": {
             "type": "object",
+            "required": [
+                "items",
+                "pagination"
+            ],
             "properties": {
                 "items": {
                     "type": "array",
@@ -1247,6 +1288,13 @@
         },
         "web.IncidentResponse": {
             "type": "object",
+            "required": [
+                "description",
+                "id",
+                "priority",
+                "status",
+                "title"
+            ],
             "properties": {
                 "author": {
                     "$ref": "#/definitions/web.UserResponse"
@@ -1276,6 +1324,9 @@
         },
         "web.ListDictEntitiesResponse": {
             "type": "object",
+            "required": [
+                "items"
+            ],
             "properties": {
                 "items": {
                     "type": "array",
@@ -1298,6 +1349,9 @@
         },
         "web.ListUsersResponse": {
             "type": "object",
+            "required": [
+                "items"
+            ],
             "properties": {
                 "items": {
                     "type": "array",
@@ -1309,6 +1363,11 @@
         },
         "web.Pagination": {
             "type": "object",
+            "required": [
+                "limit",
+                "offset",
+                "total"
+            ],
             "properties": {
                 "limit": {
                     "type": "integer"
@@ -1323,6 +1382,11 @@
         },
         "web.Role": {
             "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name"
+            ],
             "properties": {
                 "code": {
                     "type": "string",
@@ -1342,6 +1406,13 @@
         },
         "web.UpdateDictEntityRequest": {
             "type": "object",
+            "required": [
+                "code",
+                "description",
+                "id",
+                "name",
+                "sort"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1354,6 +1425,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
                 }
             }
         },
@@ -1413,6 +1487,13 @@
         },
         "web.UserResponse": {
             "type": "object",
+            "required": [
+                "email",
+                "id",
+                "name",
+                "role",
+                "username"
+            ],
             "properties": {
                 "email": {
                     "type": "string"

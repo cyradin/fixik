@@ -8,6 +8,13 @@ definitions:
         type: string
       name:
         type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - name
+    - sort
     type: object
   web.CreateIncidentRequest:
     properties:
@@ -25,6 +32,11 @@ definitions:
         type: string
       userId:
         type: integer
+    required:
+    - description
+    - priorityId
+    - statusId
+    - title
     type: object
   web.CreateUserRequest:
     properties:
@@ -44,6 +56,12 @@ definitions:
         type: integer
       username:
         type: string
+    required:
+    - email
+    - name
+    - password
+    - role
+    - username
     type: object
   web.DictEntity:
     properties:
@@ -55,6 +73,14 @@ definitions:
         type: integer
       name:
         type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - id
+    - name
+    - sort
     type: object
   web.DictEntityShort:
     properties:
@@ -64,6 +90,10 @@ definitions:
         type: integer
       name:
         type: string
+    required:
+    - code
+    - id
+    - name
     type: object
   web.ErrorResponse:
     properties:
@@ -78,6 +108,9 @@ definitions:
         type: array
       pagination:
         $ref: '#/definitions/web.Pagination'
+    required:
+    - items
+    - pagination
     type: object
   web.IncidentResponse:
     properties:
@@ -97,6 +130,12 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/web.UserResponse'
+    required:
+    - description
+    - id
+    - priority
+    - status
+    - title
     type: object
   web.ListDictEntitiesResponse:
     properties:
@@ -104,6 +143,8 @@ definitions:
         items:
           $ref: '#/definitions/web.DictEntity'
         type: array
+    required:
+    - items
     type: object
   web.ListRolesResponse:
     properties:
@@ -118,6 +159,8 @@ definitions:
         items:
           $ref: '#/definitions/web.UserResponse'
         type: array
+    required:
+    - items
     type: object
   web.Pagination:
     properties:
@@ -127,6 +170,10 @@ definitions:
         type: integer
       total:
         type: integer
+    required:
+    - limit
+    - offset
+    - total
     type: object
   web.Role:
     properties:
@@ -140,6 +187,10 @@ definitions:
         type: string
       name:
         type: string
+    required:
+    - code
+    - description
+    - name
     type: object
   web.UpdateDictEntityRequest:
     properties:
@@ -151,6 +202,14 @@ definitions:
         type: integer
       name:
         type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - id
+    - name
+    - sort
     type: object
   web.UpdateIncidentRequest:
     properties:
@@ -206,6 +265,12 @@ definitions:
         type: integer
       username:
         type: string
+    required:
+    - email
+    - id
+    - name
+    - role
+    - username
     type: object
 host: localhost:8080
 info:

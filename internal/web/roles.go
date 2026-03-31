@@ -14,9 +14,9 @@ type ListRolesResponse struct {
 }
 
 type Role struct {
-	Name        string `json:"name"`
-	Code        string `json:"code" enums:"admin,manager,user"`
-	Description string `json:"description"`
+	Name        string `json:"name" validate:"required"`
+	Code        string `json:"code" enums:"admin,manager,user" validate:"required"`
+	Description string `json:"description" validate:"required"`
 }
 
 func roleRoutes(_ *container.Container) func(r chi.Router) {

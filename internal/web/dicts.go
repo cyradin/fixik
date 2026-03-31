@@ -24,10 +24,10 @@ type entityManager interface {
 }
 
 type CreateDictEntityRequest struct {
-	Name        string `json:"name"`
-	Code        string `json:"code"`
-	Description string `json:"description"`
-	Sort        int    `json:"sort"`
+	Name        string `json:"name" validate:"required"`
+	Code        string `json:"code" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	Sort        int    `json:"sort" validate:"required"`
 }
 
 func (r CreateDictEntityRequest) Validate() error {
@@ -40,11 +40,11 @@ func (r CreateDictEntityRequest) Validate() error {
 }
 
 type UpdateDictEntityRequest struct {
-	ID          int64  `path:"id"`
-	Name        string `json:"name"`
-	Code        string `json:"code"`
-	Description string `json:"description"`
-	Sort        int    `json:"sort"`
+	ID          int64  `path:"id" validate:"required"`
+	Name        string `json:"name" validate:"required"`
+	Code        string `json:"code" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	Sort        int    `json:"sort" validate:"required"`
 }
 
 func (r UpdateDictEntityRequest) Validate() error {
@@ -57,15 +57,15 @@ func (r UpdateDictEntityRequest) Validate() error {
 }
 
 type ListDictEntitiesResponse struct {
-	Items []DictEntity `json:"items"`
+	Items []DictEntity `json:"items" validate:"required"`
 }
 
 type DictEntity struct {
-	ID          int64  `json:"id"`
-	Name        string `json:"name"`
-	Code        string `json:"code"`
-	Description string `json:"description"`
-	Sort        int    `json:"sort"`
+	ID          int64  `json:"id" validate:"required"`
+	Name        string `json:"name" validate:"required"`
+	Code        string `json:"code" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	Sort        int    `json:"sort" validate:"required"`
 }
 
 func createDictEntity(manager entityManager) http.HandlerFunc {

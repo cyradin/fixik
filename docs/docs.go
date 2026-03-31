@@ -1129,6 +1129,12 @@ const docTemplate = `{
     "definitions": {
         "web.CreateDictEntityRequest": {
             "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name",
+                "sort"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1138,11 +1144,20 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
                 }
             }
         },
         "web.CreateIncidentRequest": {
             "type": "object",
+            "required": [
+                "description",
+                "priorityId",
+                "statusId",
+                "title"
+            ],
             "properties": {
                 "authorId": {
                     "type": "integer"
@@ -1169,6 +1184,13 @@ const docTemplate = `{
         },
         "web.CreateUserRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "role",
+                "username"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -1197,6 +1219,13 @@ const docTemplate = `{
         },
         "web.DictEntity": {
             "type": "object",
+            "required": [
+                "code",
+                "description",
+                "id",
+                "name",
+                "sort"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1209,11 +1238,19 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
                 }
             }
         },
         "web.DictEntityShort": {
             "type": "object",
+            "required": [
+                "code",
+                "id",
+                "name"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1236,6 +1273,10 @@ const docTemplate = `{
         },
         "web.IncidentListResponse": {
             "type": "object",
+            "required": [
+                "items",
+                "pagination"
+            ],
             "properties": {
                 "items": {
                     "type": "array",
@@ -1250,6 +1291,13 @@ const docTemplate = `{
         },
         "web.IncidentResponse": {
             "type": "object",
+            "required": [
+                "description",
+                "id",
+                "priority",
+                "status",
+                "title"
+            ],
             "properties": {
                 "author": {
                     "$ref": "#/definitions/web.UserResponse"
@@ -1279,6 +1327,9 @@ const docTemplate = `{
         },
         "web.ListDictEntitiesResponse": {
             "type": "object",
+            "required": [
+                "items"
+            ],
             "properties": {
                 "items": {
                     "type": "array",
@@ -1301,6 +1352,9 @@ const docTemplate = `{
         },
         "web.ListUsersResponse": {
             "type": "object",
+            "required": [
+                "items"
+            ],
             "properties": {
                 "items": {
                     "type": "array",
@@ -1312,6 +1366,11 @@ const docTemplate = `{
         },
         "web.Pagination": {
             "type": "object",
+            "required": [
+                "limit",
+                "offset",
+                "total"
+            ],
             "properties": {
                 "limit": {
                     "type": "integer"
@@ -1326,6 +1385,11 @@ const docTemplate = `{
         },
         "web.Role": {
             "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name"
+            ],
             "properties": {
                 "code": {
                     "type": "string",
@@ -1345,6 +1409,13 @@ const docTemplate = `{
         },
         "web.UpdateDictEntityRequest": {
             "type": "object",
+            "required": [
+                "code",
+                "description",
+                "id",
+                "name",
+                "sort"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1357,6 +1428,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
                 }
             }
         },
@@ -1416,6 +1490,13 @@ const docTemplate = `{
         },
         "web.UserResponse": {
             "type": "object",
+            "required": [
+                "email",
+                "id",
+                "name",
+                "role",
+                "username"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
