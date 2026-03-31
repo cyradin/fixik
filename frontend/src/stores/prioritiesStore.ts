@@ -4,6 +4,7 @@ import { prioritiesApi } from '@/api/client'
 export interface Priority {
     id: number
     name: string
+    sort: number
 }
 
 interface PrioritiesState {

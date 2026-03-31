@@ -9,20 +9,27 @@
           @drop="onDrop(status.code, $event)"
         >
           <Draggable
-  v-for="incident in incidentsStore.items.filter(i => i.status.code === status.code)"
-  :key="incident.id"
->
-  <el-card shadow="never">
-    <strong>#{{incident.id}} {{ incident.title }}</strong>
-    
-    <p>{{ incident.description?.slice(0, 200) }}{{ incident.description && incident.description.length > 200 ? '…' : '' }}</p>
-    <div style="display: flex; align-items: center; gap: px; margin-top: 4px;">
-      <el-tag type="info">{{ incident.priority.name }}</el-tag>
-      <User style="width: 1em; height: 1em;" />
-      <span>{{ incident.user?.name || 'Не назначено' }}</span>
-    </div>
-  </el-card>
-</Draggable>
+            v-for="incident in incidentsStore.items.filter(i => i.status.code === status.code)"
+            :key="incident.id"
+          >
+            <el-card shadow="never">
+              <strong>#{{incident.id}} {{ incident.title }}</strong>
+              
+              <p>{{ incident.description?.slice(0, 200) }}{{ incident.description && incident.description.length > 200 ? '…' : '' }}</p>
+              <el-space justify="space-between">
+                <IncidentPriorityColor
+                  :priority-id="incident.priority.id"
+                  :label="incident.priority.name"
+                />
+
+                <el-space size="small">
+                  <el-icon><User /></el-icon>
+                  <span>{{ incident.user?.name || 'Не назначено' }}</span>
+                </el-space>
+
+              </el-space>
+            </el-card>
+          </Draggable>
         </Container>
       </el-card>
     </el-col>
@@ -36,6 +43,7 @@ import { useStatusesStore } from '@/stores/statusesStore'
 import { ElMessage } from 'element-plus'
 import { Container, Draggable } from 'vue3-smooth-dnd'
 import { User } from '@element-plus/icons-vue'
+import IncidentPriorityColor from '@/components/incidents/IncidentPriorityColor.vue'
 
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()
