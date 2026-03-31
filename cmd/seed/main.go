@@ -1,3 +1,4 @@
+//nolint:mnd
 package main
 
 import (
@@ -408,7 +409,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 		},
 		{
 			Title:       "Ошибка API заказов",
-			Description: "500 при создании заказа",
+			Description: "При создании нового заказа API возвращает 500. Нужно проверить обработку данных на backend, отладить сервис заказов, исключить nil pointer и убедиться, что новые заказы создаются корректно, включая все необходимые проверки и валидацию.",
 			StatusID:    statusMap["todo"],
 			PriorityID:  priorityMap["p1"],
 			TeamID:      new(teamIDs[teamBackend]),
@@ -432,7 +433,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 		},
 		{
 			Title:       "Падает CI pipeline",
-			Description: "Gitlab runner падает",
+			Description: "GitLab runner падает при сборке проекта. Нужно проверить конфигурацию CI, docker-образа, доступность зависимостей и корректность скриптов, чтобы pipeline стабильно выполнялся и не блокировал релизы.",
 			StatusID:    statusMap["todo"],
 			PriorityID:  priorityMap["p1"],
 			TeamID:      new(teamIDs[teamInfra]),
@@ -449,7 +450,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 
 		{
 			Title:       "Фронтенд билд падает",
-			Description: "Ошибка сборки webpack",
+			Description: "Сборка проекта через webpack падает с ошибками компиляции. Необходимо проверить конфигурацию сборки, зависимости npm, версию Node.js и исправить проблемы, чтобы фронтенд собирался стабильно на всех окружениях.",
 			StatusID:    statusMap["in_progress"],
 			PriorityID:  priorityMap["p2"],
 			TeamID:      new(teamIDs[teamFrontend]),
@@ -474,7 +475,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 
 		{
 			Title:       "Падает сервис заказов",
-			Description: "panic: nil pointer dereference",
+			Description: "Сервис заказов падает с panic: nil pointer dereference. Нужно найти участок кода, который вызывает ошибку при обработке данных, добавить проверки на nil, протестировать создание заказов и восстановить стабильную работу сервиса.",
 			StatusID:    statusMap["in_progress"],
 			PriorityID:  priorityMap["p1"],
 			TeamID:      new(teamIDs[teamBackend]),
@@ -490,7 +491,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 		},
 		{
 			Title:       "Проблема с поиском",
-			Description: "Elasticsearch не возвращает результаты",
+			Description: "Elasticsearch не возвращает результаты для некоторых запросов. Необходимо проверить индексирование данных, корректность mapping и запросов, а также нагрузку на кластер, чтобы поиск работал корректно для всех пользователей.",
 			StatusID:    statusMap["in_progress"],
 			PriorityID:  priorityMap["p2"],
 			TeamID:      new(teamIDs[teamBackend]),
@@ -499,7 +500,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 
 		{
 			Title:       "Kubernetes pod crashloop",
-			Description: "Контейнер постоянно перезапускается",
+			Description: "Контейнер в k8s pod постоянно перезапускается (CrashLoopBackOff). Нужно проверить логи контейнера, ошибки конфигурации, healthchecks, зависимости и ресурсы, чтобы pod стабильно запускался и сервис оставался доступным.",
 			StatusID:    statusMap["in_progress"],
 			PriorityID:  priorityMap["p1"],
 			TeamID:      new(teamIDs[teamInfra]),
