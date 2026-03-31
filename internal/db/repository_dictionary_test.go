@@ -34,6 +34,7 @@ func (s *DictRepositorySuite) TestCreate() {
 		Code:        "high",
 		Name:        "High",
 		Description: "High priority level",
+		Sort:        10,
 	}
 
 	err := s.repo.Create(ctx, e)
@@ -42,10 +43,11 @@ func (s *DictRepositorySuite) TestCreate() {
 	s.NotZero(e.CreatedAt)
 	s.NotZero(e.UpdatedAt)
 	s.Nil(e.DeletedAt)
+	s.Equal(10, e.Sort)
 }
 
 func (s *DictRepositorySuite) TestGetByID_Found() {
-	e := s.createEntity("medium", "Medium", "Medium priority level")
+	e := s.createEntity("medium", "Medium", "Medium priority level", 20)
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), e.ID)
 	s.Require().NoError(err)
@@ -53,6 +55,7 @@ func (s *DictRepositorySuite) TestGetByID_Found() {
 	s.Equal(e.Code, fromDB.Code)
 	s.Equal(e.Name, fromDB.Name)
 	s.Equal(e.Description, fromDB.Description)
+	s.Equal(e.Sort, fromDB.Sort)
 }
 
 func (s *DictRepositorySuite) TestGetByID_NotFound() {
@@ -62,22 +65,25 @@ func (s *DictRepositorySuite) TestGetByID_NotFound() {
 }
 
 func (s *DictRepositorySuite) TestList() {
-	e1 := s.createEntity("low", "Low", "Low priority")
-	e2 := s.createEntity("critical", "Critical", "Critical priority")
+	e1 := s.createEntity("low", "Low", "Low priority", 5)
+	e2 := s.createEntity("critical", "Critical", "Critical priority", 1)
 
 	list, err := s.repo.List(s.T().Context())
 	s.Require().NoError(err)
 	s.Len(list, 2)
-	s.Contains(list, *e1)
-	s.Contains(list, *e2)
+
+	s.Equal(e2.ID, list[0].ID)
+	s.Equal(e1.ID, list[1].ID)
 }
 
 func (s *DictRepositorySuite) TestUpdate() {
-	e := s.createEntity("pending", "Pending", "Pending priority")
+	e := s.createEntity("pending", "Pending", "Pending priority", 15)
 
 	e.Code = "waiting"
 	e.Name = "Waiting"
 	e.Description = "Waiting priority"
+	e.Sort = 25
+
 	err := s.repo.Update(s.T().Context(), e)
 	s.Require().NoError(err)
 
@@ -86,10 +92,11 @@ func (s *DictRepositorySuite) TestUpdate() {
 	s.Equal("waiting", fromDB.Code)
 	s.Equal("Waiting", fromDB.Name)
 	s.Equal(e.Description, fromDB.Description)
+	s.Equal(25, fromDB.Sort)
 }
 
 func (s *DictRepositorySuite) TestDelete() {
-	e := s.createEntity("obsolete", "Obsolete", "Obsolete priority")
+	e := s.createEntity("obsolete", "Obsolete", "Obsolete priority", 30)
 
 	err := s.repo.Delete(s.T().Context(), e.ID)
 	s.Require().NoError(err)
@@ -104,12 +111,13 @@ func (s *DictRepositorySuite) TestDeleteNotFound() {
 	s.Require().NoError(err)
 }
 
-func (s *DictRepositorySuite) createEntity(code, name, description string) *DictEntity {
+func (s *DictRepositorySuite) createEntity(code, name, description string, sort int) *DictEntity {
 	ctx := s.T().Context()
 	e := &DictEntity{
 		Code:        code,
 		Name:        name,
 		Description: description,
+		Sort:        sort,
 	}
 
 	err := s.repo.Create(ctx, e)

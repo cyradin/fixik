@@ -26,6 +26,7 @@ func TestEntityManager_Create(t *testing.T) {
 				Code:        "open",
 				Name:        "Open",
 				Description: "description",
+				Sort:        10,
 			},
 			mock: func(m *statusRepoMock) {
 				m.createFn = func(ctx context.Context, s *db.DictEntity) error {
@@ -96,6 +97,7 @@ func TestEntityManager_GetByID(t *testing.T) {
 						Code:        "open",
 						Name:        "Open",
 						Description: "description",
+						Sort:        100,
 					}, nil
 				}
 			},
@@ -104,6 +106,7 @@ func TestEntityManager_GetByID(t *testing.T) {
 				Code:        "open",
 				Name:        "Open",
 				Description: "description",
+				Sort:        100,
 			},
 		},
 		{

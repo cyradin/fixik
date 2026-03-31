@@ -9,6 +9,7 @@ type Entity struct {
 	Name        string
 	Code        string
 	Description string
+	Sort        int
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

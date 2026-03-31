@@ -34,6 +34,7 @@ type DictEntity struct {
 	Code        string
 	Name        string
 	Description string
+	Sort        int
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   *time.Time

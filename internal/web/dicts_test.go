@@ -22,10 +22,21 @@ func TestCreateDictEntity(t *testing.T) {
 
 		m := &mockManager{
 			createFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) {
-				return dict.Entity{ID: 1, Name: e.Name, Code: e.Code, Description: e.Description}, nil
+				return dict.Entity{
+					ID:          1,
+					Name:        e.Name,
+					Code:        e.Code,
+					Description: e.Description,
+					Sort:        e.Sort,
+				}, nil
 			},
 		}
-		req := CreateDictEntityRequest{Name: "Test", Code: "TST"}
+		req := CreateDictEntityRequest{
+			Name:        "Test",
+			Code:        "TST",
+			Description: "desc",
+			Sort:        42,
+		}
 		rr := testRequest(t, createDictEntity(m), http.MethodPost, "/dummy", req)
 		require.Equal(t, http.StatusOK, rr.Code)
 
@@ -34,6 +45,8 @@ func TestCreateDictEntity(t *testing.T) {
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
 		require.Equal(t, int64(1), resp.ID)
+		require.Equal(t, "desc", resp.Description)
+		require.Equal(t, 42, resp.Sort)
 	})
 
 	t.Run("validation error", func(t *testing.T) {
@@ -53,7 +66,7 @@ func TestCreateDictEntity(t *testing.T) {
 				return dict.Entity{}, errors.New("create failed")
 			},
 		}
-		req := CreateDictEntityRequest{Name: "Name", Code: "C"}
+		req := CreateDictEntityRequest{Name: "Name", Code: "C", Sort: 123}
 		rr := testRequest(t, createDictEntity(m), http.MethodPost, "/dummy", req)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
 	})
@@ -130,7 +143,7 @@ func TestUpdateDictEntity(t *testing.T) {
 		r := chi.NewRouter()
 		r.Put("/entities/{id}", updateDictEntity(m))
 
-		reqBody := UpdateDictEntityRequest{Name: "Updated", Code: "UPD"}
+		reqBody := UpdateDictEntityRequest{Name: "Updated", Code: "UPD", Sort: 123}
 		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -182,7 +195,7 @@ func TestUpdateDictEntity(t *testing.T) {
 		r := chi.NewRouter()
 		r.Put("/entities/{id}", updateDictEntity(m))
 
-		reqBody := UpdateDictEntityRequest{Name: "X", Code: "X"}
+		reqBody := UpdateDictEntityRequest{Name: "X", Code: "X", Sort: 123}
 		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -246,8 +259,8 @@ func TestListDictEntities(t *testing.T) {
 		m := &mockManager{
 			listFn: func(ctx context.Context) ([]dict.Entity, error) {
 				return []dict.Entity{
-					{ID: 1, Name: "A", Code: "A"},
-					{ID: 2, Name: "B", Code: "B"},
+					{ID: 1, Name: "A", Code: "A", Sort: 1},
+					{ID: 2, Name: "B", Code: "B", Sort: 2},
 				}, nil
 			},
 		}

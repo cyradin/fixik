@@ -97,6 +97,7 @@ func (m *EntityManager) toDB(entity Entity) db.DictEntity {
 		ID:          entity.ID,
 		Name:        entity.Name,
 		Code:        entity.Code,
+		Sort:        entity.Sort,
 		Description: entity.Description,
 	}
 }
@@ -106,6 +107,7 @@ func (m *EntityManager) fromDB(entity db.DictEntity) Entity {
 		ID:          entity.ID,
 		Name:        entity.Name,
 		Code:        entity.Code,
+		Sort:        entity.Sort,
 		Description: entity.Description,
 	}
 }

@@ -87,21 +87,25 @@ func createStatuses(ctx context.Context, c *container.Container) (map[string]int
 			Name:        "TODO",
 			Code:        "todo",
 			Description: "Инцидент создан, но работа ещё не начата",
+			Sort:        10,
 		},
 		{
 			Name:        "В процессе",
 			Code:        "in_progress",
 			Description: "Инцидент находится в работе",
+			Sort:        20,
 		},
 		{
 			Name:        "Готово",
 			Code:        "done",
 			Description: "Инцидент успешно решён",
+			Sort:        30,
 		},
 		{
 			Name:        "Отменено",
 			Code:        "cancelled",
 			Description: "Работа по инциденту отменена",
+			Sort:        40,
 		},
 	}
 
@@ -125,21 +129,25 @@ func createPriorities(ctx context.Context, c *container.Container) (map[string]i
 			Name:        "P1",
 			Code:        "p1",
 			Description: "Критический инцидент, система не работает. Время реакции: немедленно",
+			Sort:        10,
 		},
 		{
 			Name:        "P2",
 			Code:        "p2",
 			Description: "Высокий приоритет, серьёзная деградация. Время реакции: 30мин",
+			Sort:        20,
 		},
 		{
 			Name:        "P3",
 			Code:        "p3",
 			Description: "Средний приоритет, частичная проблема. Время реакции: 4ч",
+			Sort:        30,
 		},
 		{
 			Name:        "P4",
 			Code:        "p4",
 			Description: "Низкий приоритет, незначительная ошибка. Время реакции: 1 нед",
+			Sort:        40,
 		},
 	}
 
@@ -163,16 +171,19 @@ func createTeams(ctx context.Context, c *container.Container) (map[string]int64,
 			Name:        teamFrontend,
 			Code:        teamFrontend,
 			Description: "Команда разработки пользовательского интерфейса",
+			Sort:        10,
 		},
 		{
 			Name:        teamBackend,
 			Code:        teamBackend,
 			Description: "Команда разработки серверной логики",
+			Sort:        20,
 		},
 		{
 			Name:        teamInfra,
 			Code:        teamInfra,
 			Description: "Команда инфраструктуры и DevOps",
+			Sort:        30,
 		},
 	}
 

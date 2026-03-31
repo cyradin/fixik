@@ -27,6 +27,7 @@ type CreateDictEntityRequest struct {
 	Name        string `json:"name"`
 	Code        string `json:"code"`
 	Description string `json:"description"`
+	Sort        int    `json:"sort"`
 }
 
 func (r CreateDictEntityRequest) Validate() error {
@@ -34,6 +35,7 @@ func (r CreateDictEntityRequest) Validate() error {
 		&r,
 		validation.Field(&r.Name, validation.Required, validation.Length(1, maxNameLen)),
 		validation.Field(&r.Code, validation.Required, validation.Length(1, maxCodeLen)),
+		validation.Field(&r.Sort, validation.Required),
 	)
 }
 
@@ -42,6 +44,7 @@ type UpdateDictEntityRequest struct {
 	Name        string `json:"name"`
 	Code        string `json:"code"`
 	Description string `json:"description"`
+	Sort        int    `json:"sort"`
 }
 
 func (r UpdateDictEntityRequest) Validate() error {
@@ -49,6 +52,7 @@ func (r UpdateDictEntityRequest) Validate() error {
 		&r,
 		validation.Field(&r.Name, validation.Required, validation.Length(1, maxNameLen)),
 		validation.Field(&r.Code, validation.Required, validation.Length(1, maxCodeLen)),
+		validation.Field(&r.Sort, validation.Required),
 	)
 }
 
@@ -61,6 +65,7 @@ type DictEntity struct {
 	Name        string `json:"name"`
 	Code        string `json:"code"`
 	Description string `json:"description"`
+	Sort        int    `json:"sort"`
 }
 
 func createDictEntity(manager entityManager) http.HandlerFunc {
@@ -69,6 +74,7 @@ func createDictEntity(manager entityManager) http.HandlerFunc {
 			Name:        req.Name,
 			Code:        req.Code,
 			Description: req.Description,
+			Sort:        req.Sort,
 		}
 
 		result, err := manager.Create(ctx, entity)
@@ -113,6 +119,7 @@ func updateDictEntity(manager entityManager) http.HandlerFunc {
 				Name:        req.Name,
 				Code:        req.Code,
 				Description: req.Description,
+				Sort:        req.Sort,
 			}
 
 			result, err := manager.Update(ctx, entity)
@@ -165,5 +172,6 @@ func toDictEntity(item dict.Entity) DictEntity {
 		Name:        item.Name,
 		Code:        item.Code,
 		Description: item.Description,
+		Sort:        item.Sort,
 	}
 }

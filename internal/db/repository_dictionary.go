@@ -33,8 +33,8 @@ func NewTeamRepository(db *pgxpool.Pool) *DictRepository {
 
 func (r *DictRepository) Create(ctx context.Context, e *DictEntity) error {
 	const queryTemplate = `
-		INSERT INTO %s (code, name, description, created_at, updated_at)
-		VALUES ($1, $2, $3, now(), now())
+		INSERT INTO %s (code, name, description, sort, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, now(), now())
 		RETURNING id, created_at, updated_at
 	`
 
@@ -46,6 +46,7 @@ func (r *DictRepository) Create(ctx context.Context, e *DictEntity) error {
 		e.Code,
 		e.Name,
 		e.Description,
+		e.Sort,
 	).Scan(&e.ID, &e.CreatedAt, &e.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("db query: %w", err)
@@ -56,7 +57,7 @@ func (r *DictRepository) Create(ctx context.Context, e *DictEntity) error {
 
 func (r *DictRepository) GetByID(ctx context.Context, id int64) (DictEntity, error) {
 	const queryTemplate = `
-		SELECT id, code, name, description, created_at, updated_at, deleted_at
+		SELECT id, code, name, description, sort, created_at, updated_at, deleted_at
 		FROM %s
 		WHERE id = $1 AND deleted_at IS NULL
 	`
@@ -65,7 +66,7 @@ func (r *DictRepository) GetByID(ctx context.Context, id int64) (DictEntity, err
 
 	var e DictEntity
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, id).Scan(
-		&e.ID, &e.Code, &e.Name, &e.Description, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt,
+		&e.ID, &e.Code, &e.Name, &e.Description, &e.Sort, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt,
 	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return DictEntity{}, ErrNotFound
@@ -79,10 +80,10 @@ func (r *DictRepository) GetByID(ctx context.Context, id int64) (DictEntity, err
 
 func (r *DictRepository) List(ctx context.Context) ([]DictEntity, error) {
 	const queryTemplate = `
-		SELECT id, code, name, description, created_at, updated_at, deleted_at
+		SELECT id, code, name, description, sort, created_at, updated_at, deleted_at
 		FROM %s
 		WHERE deleted_at IS NULL
-		ORDER BY id
+		ORDER BY sort, id
 	`
 
 	query := fmt.Sprintf(queryTemplate, r.tableName)
@@ -97,7 +98,10 @@ func (r *DictRepository) List(ctx context.Context) ([]DictEntity, error) {
 
 	for rows.Next() {
 		var e DictEntity
-		if err := rows.Scan(&e.ID, &e.Code, &e.Name, &e.Description, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt); err != nil {
+		if err := rows.Scan(
+			&e.ID, &e.Code, &e.Name, &e.Description, &e.Sort,
+			&e.CreatedAt, &e.UpdatedAt, &e.DeletedAt,
+		); err != nil {
 			return nil, fmt.Errorf("scan: %w", err)
 		}
 
@@ -110,13 +114,13 @@ func (r *DictRepository) List(ctx context.Context) ([]DictEntity, error) {
 func (r *DictRepository) Update(ctx context.Context, e *DictEntity) error {
 	const queryTemplate = `
 		UPDATE %s
-		SET code = $1, name = $2, description = $3, updated_at = now()
-		WHERE id = $4 AND deleted_at IS NULL
+		SET code = $1, name = $2, description = $3, sort = $4, updated_at = now()
+		WHERE id = $5 AND deleted_at IS NULL
 	`
 
 	query := fmt.Sprintf(queryTemplate, r.tableName)
 
-	tag, err := transaction.FromContext(ctx, r.db).Exec(ctx, query, e.Code, e.Name, e.Description, e.ID)
+	tag, err := transaction.FromContext(ctx, r.db).Exec(ctx, query, e.Code, e.Name, e.Description, e.Sort, e.ID)
 	if err != nil {
 		return fmt.Errorf("db query: %w", err)
 	}
