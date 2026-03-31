@@ -252,6 +252,7 @@ func listUsers(manager userManager) http.HandlerFunc {
 func toUserResponse(u user.User) UserResponse {
 	return UserResponse{
 		ID:       u.ID,
+		Name:     u.Name,
 		Username: u.Username,
 		Email:    u.Email,
 		TeamID:   u.TeamID,
