@@ -1,6 +1,9 @@
 <template>
   <span v-if="user">
-    <el-link type="primary" @click="goToUser"> {{ user.name }} (@{{ user.username }}) </el-link>
+    <el-link v-if="isLink" type="primary" @click="goToUser">
+      {{ user.name }} (@{{ user.username }})
+    </el-link>
+    <span v-else>{{ user.name }} (@{{ user.username }})</span>
   </span>
 </template>
 
@@ -15,6 +18,7 @@ interface User {
 
 const props = defineProps<{
   user: User | null
+  isLink: boolean
 }>()
 
 const router = useRouter()

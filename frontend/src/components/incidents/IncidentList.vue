@@ -42,7 +42,7 @@
 
                   <el-space size="small">
                     <el-icon><User /></el-icon>
-                    <p v-if="incident.user"><UserLink :user="incident.user" /></p>
+                    <p v-if="incident.user"><UserLink :user="incident.user" :is-link="false" /></p>
                     <p v-else>Не назначено</p>
                   </el-space>
                 </el-space>
@@ -81,14 +81,17 @@ const getChildPayload = (statusCode: string) => (index: number) => {
 }
 
 const onDrop = async (statusCode: string, dropResult: any) => {
-  const { removedIndex, addedIndex, payload } = dropResult
+  const { addedIndex, payload } = dropResult
 
   if (addedIndex === null || !payload) return
   const movedItem = payload
   if (movedItem.status?.code === statusCode) return
 
+  const status = statusesStore.items.find((s) => s.code === statusCode)
+  if (!status) return
+
   try {
-    await incidentsStore.updateStatus(movedItem.id, statusCode)
+    await incidentsStore.updateStatus(movedItem.id, status.id)
   } catch (err) {
     ElMessage({
       message: `Не удалось обновить статус инцидента #${movedItem.id}`,

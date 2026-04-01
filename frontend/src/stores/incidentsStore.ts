@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
 import { incidentsApi } from '@/api/client'
 import { useStatusesStore } from '@/stores/statusesStore'
+import { usePrioritiesStore } from '@/stores/prioritiesStore'
+import { useTeamsStore } from '@/stores/teamsStore'
+import { useUsersStore } from '@/stores/usersStore'
 
 export interface IncidentStatus {
   id: number
@@ -134,24 +137,85 @@ export const useIncidentsStore = defineStore('incidents', {
       }
     },
 
-    async updateStatus(id: number, statusCode: string): Promise<void> {
+    async updateStatus(id: number, statusId: number) {
       try {
-        const statusesStore = useStatusesStore()
-        const status = statusesStore.items.find((s) => s.code === statusCode)
-        if (!status) throw new Error(`Status not found for code ${statusCode}`)
-
-        await incidentsApi.incidentsIdPatch({ id, request: { statusId: status.id } })
-
+        await incidentsApi.incidentsIdPatch({ id, request: { statusId } })
         const item = this.items.find((i) => i.id === id)
         if (item) {
-          item.status = {
-            id: status.id,
-            code: status.code,
-            name: status.name,
+          const statusesStore = useStatusesStore()
+          const status = statusesStore.items.find((s) => s.id === statusId)
+          if (status) {
+            item.status = { ...status }
           }
         }
       } catch (e) {
         console.error('update status error:', e)
+        throw e
+      }
+    },
+
+    async updatePriority(id: number, priorityId: number) {
+      try {
+        await incidentsApi.incidentsIdPatch({ id, request: { priorityId } })
+        const item = this.items.find((i) => i.id === id)
+        if (item) {
+          const prioritiesStore = usePrioritiesStore()
+          const priority = prioritiesStore.items.find((p) => p.id === priorityId)
+          if (priority) {
+            item.priority = { ...priority }
+          }
+        }
+      } catch (e) {
+        console.error('update priority error:', e)
+        throw e
+      }
+    },
+
+    async updateDescription(id: number, description: string) {
+      try {
+        await incidentsApi.incidentsIdPatch({ id, request: { description } })
+        const item = this.items.find((i) => i.id === id)
+        if (item) item.description = description
+      } catch (e) {
+        console.error('update description error:', e)
+        throw e
+      }
+    },
+
+    async updateTeam(id: number, teamId: number | undefined) {
+      try {
+        await incidentsApi.incidentsIdPatch({ id, request: { teamId } })
+        const item = this.items.find((i) => i.id === id)
+        if (item) {
+          if (teamId) {
+            const teamsStore = useTeamsStore()
+            const team = teamsStore.items.find((t) => t.id === teamId)
+            item.team = team ? { ...team } : null
+          } else {
+            item.team = null
+          }
+        }
+      } catch (e) {
+        console.error('update team error:', e)
+        throw e
+      }
+    },
+
+    async updateUser(id: number, userId: number | undefined) {
+      try {
+        await incidentsApi.incidentsIdPatch({ id, request: { userId } })
+        const item = this.items.find((i) => i.id === id)
+        if (item) {
+          if (userId) {
+            const usersStore = useUsersStore()
+            const user = usersStore.items.find((u) => u.id === userId)
+            item.user = user ? { ...user } : null
+          } else {
+            item.user = null
+          }
+        }
+      } catch (e) {
+        console.error('update user error:', e)
         throw e
       }
     },
