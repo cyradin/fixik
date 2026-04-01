@@ -42,6 +42,10 @@ interface IncidentsState {
   items: Incident[]
   loading: boolean
   pollingId: ReturnType<typeof setInterval> | null
+  filters: {
+    priorityIds: number[]
+    unassignedOnly: boolean
+  }
 }
 
 export const useIncidentsStore = defineStore('incidents', {
@@ -49,7 +53,30 @@ export const useIncidentsStore = defineStore('incidents', {
     items: [],
     loading: false,
     pollingId: null,
+    filters: {
+      priorityIds: [],
+      unassignedOnly: false,
+    },
   }),
+
+  getters: {
+    filteredItems: (state) => {
+      return state.items.filter((incident) => {
+        if (
+          state.filters.priorityIds.length > 0 &&
+          !state.filters.priorityIds.includes(incident.priority.id)
+        ) {
+          return false
+        }
+
+        if (state.filters.unassignedOnly && incident.user) {
+          return false
+        }
+
+        return true
+      })
+    },
+  },
 
   actions: {
     async fetchAll(): Promise<void> {
@@ -140,6 +167,24 @@ export const useIncidentsStore = defineStore('incidents', {
         clearInterval(this.pollingId)
         this.pollingId = null
       }
+    },
+
+    togglePriority(priorityId: number) {
+      const idx = this.filters.priorityIds.indexOf(priorityId)
+      if (idx === -1) {
+        this.filters.priorityIds.push(priorityId)
+      } else {
+        this.filters.priorityIds.splice(idx, 1)
+      }
+    },
+
+    toggleUnassigned() {
+      this.filters.unassignedOnly = !this.filters.unassignedOnly
+    },
+
+    resetFilters() {
+      this.filters.priorityIds = []
+      this.filters.unassignedOnly = false
     },
   },
 })
