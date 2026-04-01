@@ -91,6 +91,7 @@ import { useUsersStore } from '@/stores/usersStore'
 import { useTeamsStore } from '@/stores/teamsStore'
 import { usePrioritiesStore } from '@/stores/prioritiesStore'
 import { formatDateTime } from '@/utils/date'
+import { watch } from 'vue'
 import UserLink from '@/components/users/UserLink.vue'
 
 const route = useRoute()
@@ -113,6 +114,19 @@ const editable = reactive({
   teamId: incident.value?.team?.id || null,
   userId: incident.value?.user?.id || null,
 })
+
+watch(
+  incident,
+  (inc) => {
+    if (!inc) return
+    editable.description = inc.description
+    editable.statusId = inc.status?.id ?? null
+    editable.priorityId = inc.priority?.id ?? null
+    editable.teamId = inc.team?.id ?? null
+    editable.userId = inc.user?.id ?? null
+  },
+  { immediate: true },
+)
 
 const loading = reactive({
   description: false,
