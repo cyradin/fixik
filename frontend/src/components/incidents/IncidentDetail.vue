@@ -125,7 +125,11 @@ const loading = reactive({
 const statuses = computed(() => statusesStore.items)
 const priorities = computed(() => prioritiesStore.items)
 const teams = computed(() => teamsStore.items)
-const users = computed(() => usersStore.items)
+const users = computed(() => {
+  const userStore = usersStore
+  const teamId = editable.teamId
+  return userStore.byTeam(teamId ?? undefined)
+})
 
 type Field = keyof typeof loading
 

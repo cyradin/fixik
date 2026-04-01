@@ -21,6 +21,15 @@ export const useUsersStore = defineStore('users', {
     pollingId: null,
   }),
 
+  getters: {
+    byTeam: (state) => {
+      return (teamId?: number) => {
+        if (!teamId || teamId === 0) return state.items
+        return state.items.filter((u: any) => u.teamId === teamId)
+      }
+    },
+  },
+
   actions: {
     async fetchAll(): Promise<void> {
       this.loading = true
