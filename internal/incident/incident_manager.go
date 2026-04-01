@@ -358,5 +358,7 @@ func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, prior
 		Team:        team,
 		User:        user,
 		Author:      author,
+		CreatedAt:   incident.CreatedAt,
+		UpdatedAt:   incident.UpdatedAt,
 	}
 }

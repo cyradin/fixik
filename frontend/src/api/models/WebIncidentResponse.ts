@@ -45,6 +45,12 @@ export interface WebIncidentResponse {
      * @type {string}
      * @memberof WebIncidentResponse
      */
+    createdAt: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WebIncidentResponse
+     */
     description: string;
     /**
      * 
@@ -78,6 +84,12 @@ export interface WebIncidentResponse {
     title: string;
     /**
      * 
+     * @type {string}
+     * @memberof WebIncidentResponse
+     */
+    updatedAt: string;
+    /**
+     * 
      * @type {WebUserResponse}
      * @memberof WebIncidentResponse
      */
@@ -88,11 +100,13 @@ export interface WebIncidentResponse {
  * Check if a given object implements the WebIncidentResponse interface.
  */
 export function instanceOfWebIncidentResponse(value: object): value is WebIncidentResponse {
+    if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
     if (!('description' in value) || value['description'] === undefined) return false;
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('priority' in value) || value['priority'] === undefined) return false;
     if (!('status' in value) || value['status'] === undefined) return false;
     if (!('title' in value) || value['title'] === undefined) return false;
+    if (!('updatedAt' in value) || value['updatedAt'] === undefined) return false;
     return true;
 }
 
@@ -107,12 +121,14 @@ export function WebIncidentResponseFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'author': json['author'] == null ? undefined : WebUserResponseFromJSON(json['author']),
+        'createdAt': json['createdAt'],
         'description': json['description'],
         'id': json['id'],
         'priority': WebDictEntityShortFromJSON(json['priority']),
         'status': WebDictEntityShortFromJSON(json['status']),
         'team': json['team'] == null ? undefined : WebDictEntityShortFromJSON(json['team']),
         'title': json['title'],
+        'updatedAt': json['updatedAt'],
         'user': json['user'] == null ? undefined : WebUserResponseFromJSON(json['user']),
     };
 }
@@ -129,12 +145,14 @@ export function WebIncidentResponseToJSONTyped(value?: WebIncidentResponse | nul
     return {
         
         'author': WebUserResponseToJSON(value['author']),
+        'createdAt': value['createdAt'],
         'description': value['description'],
         'id': value['id'],
         'priority': WebDictEntityShortToJSON(value['priority']),
         'status': WebDictEntityShortToJSON(value['status']),
         'team': WebDictEntityShortToJSON(value['team']),
         'title': value['title'],
+        'updatedAt': value['updatedAt'],
         'user': WebUserResponseToJSON(value['user']),
     };
 }

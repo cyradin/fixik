@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/internal/incident"
@@ -74,6 +75,8 @@ type IncidentResponse struct {
 	Team        *DictEntityShort `json:"team"`
 	User        *UserResponse    `json:"user"`
 	Author      *UserResponse    `json:"author"`
+	CreatedAt   string           `json:"createdAt" validate:"required"`
+	UpdatedAt   string           `json:"updatedAt" validate:"required"`
 }
 
 type IncidentListResponse struct {
@@ -317,5 +320,8 @@ func toIncidentResponse(i incident.Incident) IncidentResponse {
 		Team:   team,
 		User:   user,
 		Author: author,
+
+		CreatedAt: i.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: i.UpdatedAt.Format(time.RFC3339),
 	}
 }

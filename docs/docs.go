@@ -1292,15 +1292,20 @@ const docTemplate = `{
         "web.IncidentResponse": {
             "type": "object",
             "required": [
+                "createdAt",
                 "description",
                 "id",
                 "priority",
                 "status",
-                "title"
+                "title",
+                "updatedAt"
             ],
             "properties": {
                 "author": {
                     "$ref": "#/definitions/web.UserResponse"
+                },
+                "createdAt": {
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -1318,6 +1323,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/web.DictEntityShort"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
                     "type": "string"
                 },
                 "user": {

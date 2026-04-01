@@ -7,12 +7,14 @@
 Name | Type
 ------------ | -------------
 `author` | [WebUserResponse](WebUserResponse.md)
+`createdAt` | string
 `description` | string
 `id` | number
 `priority` | [WebDictEntityShort](WebDictEntityShort.md)
 `status` | [WebDictEntityShort](WebDictEntityShort.md)
 `team` | [WebDictEntityShort](WebDictEntityShort.md)
 `title` | string
+`updatedAt` | string
 `user` | [WebUserResponse](WebUserResponse.md)
 
 ## Example
@@ -23,12 +25,14 @@ import type { WebIncidentResponse } from ''
 // TODO: Update the object below with actual values
 const example = {
   "author": null,
+  "createdAt": null,
   "description": null,
   "id": null,
   "priority": null,
   "status": null,
   "team": null,
   "title": null,
+  "updatedAt": null,
   "user": null,
 } satisfies WebIncidentResponse
 

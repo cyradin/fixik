@@ -116,6 +116,8 @@ definitions:
     properties:
       author:
         $ref: '#/definitions/web.UserResponse'
+      createdAt:
+        type: string
       description:
         type: string
       id:
@@ -128,14 +130,18 @@ definitions:
         $ref: '#/definitions/web.DictEntityShort'
       title:
         type: string
+      updatedAt:
+        type: string
       user:
         $ref: '#/definitions/web.UserResponse'
     required:
+    - createdAt
     - description
     - id
     - priority
     - status
     - title
+    - updatedAt
     type: object
   web.ListDictEntitiesResponse:
     properties:
