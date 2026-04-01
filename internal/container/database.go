@@ -35,7 +35,7 @@ func (c *Container) IncidentRepository() *db.IncidentRepository {
 	return c.incidentRepo
 }
 
-func (c *Container) StatusRepository() *db.DictRepository {
+func (c *Container) StatusRepository() *db.StatusRepository {
 	if c.statusRepo == nil {
 		c.statusRepo = db.NewStatusRepository(c.PgPool())
 	}

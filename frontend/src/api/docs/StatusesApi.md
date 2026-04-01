@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost:8080/api*
 
 ## statusesGet
 
-> WebListDictEntitiesResponse statusesGet()
+> WebListStatusesResponse statusesGet()
 
 List statuses
 
@@ -51,7 +51,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**WebListDictEntitiesResponse**](WebListDictEntitiesResponse.md)
+[**WebListStatusesResponse**](WebListStatusesResponse.md)
 
 ### Authorization
 
@@ -143,7 +143,7 @@ No authorization required
 
 ## statusesIdGet
 
-> WebDictEntity statusesIdGet(id)
+> WebStatus statusesIdGet(id)
 
 Get status by ID
 
@@ -188,7 +188,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**WebDictEntity**](WebDictEntity.md)
+[**WebStatus**](WebStatus.md)
 
 ### Authorization
 
@@ -212,7 +212,7 @@ No authorization required
 
 ## statusesIdPut
 
-> WebDictEntity statusesIdPut(id, request)
+> WebStatus statusesIdPut(id, request)
 
 Update status
 
@@ -234,7 +234,7 @@ async function example() {
   const body = {
     // number | Status ID
     id: 56,
-    // WebUpdateDictEntityRequest | Status data
+    // WebUpdateStatusRequest | Status data
     request: ...,
   } satisfies StatusesIdPutRequest;
 
@@ -256,11 +256,11 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | Status ID | [Defaults to `undefined`] |
-| **request** | [WebUpdateDictEntityRequest](WebUpdateDictEntityRequest.md) | Status data | |
+| **request** | [WebUpdateStatusRequest](WebUpdateStatusRequest.md) | Status data | |
 
 ### Return type
 
-[**WebDictEntity**](WebDictEntity.md)
+[**WebStatus**](WebStatus.md)
 
 ### Authorization
 
@@ -284,7 +284,7 @@ No authorization required
 
 ## statusesPost
 
-> WebDictEntity statusesPost(request)
+> WebStatus statusesPost(request)
 
 Create status
 
@@ -304,7 +304,7 @@ async function example() {
   const api = new StatusesApi();
 
   const body = {
-    // WebCreateDictEntityRequest | Status data
+    // WebCreateStatusRequest | Status data
     request: ...,
   } satisfies StatusesPostRequest;
 
@@ -325,11 +325,11 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **request** | [WebCreateDictEntityRequest](WebCreateDictEntityRequest.md) | Status data | |
+| **request** | [WebCreateStatusRequest](WebCreateStatusRequest.md) | Status data | |
 
 ### Return type
 
-[**WebDictEntity**](WebDictEntity.md)
+[**WebStatus**](WebStatus.md)
 
 ### Authorization
 

@@ -15,23 +15,23 @@
 
 import * as runtime from '../runtime';
 import type {
-  WebCreateDictEntityRequest,
-  WebDictEntity,
+  WebCreateStatusRequest,
   WebErrorResponse,
-  WebListDictEntitiesResponse,
-  WebUpdateDictEntityRequest,
+  WebListStatusesResponse,
+  WebStatus,
+  WebUpdateStatusRequest,
 } from '../models/index';
 import {
-    WebCreateDictEntityRequestFromJSON,
-    WebCreateDictEntityRequestToJSON,
-    WebDictEntityFromJSON,
-    WebDictEntityToJSON,
+    WebCreateStatusRequestFromJSON,
+    WebCreateStatusRequestToJSON,
     WebErrorResponseFromJSON,
     WebErrorResponseToJSON,
-    WebListDictEntitiesResponseFromJSON,
-    WebListDictEntitiesResponseToJSON,
-    WebUpdateDictEntityRequestFromJSON,
-    WebUpdateDictEntityRequestToJSON,
+    WebListStatusesResponseFromJSON,
+    WebListStatusesResponseToJSON,
+    WebStatusFromJSON,
+    WebStatusToJSON,
+    WebUpdateStatusRequestFromJSON,
+    WebUpdateStatusRequestToJSON,
 } from '../models/index';
 
 export interface StatusesIdDeleteRequest {
@@ -44,11 +44,11 @@ export interface StatusesIdGetRequest {
 
 export interface StatusesIdPutRequest {
     id: number;
-    request: WebUpdateDictEntityRequest;
+    request: WebUpdateStatusRequest;
 }
 
 export interface StatusesPostRequest {
-    request: WebCreateDictEntityRequest;
+    request: WebCreateStatusRequest;
 }
 
 /**
@@ -79,18 +79,18 @@ export class StatusesApi extends runtime.BaseAPI {
      * Get all statuses in dictionary
      * List statuses
      */
-    async statusesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebListDictEntitiesResponse>> {
+    async statusesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebListStatusesResponse>> {
         const requestOptions = await this.statusesGetRequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebListDictEntitiesResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebListStatusesResponseFromJSON(jsonValue));
     }
 
     /**
      * Get all statuses in dictionary
      * List statuses
      */
-    async statusesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebListDictEntitiesResponse> {
+    async statusesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebListStatusesResponse> {
         const response = await this.statusesGetRaw(initOverrides);
         return await response.value();
     }
@@ -172,18 +172,18 @@ export class StatusesApi extends runtime.BaseAPI {
      * Get status dictionary entry by ID
      * Get status by ID
      */
-    async statusesIdGetRaw(requestParameters: StatusesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebDictEntity>> {
+    async statusesIdGetRaw(requestParameters: StatusesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebStatus>> {
         const requestOptions = await this.statusesIdGetRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebDictEntityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebStatusFromJSON(jsonValue));
     }
 
     /**
      * Get status dictionary entry by ID
      * Get status by ID
      */
-    async statusesIdGet(requestParameters: StatusesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebDictEntity> {
+    async statusesIdGet(requestParameters: StatusesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebStatus> {
         const response = await this.statusesIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -221,7 +221,7 @@ export class StatusesApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: WebUpdateDictEntityRequestToJSON(requestParameters['request']),
+            body: WebUpdateStatusRequestToJSON(requestParameters['request']),
         };
     }
 
@@ -229,18 +229,18 @@ export class StatusesApi extends runtime.BaseAPI {
      * Update status dictionary entry by ID
      * Update status
      */
-    async statusesIdPutRaw(requestParameters: StatusesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebDictEntity>> {
+    async statusesIdPutRaw(requestParameters: StatusesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebStatus>> {
         const requestOptions = await this.statusesIdPutRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebDictEntityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebStatusFromJSON(jsonValue));
     }
 
     /**
      * Update status dictionary entry by ID
      * Update status
      */
-    async statusesIdPut(requestParameters: StatusesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebDictEntity> {
+    async statusesIdPut(requestParameters: StatusesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebStatus> {
         const response = await this.statusesIdPutRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -270,7 +270,7 @@ export class StatusesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: WebCreateDictEntityRequestToJSON(requestParameters['request']),
+            body: WebCreateStatusRequestToJSON(requestParameters['request']),
         };
     }
 
@@ -278,18 +278,18 @@ export class StatusesApi extends runtime.BaseAPI {
      * Create new status dictionary entry
      * Create status
      */
-    async statusesPostRaw(requestParameters: StatusesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebDictEntity>> {
+    async statusesPostRaw(requestParameters: StatusesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebStatus>> {
         const requestOptions = await this.statusesPostRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebDictEntityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebStatusFromJSON(jsonValue));
     }
 
     /**
      * Create new status dictionary entry
      * Create status
      */
-    async statusesPost(requestParameters: StatusesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebDictEntity> {
+    async statusesPost(requestParameters: StatusesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebStatus> {
         const response = await this.statusesPostRaw(requestParameters, initOverrides);
         return await response.value();
     }

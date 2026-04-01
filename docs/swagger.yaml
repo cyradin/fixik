@@ -38,6 +38,25 @@ definitions:
     - statusId
     - title
     type: object
+  web.CreateStatusRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      isFinal:
+        type: boolean
+      name:
+        type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - isFinal
+    - name
+    - sort
+    type: object
   web.CreateUserRequest:
     properties:
       email:
@@ -159,6 +178,15 @@ definitions:
           $ref: '#/definitions/web.Role'
         type: array
     type: object
+  web.ListStatusesResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/web.Status'
+        type: array
+    required:
+    - items
+    type: object
   web.ListUsersResponse:
     properties:
       items:
@@ -198,6 +226,28 @@ definitions:
     - description
     - name
     type: object
+  web.Status:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      isFinal:
+        type: boolean
+      name:
+        type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - id
+    - isFinal
+    - name
+    - sort
+    type: object
   web.UpdateDictEntityRequest:
     properties:
       code:
@@ -233,6 +283,28 @@ definitions:
         type: string
       userId:
         type: integer
+    type: object
+  web.UpdateStatusRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      isFinal:
+        type: boolean
+      name:
+        type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - id
+    - isFinal
+    - name
+    - sort
     type: object
   web.UpdateUserRequest:
     properties:
@@ -604,7 +676,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.ListDictEntitiesResponse'
+            $ref: '#/definitions/web.ListStatusesResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -622,14 +694,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/web.CreateDictEntityRequest'
+          $ref: '#/definitions/web.CreateStatusRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.DictEntity'
+            $ref: '#/definitions/web.Status'
         "400":
           description: Bad Request
           schema:
@@ -684,7 +756,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.DictEntity'
+            $ref: '#/definitions/web.Status'
         "400":
           description: Bad Request
           schema:
@@ -711,14 +783,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/web.UpdateDictEntityRequest'
+          $ref: '#/definitions/web.UpdateStatusRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.DictEntity'
+            $ref: '#/definitions/web.Status'
         "400":
           description: Bad Request
           schema:

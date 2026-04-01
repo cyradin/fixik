@@ -10,6 +10,7 @@ import (
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/incident"
+	"github.com/cyradin/fixik/internal/status"
 	"github.com/cyradin/fixik/internal/user"
 	"github.com/cyradin/fixik/pkg/logger"
 )
@@ -83,7 +84,7 @@ func seed(ctx context.Context, c *container.Container) error {
 }
 
 func createStatuses(ctx context.Context, c *container.Container) (map[string]int64, error) {
-	data := []dict.Entity{
+	data := []status.Status{
 		{
 			Name:        "TODO",
 			Code:        "todo",
@@ -101,12 +102,14 @@ func createStatuses(ctx context.Context, c *container.Container) (map[string]int
 			Code:        "done",
 			Description: "Инцидент успешно решён",
 			Sort:        30,
+			IsFinal:     true,
 		},
 		{
 			Name:        "Отменено",
 			Code:        "cancelled",
 			Description: "Работа по инциденту отменена",
 			Sort:        40,
+			IsFinal:     true,
 		},
 	}
 

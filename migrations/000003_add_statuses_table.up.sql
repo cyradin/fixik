@@ -4,6 +4,7 @@ CREATE TABLE statuses (
     name TEXT NOT NULL UNIQUE,
     description TEXT,
     sort INT NOT NULL DEFAULT 0,
+    is_final BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP NOT NULL DEFAULT now(),
     deleted_at TIMESTAMP

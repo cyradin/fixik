@@ -23,10 +23,6 @@ func NewPriorityRepository(db *pgxpool.Pool) *DictRepository {
 	return newDictRepository(db, "priorities")
 }
 
-func NewStatusRepository(db *pgxpool.Pool) *DictRepository {
-	return newDictRepository(db, "statuses")
-}
-
 func NewTeamRepository(db *pgxpool.Pool) *DictRepository {
 	return newDictRepository(db, "teams")
 }

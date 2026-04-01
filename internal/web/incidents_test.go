@@ -10,6 +10,7 @@ import (
 
 	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/incident"
+	"github.com/cyradin/fixik/internal/status"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -369,7 +370,7 @@ func testIncident(title, desc string) incident.Incident {
 		ID:          1,
 		Title:       title,
 		Description: desc,
-		Status: dict.Entity{
+		Status: status.Status{
 			ID:   1,
 			Code: "open",
 			Name: "Open",

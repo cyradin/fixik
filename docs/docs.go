@@ -497,7 +497,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListStatusesResponse"
                         }
                     },
                     "500": {
@@ -527,7 +527,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/web.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateStatusRequest"
                         }
                     }
                 ],
@@ -535,7 +535,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Status"
                         }
                     },
                     "400": {
@@ -579,7 +579,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Status"
                         }
                     },
                     "400": {
@@ -622,7 +622,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateStatusRequest"
                         }
                     }
                 ],
@@ -630,7 +630,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Status"
                         }
                     },
                     "400": {
@@ -1182,6 +1182,33 @@ const docTemplate = `{
                 }
             }
         },
+        "web.CreateStatusRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "isFinal",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "isFinal": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
         "web.CreateUserRequest": {
             "type": "object",
             "required": [
@@ -1358,6 +1385,20 @@ const docTemplate = `{
                 }
             }
         },
+        "web.ListStatusesResponse": {
+            "type": "object",
+            "required": [
+                "items"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.Status"
+                    }
+                }
+            }
+        },
         "web.ListUsersResponse": {
             "type": "object",
             "required": [
@@ -1415,6 +1456,37 @@ const docTemplate = `{
                 }
             }
         },
+        "web.Status": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "id",
+                "isFinal",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isFinal": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
         "web.UpdateDictEntityRequest": {
             "type": "object",
             "required": [
@@ -1464,6 +1536,37 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "web.UpdateStatusRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "id",
+                "isFinal",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isFinal": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
                     "type": "integer"
                 }
             }

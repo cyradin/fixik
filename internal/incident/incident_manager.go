@@ -6,6 +6,7 @@ import (
 
 	"github.com/cyradin/fixik/internal/db"
 	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/status"
 	"github.com/cyradin/fixik/internal/user"
 )
 
@@ -15,6 +16,11 @@ type incidentRepo interface {
 	Update(ctx context.Context, i *db.Incident) error
 	Delete(ctx context.Context, id int64) error
 	List(ctx context.Context, limit, offset int) (db.IncidentListResult, error)
+}
+
+type statusProvider interface {
+	GetByID(ctx context.Context, id status.StatusID) (status.Status, error)
+	List(ctx context.Context) ([]status.Status, error)
 }
 
 type entityProvider interface {
@@ -29,7 +35,7 @@ type userProvider interface {
 
 type IncidentManager struct {
 	repo             incidentRepo
-	statusProvider   entityProvider
+	statusProvider   statusProvider
 	priorityProvider entityProvider
 	teamProvider     entityProvider
 	userProvider     userProvider
@@ -37,7 +43,7 @@ type IncidentManager struct {
 
 func NewIncidentManager(
 	repo incidentRepo,
-	statusProvider entityProvider,
+	statusProvider statusProvider,
 	priorityProvider entityProvider,
 	teamProvider entityProvider,
 	userProvider userProvider,
@@ -152,7 +158,7 @@ func (m *IncidentManager) Update(ctx context.Context, incident UpdateIncident) (
 
 	if incident.UserID != nil {
 		if *incident.UserID == 0 {
-			incident.UserID = nil
+			current.UserID = nil
 		} else {
 			current.UserID = incident.UserID
 		}
@@ -160,7 +166,7 @@ func (m *IncidentManager) Update(ctx context.Context, incident UpdateIncident) (
 
 	if incident.AuthorID != nil {
 		if *incident.AuthorID == 0 {
-			incident.AuthorID = nil
+			current.AuthorID = nil
 		} else {
 			current.AuthorID = incident.AuthorID
 		}
@@ -251,13 +257,13 @@ func (m *IncidentManager) List(ctx context.Context, limit, offset int) (Incident
 	}, nil
 }
 
-func (m *IncidentManager) loadStatuses(ctx context.Context) (map[int64]dict.Entity, error) {
+func (m *IncidentManager) loadStatuses(ctx context.Context) (map[int64]status.Status, error) {
 	items, err := m.statusProvider.List(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("list statuses: %w", err)
 	}
 
-	result := make(map[int64]dict.Entity, len(items))
+	result := make(map[int64]status.Status, len(items))
 	for _, e := range items {
 		result[e.ID] = e
 	}
@@ -295,7 +301,7 @@ func (m *IncidentManager) loadTeams(ctx context.Context) (map[int64]dict.Entity,
 
 func (m *IncidentManager) transformFromDB(
 	r db.Incident,
-	statusMap map[int64]dict.Entity,
+	statusMap map[int64]status.Status,
 	priorityMap map[int64]dict.Entity,
 	teamMap map[int64]dict.Entity,
 	userMap map[int64]user.User,
@@ -348,7 +354,7 @@ func (m *IncidentManager) transformFromDB(
 	return m.fromDB(r, status, priority, team, usr, author), nil
 }
 
-func (m *IncidentManager) fromDB(incident db.Incident, status dict.Entity, priority dict.Entity, team *dict.Entity, user *user.User, author *user.User) Incident {
+func (m *IncidentManager) fromDB(incident db.Incident, status status.Status, priority dict.Entity, team *dict.Entity, user *user.User, author *user.User) Incident {
 	return Incident{
 		ID:          incident.ID,
 		Title:       incident.Title,

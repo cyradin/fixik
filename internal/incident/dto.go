@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/status"
 	"github.com/cyradin/fixik/internal/user"
 )
 
@@ -14,8 +15,8 @@ type Incident struct {
 	Title       string
 	Description string
 
+	Status   status.Status
 	Priority dict.Entity
-	Status   dict.Entity
 
 	Team   *dict.Entity
 	User   *user.User

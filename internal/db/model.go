@@ -42,7 +42,6 @@ type DictEntity struct {
 
 type (
 	Priority = DictEntity
-	Status   = DictEntity
 	Team     = DictEntity
 )
 
@@ -66,3 +65,15 @@ const (
 	RoleManager = "manager"
 	RoleAdmin   = "admin"
 )
+
+type Status struct {
+	ID          int64
+	Code        string
+	Name        string
+	Description string
+	Sort        int
+	IsFinal     bool
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   *time.Time
+}

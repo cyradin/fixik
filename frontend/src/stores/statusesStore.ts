@@ -6,6 +6,7 @@ export interface Status {
   code: string
   name: string
   sort: number
+  isFinal: boolean
 }
 
 interface StatusesState {
