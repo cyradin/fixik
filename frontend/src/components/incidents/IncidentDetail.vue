@@ -4,6 +4,8 @@
     <h2>#{{ incident.id }} {{ incident.title }}</h2>
 
     <p v-if="incident.author"><b>Автор:</b> <UserLink :user="incident.author" /></p>
+    <p><b>Создан:</b> {{ formatDateTime(incident.createdAt) }}</p>
+    <p><b>Обновлён:</b> {{ formatDateTime(incident.updatedAt) }}</p>
 
     <p><b>Описание:</b> {{ incident.description }}</p>
 
@@ -24,6 +26,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useIncidentsStore } from '@/stores/incidentsStore'
+import { formatDateTime } from '@/utils/date'
 import IncidentPriorityColor from '@/components/incidents/IncidentPriorityColor.vue'
 import UserLink from '@/components/users/UserLink.vue'
 

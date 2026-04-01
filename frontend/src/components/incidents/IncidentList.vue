@@ -19,6 +19,10 @@
                 {{ incident.description?.slice(0, 200)
                 }}{{ incident.description && incident.description.length > 200 ? '…' : '' }}
               </p>
+
+              <p><b>Создан:</b> {{ formatDateTime(incident.createdAt) }}</p>
+              <p><b>Обновлён:</b> {{ formatDateTime(incident.updatedAt) }}</p>
+
               <el-space justify="space-between">
                 <IncidentPriorityColor
                   :priority-id="incident.priority.id"
@@ -49,6 +53,7 @@ import { Container, Draggable } from 'vue3-smooth-dnd'
 import { User } from '@element-plus/icons-vue'
 import IncidentPriorityColor from '@/components/incidents/IncidentPriorityColor.vue'
 import UserLink from '@/components/users/UserLink.vue'
+import { formatDateTime } from '@/utils/date'
 
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()

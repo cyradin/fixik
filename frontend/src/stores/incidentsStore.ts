@@ -34,6 +34,8 @@ export interface Incident {
   user: IncidentUser | null
   author: IncidentUser | null
   team: IncidentTeam | null
+  createdAt: string
+  updatedAt: string
 }
 
 interface IncidentsState {
