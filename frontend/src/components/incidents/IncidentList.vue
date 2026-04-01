@@ -9,13 +9,16 @@
           @drop="onDrop(status.code, $event)"
         >
           <Draggable
-            v-for="incident in incidentsStore.items.filter(i => i.status.code === status.code)"
+            v-for="incident in incidentsStore.items.filter((i) => i.status.code === status.code)"
             :key="incident.id"
           >
-            <el-card shadow="never">
-              <strong>#{{incident.id}} {{ incident.title }}</strong>
-              
-              <p>{{ incident.description?.slice(0, 200) }}{{ incident.description && incident.description.length > 200 ? '…' : '' }}</p>
+            <el-card shadow="never" style="cursor: pointer" @click="goToIncident(incident.id)">
+              <strong>#{{ incident.id }} {{ incident.title }}</strong>
+
+              <p>
+                {{ incident.description?.slice(0, 200)
+                }}{{ incident.description && incident.description.length > 200 ? '…' : '' }}
+              </p>
               <el-space justify="space-between">
                 <IncidentPriorityColor
                   :priority-id="incident.priority.id"
@@ -24,9 +27,9 @@
 
                 <el-space size="small">
                   <el-icon><User /></el-icon>
-                  <span>{{ incident.user?.name || 'Не назначено' }}</span>
+                  <p v-if="incident.user"><UserLink :user="incident.user" /></p>
+                  <p v-else>Не назначено</p>
                 </el-space>
-
               </el-space>
             </el-card>
           </Draggable>
@@ -36,31 +39,38 @@
   </el-row>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useIncidentsStore } from '@/stores/incidentsStore'
 import { useStatusesStore } from '@/stores/statusesStore'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Container, Draggable } from 'vue3-smooth-dnd'
 import { User } from '@element-plus/icons-vue'
 import IncidentPriorityColor from '@/components/incidents/IncidentPriorityColor.vue'
+import UserLink from '@/components/users/UserLink.vue'
 
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()
+const router = useRouter()
+
+const goToIncident = (id: number) => {
+  router.push(`/incident/${id}`)
+}
 
 const columns = computed(() =>
-  statusesStore.items.map(status => ({
+  statusesStore.items.map((status) => ({
     ...status,
-    incidents: incidentsStore.items.filter(i => i.status.code === status.code)
-  }))
+    incidents: incidentsStore.items.filter((i) => i.status.code === status.code),
+  })),
 )
 
-const getChildPayload = (statusCode) => (index) => {
-  const items = incidentsStore.items.filter(i => i.status.code === statusCode)
+const getChildPayload = (statusCode: string) => (index: number) => {
+  const items = incidentsStore.items.filter((i) => i.status.code === statusCode)
   return items[index]
 }
 
-const onDrop = async (statusCode, dropResult) => {
+const onDrop = async (statusCode: string, dropResult: any) => {
   const { removedIndex, addedIndex, payload } = dropResult
 
   if (addedIndex === null || !payload) return

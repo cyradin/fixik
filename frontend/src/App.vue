@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
 
-import IncidentList from '@/components/incidents/IncidentList.vue'
-
 import { useIncidentsStore } from '@/stores/incidentsStore'
 import { useStatusesStore } from '@/stores/statusesStore'
 import { usePrioritiesStore } from '@/stores/prioritiesStore'
@@ -38,7 +36,7 @@ onUnmounted(() => {
     </el-header>
 
     <el-main>
-      <IncidentList />
+      <router-view />
     </el-main>
   </el-container>
 </template>
@@ -46,6 +44,6 @@ onUnmounted(() => {
 <style>
 body {
   margin: 0;
-  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 </style>

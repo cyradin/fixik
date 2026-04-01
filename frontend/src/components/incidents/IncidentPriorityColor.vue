@@ -29,10 +29,15 @@ const incidentsStore = useIncidentsStore()
 const priorityIndex = computed(() => {
   // сортируем приоритеты по sort
   const sortedPriorities = [...prioritiesStore.items].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
-  const idx = sortedPriorities.findIndex(p => p.id === props.priorityId)
+  const idx = sortedPriorities.findIndex((p) => p.id === props.priorityId)
   return idx >= 0 ? Math.min(idx, colors.length - 1) : colors.length - 1
 })
 
 const color = computed(() => colors[priorityIndex.value])
-const label = computed(() => props.label || incidentsStore.items.find(i => i.priority.id === props.priorityId)?.priority.name || '—')
+const label = computed(
+  () =>
+    props.label ||
+    incidentsStore.items.find((i) => i.priority.id === props.priorityId)?.priority.name ||
+    '—',
+)
 </script>
