@@ -150,7 +150,7 @@ func (m *IncidentManager) Update(ctx context.Context, incident UpdateIncident) (
 
 	if incident.TeamID != nil {
 		if *incident.TeamID == 0 {
-			incident.TeamID = nil
+			current.TeamID = nil
 		} else {
 			current.TeamID = incident.TeamID
 		}

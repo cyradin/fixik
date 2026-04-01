@@ -182,38 +182,38 @@ export const useIncidentsStore = defineStore('incidents', {
       }
     },
 
-    async updateTeam(id: number, teamId: number | undefined) {
+    async updateTeam(id: number, teamId?: number) {
       try {
-        await incidentsApi.incidentsIdPatch({ id, request: { teamId } })
+        await incidentsApi.incidentsIdPatch({
+          id,
+          request: { teamId: teamId || 0 },
+        })
+
         const item = this.items.find((i) => i.id === id)
-        if (item) {
-          if (teamId) {
-            const teamsStore = useTeamsStore()
-            const team = teamsStore.items.find((t) => t.id === teamId)
-            item.team = team ? { ...team } : null
-          } else {
-            item.team = null
-          }
-        }
+        if (!item) return
+
+        const teamsStore = useTeamsStore()
+        item.team =
+          teamId && teamId > 0 ? (teamsStore.items.find((t) => t.id === teamId) ?? null) : null
       } catch (e) {
         console.error('update team error:', e)
         throw e
       }
     },
 
-    async updateUser(id: number, userId: number | undefined) {
+    async updateUser(id: number, userId?: number) {
       try {
-        await incidentsApi.incidentsIdPatch({ id, request: { userId } })
+        await incidentsApi.incidentsIdPatch({
+          id,
+          request: { userId: userId || 0 },
+        })
+
         const item = this.items.find((i) => i.id === id)
-        if (item) {
-          if (userId) {
-            const usersStore = useUsersStore()
-            const user = usersStore.items.find((u) => u.id === userId)
-            item.user = user ? { ...user } : null
-          } else {
-            item.user = null
-          }
-        }
+        if (!item) return
+
+        const usersStore = useUsersStore()
+        item.user =
+          userId && userId > 0 ? (usersStore.items.find((u) => u.id === userId) ?? null) : null
       } catch (e) {
         console.error('update user error:', e)
         throw e

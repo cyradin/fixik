@@ -1,76 +1,81 @@
 <template>
   <el-button link @click="goBack"> ← Назад </el-button>
+
   <el-card v-if="incident" shadow="hover">
     <h2>#{{ incident.id }} {{ incident.title }}</h2>
 
-    <p v-if="incident.author"><b>Автор:</b> <UserLink :user="incident.author" :is-link="true" /></p>
+    <p v-if="incident.author">
+      <b>Автор:</b>
+      <UserLink :user="incident.author" :is-link="true" />
+    </p>
 
     <p><b>Создан:</b> {{ formatDateTime(incident.createdAt) }}</p>
     <p><b>Обновлён:</b> {{ formatDateTime(incident.updatedAt) }}</p>
 
-    <p>
-      <b>Описание:</b>
-      <el-input
-        type="textarea"
-        v-model="editable.description"
-        :disabled="loading.description"
-        @blur="updateField('description', editable.description)"
-        placeholder="Введите описание"
-      />
-      <el-spinner v-if="loading.description" size="small" />
-    </p>
+    <el-input
+      type="textarea"
+      v-model="editable.description"
+      :disabled="loading.description"
+      @blur="updateField('description', editable.description)"
+      placeholder="Введите описание"
+    />
+    <el-spinner v-if="loading.description" size="small" />
 
-    <p>
-      <b>Статус:</b>
-      <el-select
-        v-model="editable.statusId"
-        :disabled="loading.status"
-        placeholder="Выберите статус"
-        @change="updateField('status', editable.statusId)"
-      >
-        <el-option v-for="s in statuses" :key="s.id" :label="s.name" :value="s.id" />
-      </el-select>
-      <el-spinner v-if="loading.status" size="small" />
-    </p>
+    <el-row :gutter="16">
+      <el-col :span="12">
+        <p><b>Статус:</b></p>
+        <el-select
+          v-model="editable.statusId"
+          :disabled="loading.status"
+          placeholder="Выберите статус"
+          style="width: 100%"
+          @change="updateField('status', editable.statusId)"
+        >
+          <el-option v-for="s in statuses" :key="s.id" :label="s.name" :value="s.id" />
+        </el-select>
+        <el-spinner v-if="loading.status" size="small" />
 
-    <p>
-      <b>Приоритет:</b>
-      <el-select
-        v-model="editable.priorityId"
-        :disabled="loading.priority"
-        placeholder="Выберите приоритет"
-        @change="updateField('priority', editable.priorityId)"
-      >
-        <el-option v-for="p in priorities" :key="p.id" :label="p.name" :value="p.id" />
-      </el-select>
-      <el-spinner v-if="loading.priority" size="small" />
-    </p>
+        <p style="margin-top: 16px"><b>Команда:</b></p>
+        <el-select
+          v-model="editable.teamId"
+          clearable
+          :disabled="loading.team"
+          placeholder="Выберите команду"
+          style="width: 100%"
+          @change="updateField('team', editable.teamId)"
+        >
+          <el-option v-for="t in teams" :key="t.id" :label="t.name" :value="t.id" />
+        </el-select>
+        <el-spinner v-if="loading.team" size="small" />
+      </el-col>
 
-    <p v-if="incident.team">
-      <b>Команда:</b>
-      <el-select
-        v-model="editable.teamId"
-        :disabled="loading.team"
-        placeholder="Выберите команду"
-        @change="updateField('team', editable.teamId)"
-      >
-        <el-option v-for="t in teams" :key="t.id" :label="t.name" :value="t.id" />
-      </el-select>
-      <el-spinner v-if="loading.team" size="small" />
-    </p>
+      <el-col :span="12">
+        <p><b>Приоритет:</b></p>
+        <el-select
+          v-model="editable.priorityId"
+          :disabled="loading.priority"
+          placeholder="Выберите приоритет"
+          style="width: 100%"
+          @change="updateField('priority', editable.priorityId)"
+        >
+          <el-option v-for="p in priorities" :key="p.id" :label="p.name" :value="p.id" />
+        </el-select>
+        <el-spinner v-if="loading.priority" size="small" />
 
-    <p v-if="incident.user">
-      <b>Исполнитель:</b>
-      <el-select
-        v-model="editable.userId"
-        :disabled="loading.user"
-        placeholder="Выберите исполнителя"
-        @change="updateField('user', editable.userId)"
-      >
-        <el-option v-for="u in users" :key="u.id" :label="u.name" :value="u.id" />
-      </el-select>
-      <el-spinner v-if="loading.user" size="small" />
-    </p>
+        <p style="margin-top: 16px"><b>Исполнитель:</b></p>
+        <el-select
+          v-model="editable.userId"
+          clearable
+          :disabled="loading.user"
+          placeholder="Выберите исполнителя"
+          style="width: 100%"
+          @change="updateField('user', editable.userId)"
+        >
+          <el-option v-for="u in users" :key="u.id" :label="u.name" :value="u.id" />
+        </el-select>
+        <el-spinner v-if="loading.user" size="small" />
+      </el-col>
+    </el-row>
   </el-card>
 
   <el-empty v-else description="Инцидент не найден" />
@@ -145,12 +150,13 @@ const updateField = async (field: Field, value: any) => {
         if (priority) incident.value.priority = { ...priority }
         break
       case 'team':
-        await incidentsStore.updateTeam(incident.value.id, value)
+        await incidentsStore.updateTeam(incident.value.id, value ?? undefined)
         const team = teamsStore.items.find((t) => t.id === value)
         incident.value.team = team ? { ...team } : null
         break
+
       case 'user':
-        await incidentsStore.updateUser(incident.value.id, value)
+        await incidentsStore.updateUser(incident.value.id, value ?? undefined)
         const user = usersStore.items.find((u) => u.id === value)
         incident.value.user = user ? { ...user } : null
         break
