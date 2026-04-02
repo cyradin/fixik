@@ -79,3 +79,16 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func NewFromDB(u db.User) User {
+	return User{
+		ID:        u.ID,
+		Name:      u.Name,
+		Username:  u.Username,
+		Email:     u.Email,
+		TeamID:    u.TeamID,
+		Role:      u.Role,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+	}
+}

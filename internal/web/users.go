@@ -18,12 +18,24 @@ const (
 	maxPasswordLen = 255
 )
 
-type userManager interface {
+type userCreater interface {
 	Create(ctx context.Context, u user.CreateUser) (user.User, error)
+}
+
+type userUpdater interface {
 	Update(ctx context.Context, u user.UpdateUser) (user.User, error)
+}
+
+type userDeleter interface {
 	Delete(ctx context.Context, id int64) error
-	GetByID(ctx context.Context, id int64) (user.User, error)
+}
+
+type userLister interface {
 	List(ctx context.Context, limit, offset int) ([]user.User, error)
+}
+
+type userGetter interface {
+	GetByID(ctx context.Context, id int64) (user.User, error)
 }
 
 type CreateUserRequest struct {
@@ -103,7 +115,7 @@ func userRoutes(c *container.Container) func(r chi.Router) {
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users [post]
-func createUser(manager userManager) http.HandlerFunc {
+func createUser(manager userCreater) http.HandlerFunc {
 	return handle(func(ctx context.Context, req CreateUserRequest) (UserResponse, error) {
 		if err := req.Validate(); err != nil {
 			return UserResponse{}, err
@@ -134,7 +146,7 @@ func createUser(manager userManager) http.HandlerFunc {
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users/{id} [get]
-func getUser(manager userManager) http.HandlerFunc {
+func getUser(manager userGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -164,7 +176,7 @@ func getUser(manager userManager) http.HandlerFunc {
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users/{id} [patch]
-func updateUser(manager userManager) http.HandlerFunc {
+func updateUser(manager userUpdater) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -200,7 +212,7 @@ func updateUser(manager userManager) http.HandlerFunc {
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users/{id} [delete]
-func deleteUser(manager userManager) http.HandlerFunc {
+func deleteUser(manager userDeleter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -225,7 +237,7 @@ func deleteUser(manager userManager) http.HandlerFunc {
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users [get]
-func listUsers(manager userManager) http.HandlerFunc {
+func listUsers(manager userLister) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		limit, offset, err := decodePagination(r, 1, 100) //nolint:mnd
 		if err != nil {

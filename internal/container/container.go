@@ -32,6 +32,8 @@ type Container struct {
 
 	incidentManager *incident.IncidentManager
 	userManager     *user.UserManager
+	jwtManager      *user.JWTManager
+	authService     *user.AuthService
 }
 
 func New(
@@ -50,4 +52,8 @@ func (c *Container) Logger() *slog.Logger {
 	}
 
 	return c.logger
+}
+
+func (c *Container) Cfg() config.Config {
+	return *c.cfg
 }

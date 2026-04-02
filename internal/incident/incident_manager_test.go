@@ -672,5 +672,6 @@ func (m *statusProviderMock) List(ctx context.Context) ([]status.Status, error) 
 	if m.listFn != nil {
 		return m.listFn(ctx)
 	}
+
 	return nil, nil
 }

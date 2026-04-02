@@ -108,7 +108,7 @@ func (m *UserManager) GetByID(ctx context.Context, id int64) (User, error) {
 		return User{}, fmt.Errorf("get user: %w", err)
 	}
 
-	return m.fromDB(userDB), nil
+	return NewFromDB(userDB), nil
 }
 
 func (m *UserManager) GetByUsername(ctx context.Context, username string) (User, error) {
@@ -117,7 +117,7 @@ func (m *UserManager) GetByUsername(ctx context.Context, username string) (User,
 		return User{}, fmt.Errorf("get user: %w", err)
 	}
 
-	return m.fromDB(userDB), nil
+	return NewFromDB(userDB), nil
 }
 
 func (m *UserManager) GetByIDMany(ctx context.Context, ids []int64) ([]User, error) {
@@ -129,7 +129,7 @@ func (m *UserManager) GetByIDMany(ctx context.Context, ids []int64) ([]User, err
 	users := make([]User, 0, len(usersDB))
 
 	for _, u := range usersDB {
-		users = append(users, m.fromDB(u))
+		users = append(users, NewFromDB(u))
 	}
 
 	return users, nil
@@ -144,23 +144,10 @@ func (m *UserManager) List(ctx context.Context, limit, offset int) ([]User, erro
 	users := make([]User, 0, len(usersDB))
 
 	for _, u := range usersDB {
-		users = append(users, m.fromDB(u))
+		users = append(users, NewFromDB(u))
 	}
 
 	return users, nil
-}
-
-func (m *UserManager) fromDB(u db.User) User {
-	return User{
-		ID:        u.ID,
-		Name:      u.Name,
-		Username:  u.Username,
-		Email:     u.Email,
-		TeamID:    u.TeamID,
-		Role:      u.Role,
-		CreatedAt: u.CreatedAt,
-		UpdatedAt: u.UpdatedAt,
-	}
 }
 
 func hashPassword(password string) (string, error) {

@@ -3,12 +3,14 @@ package web
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
 	"strconv"
 
 	"github.com/cyradin/fixik/internal/container"
+	"github.com/cyradin/fixik/internal/user"
 	"github.com/cyradin/fixik/pkg/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -18,6 +20,23 @@ import (
 type ErrorResponse struct {
 	Error string `json:"error"`
 }
+
+type UnauthorizedError struct {
+	Err error
+}
+
+func (e UnauthorizedError) Error() string {
+	return "unauthorized"
+}
+
+func (e UnauthorizedError) Unwrap() error {
+	return e.Err
+}
+
+var (
+	ErrUnauthorized = fmt.Errorf("unauthorized")
+	ErrForbidden    = fmt.Errorf("forbidden")
+)
 
 func NewRouter(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 	r := chi.NewRouter()
@@ -32,6 +51,7 @@ func NewRouter(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/users", userRoutes(c))
+		r.Route("/auth", authRoutes(c))
 
 		r.Route("/statuses", statusRoutes(c))
 		r.Route("/priorities", priorityRoutes(c))
@@ -94,9 +114,7 @@ func handle[Req any, Resp any](fn func(ctx context.Context, req Req) (Resp, erro
 
 		resp, err := fn(ctx, req)
 		if err != nil {
-			logger.FromContext(ctx).Error("request error", logger.Error(err))
-			writeError(w, http.StatusInternalServerError, err)
-
+			handleError(ctx, w, err)
 			return
 		}
 
@@ -106,6 +124,28 @@ func handle[Req any, Resp any](fn func(ctx context.Context, req Req) (Resp, erro
 			w.WriteHeader(http.StatusOK)
 		}
 	}
+}
+
+func handleError(ctx context.Context, w http.ResponseWriter, err error) {
+	var (
+		unauthErr UnauthorizedError
+	)
+
+	// nolint:gocritic
+	switch true {
+	case errors.As(err, &unauthErr):
+		if errors.Is(unauthErr.Err, user.ErrUserNotFound) {
+			writeError(w, http.StatusUnauthorized, fmt.Errorf("user not found"))
+			return
+		}
+
+		writeError(w, http.StatusUnauthorized, fmt.Errorf("unauthorized"))
+
+		return
+	}
+
+	logger.FromContext(ctx).Error("request error", logger.Error(err))
+	writeError(w, http.StatusInternalServerError, err)
 }
 
 type Validatable interface {

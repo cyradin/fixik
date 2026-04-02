@@ -87,6 +87,7 @@ linters:
     paths:
       - bin
       - vendor
+      - frontend
 formatters:
   enable:
     - gofmt

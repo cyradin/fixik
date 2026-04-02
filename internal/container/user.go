@@ -13,3 +13,26 @@ func (c *Container) UserManager() *user.UserManager {
 
 	return c.userManager
 }
+
+func (c *Container) JWTManager() *user.JWTManager {
+	if c.jwtManager == nil {
+		c.jwtManager = user.NewJWTManager(
+			c.cfg.Auth.Secret,
+			c.cfg.Auth.AccessTokenTTL,
+			c.cfg.Auth.RefreshTokenTTL,
+		)
+	}
+
+	return c.jwtManager
+}
+
+func (c *Container) AuthService() *user.AuthService {
+	if c.authService == nil {
+		c.authService = user.NewAuthService(
+			c.UserRepository(),
+			c.JWTManager(),
+		)
+	}
+
+	return c.authService
+}

@@ -49,17 +49,20 @@ func (r *StatusRepository) GetByID(ctx context.Context, id int64) (Status, error
 	`
 
 	args := pgx.NamedArgs{"id": id}
-	var e Status
+
+	var s Status
+
 	if err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args).Scan(
-		&e.ID, &e.Code, &e.Name, &e.Description, &e.Sort, &e.IsFinal, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt,
+		&s.ID, &s.Code, &s.Name, &s.Description, &s.Sort, &s.IsFinal, &s.CreatedAt, &s.UpdatedAt, &s.DeletedAt,
 	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return Status{}, ErrNotFound
 		}
+
 		return Status{}, fmt.Errorf("db query: %w", err)
 	}
 
-	return e, nil
+	return s, nil
 }
 
 func (r *StatusRepository) List(ctx context.Context) ([]Status, error) {
@@ -77,14 +80,17 @@ func (r *StatusRepository) List(ctx context.Context) ([]Status, error) {
 	defer rows.Close()
 
 	var list []Status
+
 	for rows.Next() {
 		var e Status
+
 		if err := rows.Scan(
 			&e.ID, &e.Code, &e.Name, &e.Description, &e.Sort, &e.IsFinal,
 			&e.CreatedAt, &e.UpdatedAt, &e.DeletedAt,
 		); err != nil {
 			return nil, fmt.Errorf("scan: %w", err)
 		}
+
 		list = append(list, e)
 	}
 
@@ -127,6 +133,7 @@ func (r *StatusRepository) Delete(ctx context.Context, id int64) error {
 	`
 
 	args := pgx.NamedArgs{"id": id}
+
 	_, err := transaction.FromContext(ctx, r.db).Exec(ctx, query, args)
 	if err != nil {
 		return fmt.Errorf("db query: %w", err)

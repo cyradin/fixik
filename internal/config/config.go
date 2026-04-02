@@ -12,6 +12,15 @@ type Config struct {
 	HTTPDebugServer HTTPDebugServerConfig
 	Log             LogConfig
 	Postgres        PostgresConfig
+	Auth            AuthConfig
+}
+
+//nolint:gosec
+type AuthConfig struct {
+	Secret          string        `envconfig:"FIXIK_AUTH_SECRET" required:"true"`
+	AccessTokenTTL  time.Duration `envconfig:"FIXIK_AUTH_ACCESS_TOKEN_TTL" required:"true"`
+	RefreshTokenTTL time.Duration `envconfig:"FIXIK_AUTH_REFRESH_TOKEN_TTL" required:"true"`
+	SecureCookies   bool          `envconfig:"FIXIK_AUTH_SECURE_COOKIES" required:"true"`
 }
 
 type HTTPServerConfig struct {
