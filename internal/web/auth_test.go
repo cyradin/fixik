@@ -124,6 +124,49 @@ func TestAuthLogin(t *testing.T) {
 	}
 }
 
+func TestAuthLogout(t *testing.T) {
+	t.Parallel()
+
+	t.Run("success", func(t *testing.T) {
+		t.Parallel()
+
+		secure := true
+		handler := authLogout(secure)
+
+		req := httptest.NewRequest(http.MethodPost, "/api/auth/logout", nil)
+		rr := httptest.NewRecorder()
+
+		handler.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		cookies := rr.Result().Cookies()
+		require.Len(t, cookies, 2)
+
+		accessFound := false
+		refreshFound := false
+		for _, c := range cookies {
+			if c.Name == "access_token" {
+				accessFound = true
+				require.Equal(t, "", c.Value)
+				require.Equal(t, -1, c.MaxAge)
+				require.Equal(t, "/", c.Path)
+				require.Equal(t, secure, c.Secure)
+			}
+			if c.Name == "refresh_token" {
+				refreshFound = true
+				require.Equal(t, "", c.Value)
+				require.Equal(t, -1, c.MaxAge)
+				require.Equal(t, "/api/auth/refresh", c.Path)
+				require.Equal(t, secure, c.Secure)
+			}
+		}
+
+		require.True(t, accessFound, "access_token cookie not found")
+		require.True(t, refreshFound, "refresh_token cookie not found")
+	})
+}
+
 type mockAuthService struct {
 	loginFn func(ctx context.Context, username, password string) (user.LoginResult, error)
 }

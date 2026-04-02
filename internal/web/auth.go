@@ -40,6 +40,10 @@ func authRoutes(c *container.Container) func(r chi.Router) {
 			c.Cfg().Auth.RefreshTokenTTL,
 			c.Cfg().Auth.SecureCookies,
 		))
+
+		r.Post("/logout", authLogout(
+			c.Cfg().Auth.SecureCookies,
+		))
 	}
 }
 
@@ -77,5 +81,31 @@ func authLogin(srv userLoginer, accessTTL, refreshTTL time.Duration, secureCooki
 
 			return NoBody{}, nil
 		})(w, r)
+	}
+}
+
+func authLogout(secureCookies bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.SetCookie(w, &http.Cookie{
+			Name:     "access_token",
+			Value:    "",
+			HttpOnly: true,
+			Secure:   secureCookies,
+			Path:     "/",
+			MaxAge:   -1,
+			SameSite: http.SameSiteLaxMode,
+		})
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "refresh_token",
+			Value:    "",
+			HttpOnly: true,
+			Secure:   secureCookies,
+			Path:     "/api/auth/refresh",
+			MaxAge:   -1,
+			SameSite: http.SameSiteLaxMode,
+		})
+
+		w.WriteHeader(http.StatusOK)
 	}
 }
