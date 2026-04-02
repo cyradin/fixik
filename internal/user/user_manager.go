@@ -13,6 +13,7 @@ var ErrNotFound = db.ErrNotFound
 type userRepo interface {
 	Create(ctx context.Context, u *db.User) error
 	GetByID(ctx context.Context, id int64) (db.User, error)
+	GetByUsername(ctx context.Context, username string) (db.User, error)
 	GetByIDMany(ctx context.Context, ids []int64) ([]db.User, error)
 	Update(ctx context.Context, u *db.User) error
 	Delete(ctx context.Context, id int64) error
@@ -71,7 +72,6 @@ func (m *UserManager) Update(ctx context.Context, u UpdateUser) (User, error) {
 
 	if u.TeamID != nil {
 		if *u.TeamID == 0 {
-			// удалить команду
 			user.TeamID = nil
 		} else {
 			user.TeamID = u.TeamID
@@ -104,6 +104,15 @@ func (m *UserManager) Delete(ctx context.Context, id int64) error {
 
 func (m *UserManager) GetByID(ctx context.Context, id int64) (User, error) {
 	userDB, err := m.repo.GetByID(ctx, id)
+	if err != nil {
+		return User{}, fmt.Errorf("get user: %w", err)
+	}
+
+	return m.fromDB(userDB), nil
+}
+
+func (m *UserManager) GetByUsername(ctx context.Context, username string) (User, error) {
+	userDB, err := m.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return User{}, fmt.Errorf("get user: %w", err)
 	}

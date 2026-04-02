@@ -49,33 +49,21 @@ func (r *UserRepository) GetByID(ctx context.Context, id int64) (User, error) {
 			u.role, u.created_at, u.updated_at, u.deleted_at
 		FROM users u
 		WHERE u.id = $1 AND u.deleted_at IS NULL
-		GROUP BY u.id
 	`
 
-	var u User
+	return r.getOne(ctx, query, id)
+}
 
-	err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, id).Scan(
-		&u.ID,
-		&u.Name,
-		&u.Username,
-		&u.Email,
-		&u.Password,
-		&u.TeamID,
-		&u.Role,
-		&u.CreatedAt,
-		&u.UpdatedAt,
-		&u.DeletedAt,
-	)
+func (r *UserRepository) GetByUsername(ctx context.Context, username string) (User, error) {
+	const query = `
+		SELECT
+			u.id, u.name, u.username, u.email, u.password, u.team_id,
+			u.role, u.created_at, u.updated_at, u.deleted_at
+		FROM users u
+		WHERE u.username = $1 AND u.deleted_at IS NULL
+	`
 
-	if errors.Is(err, pgx.ErrNoRows) {
-		return User{}, ErrNotFound
-	}
-
-	if err != nil {
-		return User{}, fmt.Errorf("db query: %w", err)
-	}
-
-	return u, nil
+	return r.getOne(ctx, query, username)
 }
 
 func (r *UserRepository) GetByIDMany(ctx context.Context, ids []int64) ([]User, error) {
@@ -89,7 +77,6 @@ func (r *UserRepository) GetByIDMany(ctx context.Context, ids []int64) ([]User, 
 			u.role, u.created_at, u.updated_at, u.deleted_at
 		FROM users u
 		WHERE u.deleted_at IS NULL AND u.id = ANY($1)
-		GROUP BY u.id
 	`
 
 	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, query, ids)
@@ -222,4 +209,31 @@ func (r *UserRepository) Delete(ctx context.Context, id int64) error {
 	}
 
 	return nil
+}
+
+func (r *UserRepository) getOne(ctx context.Context, query string, args ...any) (User, error) {
+	var u User
+
+	err := transaction.FromContext(ctx, r.db).QueryRow(ctx, query, args...).Scan(
+		&u.ID,
+		&u.Name,
+		&u.Username,
+		&u.Email,
+		&u.Password,
+		&u.TeamID,
+		&u.Role,
+		&u.CreatedAt,
+		&u.UpdatedAt,
+		&u.DeletedAt,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return User{}, ErrNotFound
+	}
+
+	if err != nil {
+		return User{}, fmt.Errorf("db query: %w", err)
+	}
+
+	return u, nil
 }

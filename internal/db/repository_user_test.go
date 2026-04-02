@@ -50,6 +50,26 @@ func (s *UserRepositorySuite) TestGetByID() {
 	s.Nil(fromDB.DeletedAt)
 }
 
+func (s *UserRepositorySuite) TestGetByUsername() {
+	team := s.createTeam("team1", "Team One")
+
+	user := s.createUser("Алексей", "alex", "alex@example.com", "passhash", team.ID, RoleUser)
+
+	fromDB, err := s.repo.GetByUsername(s.T().Context(), user.Username)
+	s.Require().NoError(err)
+
+	s.Equal(user.ID, fromDB.ID)
+	s.Equal(user.Name, fromDB.Name)
+	s.Equal(user.Username, fromDB.Username)
+	s.Equal(user.Email, fromDB.Email)
+	s.Equal(user.Password, fromDB.Password)
+	s.Equal(user.TeamID, fromDB.TeamID)
+	s.Equal(user.Role, fromDB.Role)
+	s.WithinDuration(time.Now(), fromDB.CreatedAt, time.Second)
+	s.WithinDuration(time.Now(), fromDB.UpdatedAt, time.Second)
+	s.Nil(fromDB.DeletedAt)
+}
+
 func (s *UserRepositorySuite) TestGetByIDMany() {
 	ctx := s.T().Context()
 

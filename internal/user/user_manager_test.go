@@ -86,6 +86,71 @@ func TestUserManager_Create(t *testing.T) {
 	}
 }
 
+func TestUserManager_GetByUsername(t *testing.T) {
+	t.Parallel()
+
+	dbUser := db.User{
+		ID:       1,
+		Name:     "Алиса",
+		Username: "alice",
+		Email:    "alice@example.com",
+		Password: "hashed",
+		TeamID:   new(int64(1)),
+		Role:     RoleAdmin,
+	}
+
+	tests := []struct {
+		name string
+		mock func(*userRepoMock)
+		err  bool
+	}{
+		{
+			name: "repo error",
+			mock: func(repo *userRepoMock) {
+				repo.getByUsernameFn = func(ctx context.Context, username string) (db.User, error) {
+					return db.User{}, errors.New("repo error")
+				}
+			},
+			err: true,
+		},
+		{
+			name: "success",
+			mock: func(repo *userRepoMock) {
+				repo.getByUsernameFn = func(ctx context.Context, username string) (db.User, error) {
+					return dbUser, nil
+				}
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			repo := &userRepoMock{}
+			tt.mock(repo)
+
+			manager := NewUserManager(repo)
+			u, err := manager.GetByUsername(t.Context(), "alice")
+
+			if tt.err {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, User{
+				ID:       1,
+				Name:     "Алиса",
+				Username: "alice",
+				Email:    "alice@example.com",
+				TeamID:   new(int64(1)),
+				Role:     RoleAdmin,
+			}, u)
+		})
+	}
+}
+
 func TestUserManager_GetByID(t *testing.T) {
 	t.Parallel()
 
@@ -415,12 +480,13 @@ func TestUserManager_List(t *testing.T) {
 
 // Mocks
 type userRepoMock struct {
-	createFn      func(context.Context, *db.User) error
-	getByIDFn     func(context.Context, int64) (db.User, error)
-	getByIDManyFn func(context.Context, []int64) ([]db.User, error)
-	listFn        func(context.Context, int, int) ([]db.User, error)
-	updateFn      func(context.Context, *db.User) error
-	deleteFn      func(context.Context, int64) error
+	createFn        func(context.Context, *db.User) error
+	getByIDFn       func(context.Context, int64) (db.User, error)
+	getByUsernameFn func(context.Context, string) (db.User, error)
+	getByIDManyFn   func(context.Context, []int64) ([]db.User, error)
+	listFn          func(context.Context, int, int) ([]db.User, error)
+	updateFn        func(context.Context, *db.User) error
+	deleteFn        func(context.Context, int64) error
 }
 
 func (m *userRepoMock) Create(ctx context.Context, u *db.User) error {
@@ -429,6 +495,10 @@ func (m *userRepoMock) Create(ctx context.Context, u *db.User) error {
 
 func (m *userRepoMock) GetByID(ctx context.Context, id int64) (db.User, error) {
 	return m.getByIDFn(ctx, id)
+}
+
+func (m *userRepoMock) GetByUsername(ctx context.Context, username string) (db.User, error) {
+	return m.getByUsernameFn(ctx, username)
 }
 
 func (m *userRepoMock) List(ctx context.Context, limit, offset int) ([]db.User, error) {
