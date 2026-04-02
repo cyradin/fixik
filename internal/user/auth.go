@@ -109,6 +109,7 @@ func (a *AuthService) GetUserFromAccessToken(ctx context.Context, token string) 
 		if errors.Is(err, db.ErrNotFound) {
 			return User{}, ErrUserNotFound
 		}
+
 		return User{}, err
 	}
 
