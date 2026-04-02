@@ -3,6 +3,7 @@ package web
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -14,6 +15,10 @@ import (
 
 type userLoginer interface {
 	Login(ctx context.Context, username string, password string) (user.LoginResult, error)
+}
+
+type tokenRefresher interface {
+	Refresh(ctx context.Context, refreshToken string) (user.LoginResult, error)
 }
 
 //nolint:gosec
@@ -44,6 +49,13 @@ func authRoutes(c *container.Container) func(r chi.Router) {
 		r.Post("/logout", authLogout(
 			c.Cfg().Auth.SecureCookies,
 		))
+
+		r.Post("/refresh", authRefresh(
+			authService,
+			c.Cfg().Auth.AccessTokenTTL,
+			c.Cfg().Auth.RefreshTokenTTL,
+			c.Cfg().Auth.SecureCookies,
+		))
 	}
 }
 
@@ -59,25 +71,8 @@ func authLogin(srv userLoginer, accessTTL, refreshTTL time.Duration, secureCooki
 				return NoBody{}, err
 			}
 
-			http.SetCookie(w, &http.Cookie{
-				Name:     "access_token",
-				Value:    result.AccessToken,
-				HttpOnly: true,
-				Secure:   secureCookies,
-				Path:     "/",
-				MaxAge:   int(accessTTL.Seconds()),
-				SameSite: http.SameSiteLaxMode,
-			})
-
-			http.SetCookie(w, &http.Cookie{
-				Name:     "refresh_token",
-				Value:    result.RefreshToken,
-				HttpOnly: true,
-				Secure:   secureCookies,
-				Path:     "/api/auth/refresh",
-				MaxAge:   int(refreshTTL.Seconds()),
-				SameSite: http.SameSiteLaxMode,
-			})
+			setAccessToken(w, result.AccessToken, accessTTL, secureCookies)
+			setRefreshToken(w, result.RefreshToken, refreshTTL, secureCookies)
 
 			return NoBody{}, nil
 		})(w, r)
@@ -86,26 +81,54 @@ func authLogin(srv userLoginer, accessTTL, refreshTTL time.Duration, secureCooki
 
 func authLogout(secureCookies bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.SetCookie(w, &http.Cookie{
-			Name:     "access_token",
-			Value:    "",
-			HttpOnly: true,
-			Secure:   secureCookies,
-			Path:     "/",
-			MaxAge:   -1,
-			SameSite: http.SameSiteLaxMode,
-		})
-
-		http.SetCookie(w, &http.Cookie{
-			Name:     "refresh_token",
-			Value:    "",
-			HttpOnly: true,
-			Secure:   secureCookies,
-			Path:     "/api/auth/refresh",
-			MaxAge:   -1,
-			SameSite: http.SameSiteLaxMode,
-		})
+		setAccessToken(w, "", -1*time.Second, secureCookies)
+		setRefreshToken(w, "", -1*time.Second, secureCookies)
 
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+func authRefresh(srv tokenRefresher, accessTTL, refreshTTL time.Duration, secureCookies bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		handle(func(ctx context.Context, req NoBody) (NoBody, error) {
+			rtCookie, err := r.Cookie("refresh_token")
+			if err != nil {
+				return NoBody{}, UnauthorizedError{Err: fmt.Errorf("refresh token missing")}
+			}
+
+			result, err := srv.Refresh(ctx, rtCookie.Value)
+			if err != nil {
+				return NoBody{}, UnauthorizedError{Err: err}
+			}
+
+			setAccessToken(w, result.AccessToken, accessTTL, secureCookies)
+			setRefreshToken(w, result.RefreshToken, refreshTTL, secureCookies)
+
+			return NoBody{}, nil
+		})(w, r)
+	}
+}
+
+func setAccessToken(w http.ResponseWriter, token string, ttl time.Duration, secure bool) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    token,
+		HttpOnly: true,
+		Secure:   secure,
+		Path:     "/",
+		MaxAge:   int(ttl.Seconds()),
+		SameSite: http.SameSiteLaxMode,
+	})
+}
+
+func setRefreshToken(w http.ResponseWriter, token string, ttl time.Duration, secure bool) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    token,
+		HttpOnly: true,
+		Secure:   secure,
+		Path:     "/api/auth/refresh",
+		MaxAge:   int(ttl.Seconds()),
+		SameSite: http.SameSiteLaxMode,
+	})
 }

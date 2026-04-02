@@ -113,3 +113,75 @@ func TestJWTManager_GenerateRefreshToken(t *testing.T) {
 		})
 	}
 }
+
+func TestJWTManager_ValidateAccessToken(t *testing.T) {
+	t.Parallel()
+
+	secret := "test-secret"
+	manager := NewJWTManager(secret, 1*time.Hour, 24*time.Hour)
+
+	t.Run("valid token", func(t *testing.T) {
+		t.Parallel()
+
+		tokenStr, err := manager.GenerateAccessToken(123)
+		require.NoError(t, err)
+
+		userID, err := manager.ValidateAccessToken(tokenStr)
+		require.NoError(t, err)
+		require.Equal(t, int64(123), userID)
+	})
+
+	t.Run("expired token", func(t *testing.T) {
+		t.Parallel()
+
+		shortManager := NewJWTManager(secret, -1*time.Minute, 24*time.Hour)
+		tokenStr, err := shortManager.GenerateAccessToken(1)
+		require.NoError(t, err)
+
+		_, err = manager.ValidateAccessToken(tokenStr)
+		require.ErrorIs(t, err, jwt.ErrTokenExpired)
+	})
+
+	t.Run("invalid token", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := manager.ValidateAccessToken("invalid.token.here")
+		require.Error(t, err)
+	})
+}
+
+func TestJWTManager_ValidateRefreshToken(t *testing.T) {
+	t.Parallel()
+
+	secret := "test-secret"
+	manager := NewJWTManager(secret, 1*time.Hour, 24*time.Hour)
+
+	t.Run("valid token", func(t *testing.T) {
+		t.Parallel()
+
+		tokenStr, err := manager.GenerateRefreshToken(456)
+		require.NoError(t, err)
+
+		userID, err := manager.ValidateRefreshToken(tokenStr)
+		require.NoError(t, err)
+		require.Equal(t, int64(456), userID)
+	})
+
+	t.Run("expired token", func(t *testing.T) {
+		t.Parallel()
+
+		shortManager := NewJWTManager(secret, 1*time.Hour, -1*time.Minute)
+		tokenStr, err := shortManager.GenerateRefreshToken(2)
+		require.NoError(t, err)
+
+		_, err = manager.ValidateRefreshToken(tokenStr)
+		require.ErrorIs(t, err, jwt.ErrTokenExpired)
+	})
+
+	t.Run("invalid token", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := manager.ValidateRefreshToken("totally.invalid")
+		require.Error(t, err)
+	})
+}

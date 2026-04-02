@@ -145,16 +145,20 @@ func TestAuthLogout(t *testing.T) {
 
 		accessFound := false
 		refreshFound := false
+
 		for _, c := range cookies {
 			if c.Name == "access_token" {
 				accessFound = true
+
 				require.Equal(t, "", c.Value)
 				require.Equal(t, -1, c.MaxAge)
 				require.Equal(t, "/", c.Path)
 				require.Equal(t, secure, c.Secure)
 			}
+
 			if c.Name == "refresh_token" {
 				refreshFound = true
+
 				require.Equal(t, "", c.Value)
 				require.Equal(t, -1, c.MaxAge)
 				require.Equal(t, "/api/auth/refresh", c.Path)
@@ -165,6 +169,110 @@ func TestAuthLogout(t *testing.T) {
 		require.True(t, accessFound, "access_token cookie not found")
 		require.True(t, refreshFound, "refresh_token cookie not found")
 	})
+}
+
+func TestAuthRefresh(t *testing.T) {
+	t.Parallel()
+
+	accessTTL := 15 * time.Minute
+	refreshTTL := 24 * time.Hour
+
+	tests := []struct {
+		name   string
+		cookie string
+		mock   func(*mockRefreshService)
+		status int
+		check  func(t *testing.T, rr *httptest.ResponseRecorder)
+	}{
+		{
+			name:   "success",
+			cookie: "valid-refresh",
+			mock: func(m *mockRefreshService) {
+				m.refreshFn = func(ctx context.Context, token string) (user.LoginResult, error) {
+					return user.LoginResult{
+						User:         user.User{ID: 1},
+						AccessToken:  "new-access",
+						RefreshToken: "new-refresh",
+					}, nil
+				}
+			},
+			status: http.StatusOK,
+			check: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				t.Helper()
+
+				cookies := rr.Result().Cookies()
+				require.Len(t, cookies, 2)
+
+				var access, refresh *http.Cookie
+
+				for _, c := range cookies {
+					if c.Name == "access_token" {
+						access = c
+					}
+
+					if c.Name == "refresh_token" {
+						refresh = c
+					}
+				}
+
+				require.NotNil(t, access)
+				require.Equal(t, "new-access", access.Value)
+				require.Equal(t, "/", access.Path)
+
+				require.NotNil(t, refresh)
+				require.Equal(t, "new-refresh", refresh.Value)
+				require.Equal(t, "/api/auth/refresh", refresh.Path)
+			},
+		},
+		{
+			name:   "missing cookie",
+			cookie: "",
+			mock:   func(m *mockRefreshService) {},
+			status: http.StatusUnauthorized,
+		},
+		{
+			name:   "invalid token",
+			cookie: "bad-token",
+			mock: func(m *mockRefreshService) {
+				m.refreshFn = func(ctx context.Context, token string) (user.LoginResult, error) {
+					return user.LoginResult{}, errors.New("invalid token")
+				}
+			},
+			status: http.StatusUnauthorized,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			m := &mockRefreshService{}
+			tt.mock(m)
+
+			handler := authRefresh(m, accessTTL, refreshTTL, false)
+
+			req := httptest.NewRequest(http.MethodPost, "/api/auth/refresh", nil)
+			if tt.cookie != "" {
+				req.AddCookie(&http.Cookie{
+					Name:  "refresh_token",
+					Value: tt.cookie,
+				})
+			}
+
+			rr := httptest.NewRecorder()
+			handler.ServeHTTP(rr, req)
+
+			require.Equal(t, tt.status, rr.Code)
+		})
+	}
+}
+
+type mockRefreshService struct {
+	refreshFn func(ctx context.Context, token string) (user.LoginResult, error)
+}
+
+func (m *mockRefreshService) Refresh(ctx context.Context, refreshToken string) (user.LoginResult, error) {
+	return m.refreshFn(ctx, refreshToken)
 }
 
 type mockAuthService struct {
