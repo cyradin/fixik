@@ -91,7 +91,7 @@ func authLogout(secureCookies bool) http.HandlerFunc {
 func authRefresh(srv tokenRefresher, accessTTL, refreshTTL time.Duration, secureCookies bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handle(func(ctx context.Context, req NoBody) (NoBody, error) {
-			rtCookie, err := r.Cookie("refresh_token")
+			rtCookie, err := r.Cookie(refreshTokenCookie)
 			if err != nil {
 				return NoBody{}, UnauthorizedError{Err: fmt.Errorf("refresh token missing")}
 			}
@@ -111,7 +111,7 @@ func authRefresh(srv tokenRefresher, accessTTL, refreshTTL time.Duration, secure
 
 func setAccessToken(w http.ResponseWriter, token string, ttl time.Duration, secure bool) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "access_token",
+		Name:     accessTokenCookie,
 		Value:    token,
 		HttpOnly: true,
 		Secure:   secure,
@@ -123,7 +123,7 @@ func setAccessToken(w http.ResponseWriter, token string, ttl time.Duration, secu
 
 func setRefreshToken(w http.ResponseWriter, token string, ttl time.Duration, secure bool) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "refresh_token",
+		Name:     refreshTokenCookie,
 		Value:    token,
 		HttpOnly: true,
 		Secure:   secure,
@@ -132,3 +132,8 @@ func setRefreshToken(w http.ResponseWriter, token string, ttl time.Duration, sec
 		SameSite: http.SameSiteLaxMode,
 	})
 }
+
+const (
+	accessTokenCookie  = "access_token"
+	refreshTokenCookie = "refresh_token"
+)

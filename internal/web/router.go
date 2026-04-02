@@ -50,14 +50,19 @@ func NewRouter(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 	}))
 
 	r.Route("/api", func(r chi.Router) {
-		r.Route("/users", userRoutes(c))
 		r.Route("/auth", authRoutes(c))
 
-		r.Route("/statuses", statusRoutes(c))
-		r.Route("/priorities", priorityRoutes(c))
-		r.Route("/teams", teamRoutes(c))
-		r.Route("/roles", roleRoutes(c))
-		r.Route("/incidents", incidentRoutes(c))
+		// все остальные роуты требуют аутентификацию
+		r.Group(func(r chi.Router) {
+			r.Use(AuthMiddleware(c.AuthService()))
+
+			r.Route("/users", userRoutes(c))
+			r.Route("/statuses", statusRoutes(c))
+			r.Route("/priorities", priorityRoutes(c))
+			r.Route("/teams", teamRoutes(c))
+			r.Route("/roles", roleRoutes(c))
+			r.Route("/incidents", incidentRoutes(c))
+		})
 	})
 
 	r.Handle("/*", http.FileServer(

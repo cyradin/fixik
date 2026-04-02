@@ -59,14 +59,9 @@ func (a *AuthService) Login(ctx context.Context, username string, password strin
 		return LoginResult{}, ErrUserNotFound
 	}
 
-	accessToken, err := a.tokens.GenerateAccessToken(user.ID)
+	accessToken, refreshToken, err := a.generateTokens(user.ID)
 	if err != nil {
-		return LoginResult{}, fmt.Errorf("generate access token: %w", err)
-	}
-
-	refreshToken, err := a.tokens.GenerateRefreshToken(user.ID)
-	if err != nil {
-		return LoginResult{}, fmt.Errorf("generate refresh token: %w", err)
+		return LoginResult{}, err
 	}
 
 	return LoginResult{
@@ -91,14 +86,9 @@ func (a *AuthService) Refresh(ctx context.Context, oldRefreshToken string) (Logi
 		return LoginResult{}, err
 	}
 
-	accessToken, err := a.tokens.GenerateAccessToken(user.ID)
+	accessToken, refreshToken, err := a.generateTokens(user.ID)
 	if err != nil {
-		return LoginResult{}, fmt.Errorf("generate access token: %w", err)
-	}
-
-	refreshToken, err := a.tokens.GenerateRefreshToken(user.ID)
-	if err != nil {
-		return LoginResult{}, fmt.Errorf("generate refresh token: %w", err)
+		return LoginResult{}, err
 	}
 
 	return LoginResult{
@@ -106,4 +96,35 @@ func (a *AuthService) Refresh(ctx context.Context, oldRefreshToken string) (Logi
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
+}
+
+func (a *AuthService) GetUserFromAccessToken(ctx context.Context, token string) (User, error) {
+	userID, err := a.tokens.ValidateAccessToken(token)
+	if err != nil {
+		return User{}, fmt.Errorf("invalid access token: %w", err)
+	}
+
+	user, err := a.userProvider.GetByID(ctx, userID)
+	if err != nil {
+		if errors.Is(err, db.ErrNotFound) {
+			return User{}, ErrUserNotFound
+		}
+		return User{}, err
+	}
+
+	return NewFromDB(user), nil
+}
+
+func (a *AuthService) generateTokens(userID int64) (string, string, error) {
+	accessToken, err := a.tokens.GenerateAccessToken(userID)
+	if err != nil {
+		return "", "", fmt.Errorf("generate access token: %w", err)
+	}
+
+	refreshToken, err := a.tokens.GenerateRefreshToken(userID)
+	if err != nil {
+		return "", "", fmt.Errorf("generate refresh token: %w", err)
+	}
+
+	return accessToken, refreshToken, nil
 }
