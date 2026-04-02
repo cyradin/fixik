@@ -1,5 +1,15 @@
 basePath: /api
 definitions:
+  web.AuthLoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
   web.CreateDictEntityRequest:
     properties:
       code:
@@ -357,6 +367,76 @@ info:
   title: Fixik API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with username and password
+      parameters:
+      - description: Login data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/web.AuthLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sets access and refresh cookies
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout by clearing access and refresh cookies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Clears cookies
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Logout
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh access and refresh tokens using refresh cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sets new access and refresh cookies
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Refresh
+      tags:
+      - auth
   /incidents:
     get:
       consumes:
@@ -382,6 +462,10 @@ paths:
             $ref: '#/definitions/web.IncidentListResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -413,6 +497,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -438,6 +526,10 @@ paths:
           description: OK
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -466,6 +558,10 @@ paths:
             $ref: '#/definitions/web.IncidentResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -502,6 +598,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -521,6 +621,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/web.ListDictEntitiesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -550,6 +654,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -575,6 +683,10 @@ paths:
           description: OK
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -603,6 +715,10 @@ paths:
             $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -639,6 +755,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -658,6 +778,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/web.ListRolesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -677,6 +801,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/web.ListStatusesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -706,6 +834,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -731,6 +863,10 @@ paths:
           description: OK
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -759,6 +895,10 @@ paths:
             $ref: '#/definitions/web.Status'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -795,6 +935,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -814,6 +958,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/web.ListDictEntitiesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -843,6 +991,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -868,6 +1020,10 @@ paths:
           description: OK
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -896,6 +1052,10 @@ paths:
             $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -930,6 +1090,10 @@ paths:
             $ref: '#/definitions/web.DictEntity'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -968,6 +1132,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -997,6 +1165,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1022,6 +1194,10 @@ paths:
           description: OK
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1050,6 +1226,10 @@ paths:
             $ref: '#/definitions/web.UserResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1084,6 +1264,10 @@ paths:
             $ref: '#/definitions/web.UserResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":

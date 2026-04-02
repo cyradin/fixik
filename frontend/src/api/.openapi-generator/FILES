@@ -1,3 +1,4 @@
+apis/AuthApi.ts
 apis/IncidentsApi.ts
 apis/PrioritiesApi.ts
 apis/RolesApi.ts
@@ -5,12 +6,14 @@ apis/StatusesApi.ts
 apis/TeamsApi.ts
 apis/UsersApi.ts
 apis/index.ts
+docs/AuthApi.md
 docs/IncidentsApi.md
 docs/PrioritiesApi.md
 docs/RolesApi.md
 docs/StatusesApi.md
 docs/TeamsApi.md
 docs/UsersApi.md
+docs/WebAuthLoginRequest.md
 docs/WebCreateDictEntityRequest.md
 docs/WebCreateIncidentRequest.md
 docs/WebCreateStatusRequest.md
@@ -33,6 +36,7 @@ docs/WebUpdateStatusRequest.md
 docs/WebUpdateUserRequest.md
 docs/WebUserResponse.md
 index.ts
+models/WebAuthLoginRequest.ts
 models/WebCreateDictEntityRequest.ts
 models/WebCreateIncidentRequest.ts
 models/WebCreateStatusRequest.ts

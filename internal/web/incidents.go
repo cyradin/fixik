@@ -116,6 +116,7 @@ func incidentRoutes(c *container.Container) func(r chi.Router) {
 // @Param request body CreateIncidentRequest true "Incident data"
 // @Success 200 {object} IncidentResponse
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents [post]
 func createIncident(manager incidentManager) http.HandlerFunc {
@@ -149,6 +150,7 @@ func createIncident(manager incidentManager) http.HandlerFunc {
 // @Param id path int true "Incident ID"
 // @Success 200 {object} IncidentResponse
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents/{id} [get]
 func getIncident(manager incidentManager) http.HandlerFunc {
@@ -179,6 +181,7 @@ func getIncident(manager incidentManager) http.HandlerFunc {
 // @Param request body UpdateIncidentRequest true "Incident data"
 // @Success 200 {object} IncidentResponse
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents/{id} [patch]
 func updateIncident(manager incidentManager) http.HandlerFunc {
@@ -221,6 +224,7 @@ func updateIncident(manager incidentManager) http.HandlerFunc {
 // @Param id path int true "Incident ID"
 // @Success 200
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents/{id} [delete]
 func deleteIncident(manager incidentManager) http.HandlerFunc {
@@ -246,6 +250,7 @@ func deleteIncident(manager incidentManager) http.HandlerFunc {
 // @Param offset query int false "Offset" default(0)
 // @Success 200 {object} IncidentListResponse
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents [get]
 func listIncidents(manager incidentManager) http.HandlerFunc {

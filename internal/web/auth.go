@@ -59,6 +59,17 @@ func authRoutes(c *container.Container) func(r chi.Router) {
 	}
 }
 
+// @Summary Login
+// @Description Login with username and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body AuthLoginRequest true "Login data"
+// @Success 200 "Sets access and refresh cookies"
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /auth/login [post]
 func authLogin(srv userLoginer, accessTTL, refreshTTL time.Duration, secureCookies bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handle(func(ctx context.Context, req AuthLoginRequest) (NoBody, error) {
@@ -79,6 +90,14 @@ func authLogin(srv userLoginer, accessTTL, refreshTTL time.Duration, secureCooki
 	}
 }
 
+// @Summary Logout
+// @Description Logout by clearing access and refresh cookies
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 "Clears cookies"
+// @Failure 500 {object} ErrorResponse
+// @Router /auth/logout [post]
 func authLogout(secureCookies bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		setAccessToken(w, "", -1*time.Second, secureCookies)
@@ -88,6 +107,15 @@ func authLogout(secureCookies bool) http.HandlerFunc {
 	}
 }
 
+// @Summary Refresh
+// @Description Refresh access and refresh tokens using refresh cookie
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 "Sets new access and refresh cookies"
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /auth/refresh [post]
 func authRefresh(srv tokenRefresher, accessTTL, refreshTTL time.Duration, secureCookies bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handle(func(ctx context.Context, req NoBody) (NoBody, error) {

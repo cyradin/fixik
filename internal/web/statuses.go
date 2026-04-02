@@ -79,6 +79,7 @@ func statusRoutes(c *container.Container) func(r chi.Router) {
 // @Param request body CreateStatusRequest true "Status data"
 // @Success 200 {object} Status
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses [post]
 func createStatus(manager *status.StatusManager) http.HandlerFunc {
@@ -108,6 +109,7 @@ func createStatus(manager *status.StatusManager) http.HandlerFunc {
 // @Param id path int true "Status ID"
 // @Success 200 {object} Status
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [get]
 func getStatus(manager *status.StatusManager) http.HandlerFunc {
@@ -138,6 +140,7 @@ func getStatus(manager *status.StatusManager) http.HandlerFunc {
 // @Param request body UpdateStatusRequest true "Status data"
 // @Success 200 {object} Status
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [put]
 func updateStatus(manager *status.StatusManager) http.HandlerFunc {
@@ -177,6 +180,7 @@ func updateStatus(manager *status.StatusManager) http.HandlerFunc {
 // @Param id path int true "Status ID"
 // @Success 200
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [delete]
 func deleteStatus(manager *status.StatusManager) http.HandlerFunc {
@@ -204,6 +208,7 @@ func deleteStatus(manager *status.StatusManager) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} ListStatusesResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses [get]
 func listStatuses(manager *status.StatusManager) http.HandlerFunc {

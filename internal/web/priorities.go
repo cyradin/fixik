@@ -28,6 +28,7 @@ func priorityRoutes(c *container.Container) func(r chi.Router) {
 // @Param request body CreateDictEntityRequest true "Priority data"
 // @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities [post]
 func createPriority(manager *dict.EntityManager) http.HandlerFunc {
@@ -42,6 +43,7 @@ func createPriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Param id path int true "Priority ID"
 // @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [get]
 func getPriority(manager *dict.EntityManager) http.HandlerFunc {
@@ -57,6 +59,7 @@ func getPriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Param request body UpdateDictEntityRequest true "Priority data"
 // @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [put]
 func updatePriority(manager *dict.EntityManager) http.HandlerFunc {
@@ -72,6 +75,7 @@ func updatePriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Param id path int true "Priority ID"
 // @Success 200
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [delete]
 func deletePriority(manager *dict.EntityManager) http.HandlerFunc {
@@ -85,6 +89,7 @@ func deletePriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} ListDictEntitiesResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities [get]
 func listPriorities(manager *dict.EntityManager) http.HandlerFunc {

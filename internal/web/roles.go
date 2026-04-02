@@ -32,6 +32,7 @@ func roleRoutes(_ *container.Container) func(r chi.Router) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} ListRolesResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /roles [get]
 func listRoles() http.HandlerFunc {

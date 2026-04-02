@@ -113,6 +113,7 @@ func userRoutes(c *container.Container) func(r chi.Router) {
 // @Param request body CreateUserRequest true "User data"
 // @Success 200 {object} UserResponse
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users [post]
 func createUser(manager userCreater) http.HandlerFunc {
@@ -144,6 +145,7 @@ func createUser(manager userCreater) http.HandlerFunc {
 // @Param id path int true "User ID"
 // @Success 200 {object} UserResponse
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users/{id} [get]
 func getUser(manager userGetter) http.HandlerFunc {
@@ -174,6 +176,7 @@ func getUser(manager userGetter) http.HandlerFunc {
 // @Param request body UpdateUserRequest true "User data"
 // @Success 200 {object} UserResponse
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users/{id} [patch]
 func updateUser(manager userUpdater) http.HandlerFunc {
@@ -210,6 +213,7 @@ func updateUser(manager userUpdater) http.HandlerFunc {
 // @Param id path int true "User ID"
 // @Success 200
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users/{id} [delete]
 func deleteUser(manager userDeleter) http.HandlerFunc {
@@ -235,6 +239,7 @@ func deleteUser(manager userDeleter) http.HandlerFunc {
 // @Param offset query int true "Offset for pagination" default(0)
 // @Success 200 {object} ListUsersResponse
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users [get]
 func listUsers(manager userLister) http.HandlerFunc {

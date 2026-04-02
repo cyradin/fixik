@@ -28,6 +28,7 @@ func teamRoutes(c *container.Container) func(r chi.Router) {
 // @Param request body CreateDictEntityRequest true "Team data"
 // @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams [post]
 func createTeam(manager *dict.EntityManager) http.HandlerFunc {
@@ -42,6 +43,7 @@ func createTeam(manager *dict.EntityManager) http.HandlerFunc {
 // @Param id path int true "Team ID"
 // @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams/{id} [get]
 func getTeam(manager *dict.EntityManager) http.HandlerFunc {
@@ -57,6 +59,7 @@ func getTeam(manager *dict.EntityManager) http.HandlerFunc {
 // @Param request body UpdateDictEntityRequest true "Team data"
 // @Success 200 {object} DictEntity
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams/{id} [put]
 func updateTeam(manager *dict.EntityManager) http.HandlerFunc {
@@ -72,6 +75,7 @@ func updateTeam(manager *dict.EntityManager) http.HandlerFunc {
 // @Param id path int true "Team ID"
 // @Success 200
 // @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams/{id} [delete]
 func deleteTeam(manager *dict.EntityManager) http.HandlerFunc {
@@ -85,6 +89,7 @@ func deleteTeam(manager *dict.EntityManager) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} ListDictEntitiesResponse
+// @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams [get]
 func listTeams(manager *dict.EntityManager) http.HandlerFunc {
