@@ -37,13 +37,25 @@
                     :priority-id="incident.priority.id"
                     :label="incident.priority.name"
                   />
-
-                  <el-space size="small">
-                    <el-icon><User /></el-icon>
-                    <p v-if="incident.user"><UserLink :user="incident.user" :is-link="false" /></p>
-                    <p v-else>Не назначено</p>
-                  </el-space>
                 </el-space>
+
+                <template #footer>
+                  <el-row justify="space-between" align="middle">
+                    <el-space size="small">
+                      <el-icon><User /></el-icon>
+                      <p v-if="incident.user" style="margin: 0">
+                        <UserLink :user="incident.user" :is-link="false" />
+                      </p>
+                      <p v-else style="margin: 0">Не назначено</p>
+                    </el-space>
+
+                    <el-space size="small">
+                      <el-badge v-if="incident.commentsCount > 0" :value="incident.commentsCount">
+                        <el-icon><ChatDotRound /></el-icon>
+                      </el-badge>
+                    </el-space>
+                  </el-row>
+                </template>
               </el-card>
             </Draggable>
           </Container>
@@ -59,7 +71,7 @@ import { useStatusesStore } from '@/stores/statusesStore'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Container, Draggable } from 'vue3-smooth-dnd'
-import { User } from '@element-plus/icons-vue'
+import { User, ChatDotRound } from '@element-plus/icons-vue'
 import IncidentPriorityColor from '@/components/incidents/IncidentPriorityColor.vue'
 import UserLink from '@/components/users/UserLink.vue'
 import { formatDateTime } from '@/utils/date'

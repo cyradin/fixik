@@ -39,6 +39,7 @@ export interface Incident {
   team: IncidentTeam | null
   createdAt: string
   updatedAt: string
+  commentsCount: number
 }
 
 interface IncidentsState {
