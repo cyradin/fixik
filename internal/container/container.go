@@ -32,6 +32,7 @@ type Container struct {
 	teamManager     *dict.EntityManager
 
 	incidentManager *incident.IncidentManager
+	commentManager  *incident.CommentManager
 	userManager     *user.UserManager
 	jwtManager      *user.JWTManager
 	authService     *user.AuthService

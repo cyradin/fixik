@@ -15,3 +15,14 @@ func (c *Container) IncidentManager() *incident.IncidentManager {
 
 	return c.incidentManager
 }
+
+func (c *Container) CommentManager() *incident.CommentManager {
+	if c.commentManager == nil {
+		c.commentManager = incident.NewCommentManager(
+			c.CommentRepository(),
+			c.UserManager(),
+		)
+	}
+
+	return c.commentManager
+}

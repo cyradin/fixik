@@ -56,3 +56,14 @@ type UpdateIncident struct {
 	PriorityID *dict.EntityID
 	StatusID   *dict.EntityID
 }
+
+type CommentID = int64
+
+type Comment struct {
+	ID         CommentID
+	IncidentID IncidentID
+	Author     user.User
+	Text       string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
