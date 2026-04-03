@@ -70,19 +70,20 @@ export class AuthApi extends runtime.BaseAPI {
      * Login with username and password
      * Login
      */
-    async authLoginPostRaw(requestParameters: AuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async authLoginPostRaw(requestParameters: AuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebUserResponse>> {
         const requestOptions = await this.authLoginPostRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebUserResponseFromJSON(jsonValue));
     }
 
     /**
      * Login with username and password
      * Login
      */
-    async authLoginPost(requestParameters: AuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.authLoginPostRaw(requestParameters, initOverrides);
+    async authLoginPost(requestParameters: AuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebUserResponse> {
+        const response = await this.authLoginPostRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

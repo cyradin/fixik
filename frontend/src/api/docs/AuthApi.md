@@ -12,7 +12,7 @@ All URIs are relative to *http://localhost:8080/api*
 
 ## authLoginPost
 
-> authLoginPost(request)
+> WebUserResponse authLoginPost(request)
 
 Login
 
@@ -57,7 +57,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**WebUserResponse**](WebUserResponse.md)
 
 ### Authorization
 
@@ -72,7 +72,7 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | Sets access and refresh cookies |  -  |
+| **200** | Sets new access and refresh cookies |  -  |
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
 | **500** | Internal Server Error |  -  |

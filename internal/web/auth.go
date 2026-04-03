@@ -65,27 +65,27 @@ func authRoutes(c *container.Container) func(r chi.Router) {
 // @Accept json
 // @Produce json
 // @Param request body AuthLoginRequest true "Login data"
-// @Success 200 "Sets access and refresh cookies"
+// @Success 200 {object} UserResponse "Sets new access and refresh cookies"
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /auth/login [post]
 func authLogin(srv userLoginer, accessTTL, refreshTTL time.Duration, secureCookies bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		handle(func(ctx context.Context, req AuthLoginRequest) (NoBody, error) {
+		handle(func(ctx context.Context, req AuthLoginRequest) (UserResponse, error) {
 			result, err := srv.Login(ctx, req.Username, req.Password)
 			if err != nil {
 				if errors.Is(err, user.ErrUserNotFound) {
-					return NoBody{}, UnauthorizedError{Err: err}
+					return UserResponse{}, UnauthorizedError{Err: err}
 				}
 
-				return NoBody{}, err
+				return UserResponse{}, err
 			}
 
 			setAccessToken(w, result.AccessToken, accessTTL, secureCookies)
 			setRefreshToken(w, result.RefreshToken, refreshTTL, secureCookies)
 
-			return NoBody{}, nil
+			return toUserResponse(result.User), nil
 		})(w, r)
 	}
 }
