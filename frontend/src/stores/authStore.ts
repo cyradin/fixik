@@ -16,14 +16,14 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
   const error = ref('')
   const initialized = ref(false)
-  const user = ref<CurrentUser | null>(null) // <-- сюда сохраняем данные юзера
+  const user = ref<CurrentUser | null>(null)
 
   const login = async (username: string, password: string) => {
     loading.value = true
     try {
       const data = await authApi.authLoginPost({ request: { username, password } })
       isAuth.value = true
-      user.value = data // предполагаем, что сервер вернул { user: { id, username, roles } }
+      user.value = data
       error.value = ''
     } catch (e: any) {
       error.value = e.message || 'Login failed'

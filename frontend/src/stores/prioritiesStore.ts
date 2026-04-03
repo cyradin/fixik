@@ -9,11 +9,13 @@ export interface Priority {
 
 interface PrioritiesState {
   items: Priority[]
+  pollingId: ReturnType<typeof setInterval> | null
 }
 
 export const usePrioritiesStore = defineStore('priorities', {
   state: (): PrioritiesState => ({
     items: [],
+    pollingId: null,
   }),
 
   actions: {
@@ -23,6 +25,19 @@ export const usePrioritiesStore = defineStore('priorities', {
         this.items = resp.items
       } catch (e) {
         console.error('priorities fetch error:', e)
+      }
+    },
+
+    startPolling(interval = 30000): void {
+      this.stopPolling()
+      this.fetchAll()
+      this.pollingId = setInterval(() => this.fetchAll(), interval)
+    },
+
+    stopPolling(): void {
+      if (this.pollingId) {
+        clearInterval(this.pollingId)
+        this.pollingId = null
       }
     },
   },

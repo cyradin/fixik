@@ -9,11 +9,13 @@ export interface Team {
 
 interface TeamsState {
   items: Team[]
+  pollingId: ReturnType<typeof setInterval> | null
 }
 
 export const useTeamsStore = defineStore('teams', {
   state: (): TeamsState => ({
     items: [],
+    pollingId: null,
   }),
 
   actions: {
@@ -23,6 +25,19 @@ export const useTeamsStore = defineStore('teams', {
         this.items = resp.items
       } catch (e) {
         console.error('teams fetch error:', e)
+      }
+    },
+
+    startPolling(interval = 30000): void {
+      this.stopPolling()
+      this.fetchAll()
+      this.pollingId = setInterval(() => this.fetchAll(), interval)
+    },
+
+    stopPolling(): void {
+      if (this.pollingId) {
+        clearInterval(this.pollingId)
+        this.pollingId = null
       }
     },
   },

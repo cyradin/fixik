@@ -21,16 +21,17 @@ watch(
   () => authStore.isAuth,
   (isAuth) => {
     if (isAuth) {
-      statusesStore.fetchAll()
-      prioritiesStore.fetchAll()
-      teamsStore.fetchAll()
-      usersStore.fetchAll()
-
-      incidentsStore.startPolling(5000)
-      usersStore.startPolling(5000)
+      statusesStore.startPolling()
+      prioritiesStore.startPolling()
+      teamsStore.startPolling()
+      usersStore.startPolling()
+      incidentsStore.startPolling()
     } else {
-      incidentsStore.stopPolling()
+      statusesStore.stopPolling()
+      prioritiesStore.stopPolling()
+      teamsStore.stopPolling()
       usersStore.stopPolling()
+      incidentsStore.stopPolling()
     }
   },
   { immediate: true },

@@ -43,7 +43,6 @@ export interface Incident {
 
 interface IncidentsState {
   items: Incident[]
-  loading: boolean
   pollingId: ReturnType<typeof setInterval> | null
   filters: {
     priorityIds: number[]
@@ -54,7 +53,6 @@ interface IncidentsState {
 export const useIncidentsStore = defineStore('incidents', {
   state: (): IncidentsState => ({
     items: [],
-    loading: false,
     pollingId: null,
     filters: {
       priorityIds: [],
@@ -83,7 +81,6 @@ export const useIncidentsStore = defineStore('incidents', {
 
   actions: {
     async fetchAll(): Promise<void> {
-      this.loading = true
       try {
         let allItems: Incident[] = []
         let offset = 0
@@ -132,8 +129,6 @@ export const useIncidentsStore = defineStore('incidents', {
         this.items = allItems
       } catch (e) {
         console.error('incidents fetch error:', e)
-      } finally {
-        this.loading = false
       }
     },
 
@@ -220,7 +215,7 @@ export const useIncidentsStore = defineStore('incidents', {
       }
     },
 
-    startPolling(interval = 10000): void {
+    startPolling(interval = 5000): void {
       this.stopPolling()
       this.fetchAll()
       this.pollingId = setInterval(() => this.fetchAll(), interval)

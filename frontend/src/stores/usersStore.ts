@@ -10,14 +10,12 @@ export interface User {
 
 interface UsersState {
   items: User[]
-  loading: boolean
   pollingId: ReturnType<typeof setInterval> | null
 }
 
 export const useUsersStore = defineStore('users', {
   state: (): UsersState => ({
     items: [],
-    loading: false,
     pollingId: null,
   }),
 
@@ -32,7 +30,6 @@ export const useUsersStore = defineStore('users', {
 
   actions: {
     async fetchAll(): Promise<void> {
-      this.loading = true
       try {
         let allItems: User[] = []
         let offset = 0
@@ -51,12 +48,10 @@ export const useUsersStore = defineStore('users', {
         this.items = allItems
       } catch (e) {
         console.error('users fetch error:', e)
-      } finally {
-        this.loading = false
       }
     },
 
-    startPolling(interval = 10000): void {
+    startPolling(interval = 5000): void {
       this.stopPolling()
       this.fetchAll()
       this.pollingId = setInterval(() => this.fetchAll(), interval)
