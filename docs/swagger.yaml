@@ -198,6 +198,8 @@ definitions:
     properties:
       author:
         $ref: '#/definitions/web.UserResponse'
+      commentsCount:
+        type: integer
       createdAt:
         type: string
       description:
@@ -217,6 +219,7 @@ definitions:
       user:
         $ref: '#/definitions/web.UserResponse'
     required:
+    - commentsCount
     - createdAt
     - description
     - id

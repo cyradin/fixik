@@ -24,6 +24,8 @@ type Incident struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+
+	CommentsCount int
 }
 
 type IncidentList struct {

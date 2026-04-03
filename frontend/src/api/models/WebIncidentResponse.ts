@@ -42,6 +42,12 @@ export interface WebIncidentResponse {
     author?: WebUserResponse;
     /**
      * 
+     * @type {number}
+     * @memberof WebIncidentResponse
+     */
+    commentsCount: number;
+    /**
+     * 
      * @type {string}
      * @memberof WebIncidentResponse
      */
@@ -100,6 +106,7 @@ export interface WebIncidentResponse {
  * Check if a given object implements the WebIncidentResponse interface.
  */
 export function instanceOfWebIncidentResponse(value: object): value is WebIncidentResponse {
+    if (!('commentsCount' in value) || value['commentsCount'] === undefined) return false;
     if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
     if (!('description' in value) || value['description'] === undefined) return false;
     if (!('id' in value) || value['id'] === undefined) return false;
@@ -121,6 +128,7 @@ export function WebIncidentResponseFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'author': json['author'] == null ? undefined : WebUserResponseFromJSON(json['author']),
+        'commentsCount': json['commentsCount'],
         'createdAt': json['createdAt'],
         'description': json['description'],
         'id': json['id'],
@@ -145,6 +153,7 @@ export function WebIncidentResponseToJSONTyped(value?: WebIncidentResponse | nul
     return {
         
         'author': WebUserResponseToJSON(value['author']),
+        'commentsCount': value['commentsCount'],
         'createdAt': value['createdAt'],
         'description': value['description'],
         'id': value['id'],

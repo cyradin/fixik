@@ -7,6 +7,7 @@
 Name | Type
 ------------ | -------------
 `author` | [WebUserResponse](WebUserResponse.md)
+`commentsCount` | number
 `createdAt` | string
 `description` | string
 `id` | number
@@ -25,6 +26,7 @@ import type { WebIncidentResponse } from ''
 // TODO: Update the object below with actual values
 const example = {
   "author": null,
+  "commentsCount": null,
   "createdAt": null,
   "description": null,
   "id": null,

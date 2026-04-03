@@ -5,9 +5,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/cyradin/fixik/internal/config"
 	"github.com/cyradin/fixik/internal/container"
+	"github.com/cyradin/fixik/internal/db"
 	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/incident"
 	"github.com/cyradin/fixik/internal/status"
@@ -77,6 +79,10 @@ func seed(ctx context.Context, c *container.Container) error {
 	}
 
 	if err := createIncidents(ctx, c, teamIDs); err != nil {
+		return err
+	}
+
+	if err := seedComments(ctx, c, teamIDs); err != nil {
 		return err
 	}
 
@@ -538,6 +544,102 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 		})
 		if err != nil {
 			return fmt.Errorf("create incident %s: %w", d.Title, err)
+		}
+	}
+
+	return nil
+}
+
+func seedComments(ctx context.Context, c *container.Container, teamIDs map[string]int64) error {
+	incidents, err := c.IncidentManager().List(ctx, 1000, 0) //nolint:mnd
+	if err != nil {
+		return fmt.Errorf("list incidents: %w", err)
+	}
+
+	findUserByTeam := func(teamID int64) *user.User {
+		users, _ := c.UserManager().List(ctx, 1000, 0)
+		for _, u := range users {
+			if u.TeamID != nil && *u.TeamID == teamID {
+				return &u
+			}
+		}
+		return nil
+	}
+
+	type commentSeed struct {
+		TeamID int64
+		Texts  []string
+	}
+	incidentCommentsMap := map[string][]commentSeed{
+		"main_page_error": {
+			{
+				TeamID: teamIDs["frontend"],
+				Texts: []string{
+					"Проверил логи сервера, похоже ошибка связана с новым JS-бандлом.",
+					"CSS стили не загружаются, нужно обновить webpack-конфиг.",
+				},
+			},
+		},
+		"orders_api_error": {
+			{
+				TeamID: teamIDs["backend"],
+				Texts: []string{
+					"Сервис падает на nil pointer в OrderService.Create.",
+					"Добавил проверки на nil, ошибка исчезла на тестовом окружении.",
+				},
+			},
+		},
+		"frontend_build_fail": {
+			{
+				TeamID: teamIDs["frontend"],
+				Texts: []string{
+					"Проверил версии npm и Node.js, нужно обновить зависимости.",
+					"Ошибки компиляции устранил, сборка прошла успешно.",
+					"Закомментировал экспериментальный компонент, чтобы билд прошел.",
+				},
+			},
+		},
+	}
+
+	incidentKey := func(inc incident.Incident) string {
+		switch {
+		case strings.Contains(inc.Title, "главная страница"):
+			return "main_page_error"
+		case strings.Contains(inc.Title, "API заказов"):
+			return "orders_api_error"
+		case strings.Contains(inc.Title, "Фронтенд билд"):
+			return "frontend_build_fail"
+		default:
+			return ""
+		}
+	}
+
+	for _, inc := range incidents.Items {
+		key := incidentKey(inc)
+		if key == "" {
+			continue
+		}
+
+		commentGroups, ok := incidentCommentsMap[key]
+		if !ok {
+			continue
+		}
+
+		for _, cmGroup := range commentGroups {
+			author := findUserByTeam(cmGroup.TeamID)
+			if author == nil {
+				continue
+			}
+
+			for _, text := range cmGroup.Texts {
+				if err := c.CommentRepository().Create(ctx, &db.Comment{
+					AuthorID:   author.ID,
+					IncidentID: inc.ID,
+					Text:       text,
+				}); err != nil {
+					return fmt.Errorf("create comment for incident %d: %w", inc.ID, err)
+				}
+			}
 		}
 	}
 

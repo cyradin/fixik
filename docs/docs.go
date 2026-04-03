@@ -1857,6 +1857,7 @@ const docTemplate = `{
         "web.IncidentResponse": {
             "type": "object",
             "required": [
+                "commentsCount",
                 "createdAt",
                 "description",
                 "id",
@@ -1868,6 +1869,9 @@ const docTemplate = `{
             "properties": {
                 "author": {
                     "$ref": "#/definitions/web.UserResponse"
+                },
+                "commentsCount": {
+                    "type": "integer"
                 },
                 "createdAt": {
                     "type": "string"

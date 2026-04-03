@@ -61,24 +61,30 @@ func (r *IncidentRepository) Create(ctx context.Context, i *Incident) error {
 
 	return nil
 }
-
 func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, error) {
 	const query = `
 		SELECT
-			id,
-			title,
-			description,
-			priority_id,
-			status_id,
-			team_id,
-			user_id,
-			author_id,
-			created_at,
-			updated_at,
-			deleted_at
-		FROM incidents
-		WHERE id = @id
-		  AND deleted_at IS NULL
+			i.id,
+			i.title,
+			i.description,
+			i.priority_id,
+			i.status_id,
+			i.team_id,
+			i.user_id,
+			i.author_id,
+			i.created_at,
+			i.updated_at,
+			i.deleted_at,
+			COALESCE(c.comments_count, 0) AS comments_count
+		FROM incidents i
+		LEFT JOIN (
+			SELECT incident_id, COUNT(*) AS comments_count
+			FROM comments
+			WHERE deleted_at IS NULL
+			GROUP BY incident_id
+		) c ON c.incident_id = i.id
+		WHERE i.id = @id
+		  AND i.deleted_at IS NULL
 	`
 
 	args := pgx.NamedArgs{"id": id}
@@ -97,6 +103,7 @@ func (r *IncidentRepository) GetByID(ctx context.Context, id int64) (Incident, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.CommentsCount,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -164,24 +171,30 @@ func (r *IncidentRepository) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
-
 func (r *IncidentRepository) List(ctx context.Context, limit, offset int) (IncidentListResult, error) {
 	const listQuery = `
 		SELECT
-			id,
-			title,
-			description,
-			priority_id,
-			status_id,
-			team_id,
-			user_id,
-			author_id,
-			created_at,
-			updated_at,
-			deleted_at
-		FROM incidents
-		WHERE deleted_at IS NULL
-		ORDER BY id DESC
+			i.id,
+			i.title,
+			i.description,
+			i.priority_id,
+			i.status_id,
+			i.team_id,
+			i.user_id,
+			i.author_id,
+			i.created_at,
+			i.updated_at,
+			i.deleted_at,
+			COALESCE(c.comments_count, 0) AS comments_count
+		FROM incidents i
+		LEFT JOIN (
+			SELECT incident_id, COUNT(*) AS comments_count
+			FROM comments
+			WHERE deleted_at IS NULL
+			GROUP BY incident_id
+		) c ON c.incident_id = i.id
+		WHERE i.deleted_at IS NULL
+		ORDER BY i.id DESC
 		LIMIT @limit
 		OFFSET @offset
 	`
@@ -219,6 +232,7 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) (Incid
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.CommentsCount,
 		); err != nil {
 			return IncidentListResult{}, fmt.Errorf("scan: %w", err)
 		}

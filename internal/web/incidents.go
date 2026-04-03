@@ -75,16 +75,17 @@ func (r UpdateIncidentRequest) Validate() error {
 }
 
 type IncidentResponse struct {
-	ID          int64            `json:"id" validate:"required"`
-	Title       string           `json:"title" validate:"required"`
-	Description string           `json:"description" validate:"required"`
-	Status      DictEntityShort  `json:"status" validate:"required"`
-	Priority    DictEntityShort  `json:"priority" validate:"required"`
-	Team        *DictEntityShort `json:"team"`
-	User        *UserResponse    `json:"user"`
-	Author      *UserResponse    `json:"author"`
-	CreatedAt   string           `json:"createdAt" validate:"required"`
-	UpdatedAt   string           `json:"updatedAt" validate:"required"`
+	ID            int64            `json:"id" validate:"required"`
+	Title         string           `json:"title" validate:"required"`
+	Description   string           `json:"description" validate:"required"`
+	Status        DictEntityShort  `json:"status" validate:"required"`
+	Priority      DictEntityShort  `json:"priority" validate:"required"`
+	Team          *DictEntityShort `json:"team"`
+	User          *UserResponse    `json:"user"`
+	Author        *UserResponse    `json:"author"`
+	CreatedAt     string           `json:"createdAt" validate:"required"`
+	UpdatedAt     string           `json:"updatedAt" validate:"required"`
+	CommentsCount int              `json:"commentsCount" validate:"required"`
 }
 
 type IncidentListResponse struct {
@@ -364,6 +365,8 @@ func toIncidentResponse(i incident.Incident) IncidentResponse {
 
 		CreatedAt: i.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: i.UpdatedAt.Format(time.RFC3339),
+
+		CommentsCount: i.CommentsCount,
 	}
 }
 

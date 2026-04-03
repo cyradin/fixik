@@ -356,15 +356,16 @@ func (m *IncidentManager) transformFromDB(
 
 func (m *IncidentManager) fromDB(incident db.Incident, status status.Status, priority dict.Entity, team *dict.Entity, user *user.User, author *user.User) Incident {
 	return Incident{
-		ID:          incident.ID,
-		Title:       incident.Title,
-		Description: incident.Description,
-		Status:      status,
-		Priority:    priority,
-		Team:        team,
-		User:        user,
-		Author:      author,
-		CreatedAt:   incident.CreatedAt,
-		UpdatedAt:   incident.UpdatedAt,
+		ID:            incident.ID,
+		Title:         incident.Title,
+		Description:   incident.Description,
+		Status:        status,
+		Priority:      priority,
+		Team:          team,
+		User:          user,
+		Author:        author,
+		CreatedAt:     incident.CreatedAt,
+		UpdatedAt:     incident.UpdatedAt,
+		CommentsCount: incident.CommentsCount,
 	}
 }
