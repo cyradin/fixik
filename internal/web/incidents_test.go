@@ -1,16 +1,19 @@
 package web
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/incident"
 	"github.com/cyradin/fixik/internal/status"
+	"github.com/cyradin/fixik/internal/user"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -335,6 +338,165 @@ func TestListIncidents(t *testing.T) {
 
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
 	})
+}
+
+func TestCreateIncidentComment(t *testing.T) {
+	t.Parallel()
+
+	t.Run("success", func(t *testing.T) {
+		t.Parallel()
+
+		var createdID int64
+		m := &mockCommentManager{
+			createFn: func(ctx context.Context, incidentID int64, text string) (incident.Comment, error) {
+				createdID = incidentID
+				return incident.Comment{
+					ID:         1,
+					IncidentID: incidentID,
+					Author:     testUser(),
+					Text:       text,
+					CreatedAt:  now(),
+					UpdatedAt:  now(),
+				}, nil
+			},
+		}
+
+		r := chi.NewRouter()
+		r.Post("/incidents/{id}/comments", createIncidentComment(m))
+
+		reqBody := IncidentCommentCreateRequest{Text: "test comment"}
+		buf := new(bytes.Buffer)
+		require.NoError(t, json.NewEncoder(buf).Encode(reqBody))
+
+		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf)
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+		require.Equal(t, int64(1), createdID)
+
+		var resp IncidentComment
+		err := json.NewDecoder(rr.Body).Decode(&resp)
+		require.NoError(t, err)
+		require.Equal(t, "test comment", resp.Text)
+	})
+
+	t.Run("validation error", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockCommentManager{}
+		r := chi.NewRouter()
+		r.Post("/incidents/{id}/comments", createIncidentComment(m))
+
+		reqBody := IncidentCommentCreateRequest{} // пустой текст
+		buf := new(bytes.Buffer)
+		require.NoError(t, json.NewEncoder(buf).Encode(reqBody))
+
+		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf)
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("manager error", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockCommentManager{
+			createFn: func(ctx context.Context, incidentID int64, text string) (incident.Comment, error) {
+				return incident.Comment{}, errors.New("fail")
+			},
+		}
+
+		r := chi.NewRouter()
+		r.Post("/incidents/{id}/comments", createIncidentComment(m))
+
+		reqBody := IncidentCommentCreateRequest{Text: "fail"}
+		buf := new(bytes.Buffer)
+		require.NoError(t, json.NewEncoder(buf).Encode(reqBody))
+
+		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf)
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+}
+
+func TestGetIncidentComments(t *testing.T) {
+	t.Parallel()
+
+	t.Run("success", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockCommentManager{
+			listFn: func(ctx context.Context, incidentID int64, limit, offset int) (incident.CommentList, error) {
+				return incident.CommentList{
+					Items: []incident.Comment{
+						{
+							ID:         1,
+							IncidentID: incidentID,
+							Author:     testUser(),
+							Text:       "c1",
+							CreatedAt:  now(),
+							UpdatedAt:  now(),
+						},
+						{
+							ID:         2,
+							IncidentID: incidentID,
+							Author:     testUser(),
+							Text:       "c2",
+							CreatedAt:  now(),
+							UpdatedAt:  now(),
+						},
+					},
+					Total: 2,
+				}, nil
+			},
+		}
+
+		r := chi.NewRouter()
+		r.Get("/incidents/{id}/comments", getIncidentComments(m))
+
+		req := httptest.NewRequest(http.MethodGet, "/incidents/1/comments?limit=10&offset=0", nil)
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var resp IncidentCommentListResponse
+		err := json.NewDecoder(rr.Body).Decode(&resp)
+		require.NoError(t, err)
+		require.Len(t, resp.Items, 2)
+		require.Equal(t, 2, resp.Pagination.Total)
+	})
+}
+
+type mockCommentManager struct {
+	createFn func(ctx context.Context, incidentID int64, text string) (incident.Comment, error)
+	listFn   func(ctx context.Context, incidentID int64, limit, offset int) (incident.CommentList, error)
+}
+
+func (m *mockCommentManager) Create(ctx context.Context, incidentID int64, text string) (incident.Comment, error) {
+	return m.createFn(ctx, incidentID, text)
+}
+
+func (m *mockCommentManager) ListByIncident(ctx context.Context, incidentID int64, limit, offset int) (incident.CommentList, error) {
+	return m.listFn(ctx, incidentID, limit, offset)
+}
+
+func testUser() user.User {
+	return user.User{
+		ID:   1,
+		Name: "Test User",
+	}
+}
+
+func now() time.Time {
+	return time.Now()
 }
 
 type mockIncidentManager struct {

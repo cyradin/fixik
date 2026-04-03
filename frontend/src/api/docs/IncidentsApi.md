@@ -5,6 +5,8 @@ All URIs are relative to *http://localhost:8080/api*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**incidentsGet**](IncidentsApi.md#incidentsget) | **GET** /incidents | List incidents |
+| [**incidentsIdCommentsGet**](IncidentsApi.md#incidentsidcommentsget) | **GET** /incidents/{id}/comments | Get incident comments |
+| [**incidentsIdCommentsPost**](IncidentsApi.md#incidentsidcommentspost) | **POST** /incidents/{id}/comments | Create incident comment |
 | [**incidentsIdDelete**](IncidentsApi.md#incidentsiddelete) | **DELETE** /incidents/{id} | Delete incident |
 | [**incidentsIdGet**](IncidentsApi.md#incidentsidget) | **GET** /incidents/{id} | Get incident |
 | [**incidentsIdPatch**](IncidentsApi.md#incidentsidpatch) | **PATCH** /incidents/{id} | Update incident |
@@ -71,6 +73,155 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
+| **500** | Internal Server Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## incidentsIdCommentsGet
+
+> WebIncidentCommentListResponse incidentsIdCommentsGet(id, limit, offset)
+
+Get incident comments
+
+Get all comments for an incident with pagination
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IncidentsApi,
+} from '';
+import type { IncidentsIdCommentsGetRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IncidentsApi();
+
+  const body = {
+    // number | Incident ID
+    id: 56,
+    // number | Limit (optional)
+    limit: 56,
+    // number | Offset (optional)
+    offset: 56,
+  } satisfies IncidentsIdCommentsGetRequest;
+
+  try {
+    const data = await api.incidentsIdCommentsGet(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | Incident ID | [Defaults to `undefined`] |
+| **limit** | `number` | Limit | [Optional] [Defaults to `100`] |
+| **offset** | `number` | Offset | [Optional] [Defaults to `0`] |
+
+### Return type
+
+[**WebIncidentCommentListResponse**](WebIncidentCommentListResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
+| **500** | Internal Server Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## incidentsIdCommentsPost
+
+> WebIncidentComment incidentsIdCommentsPost(id, request)
+
+Create incident comment
+
+Create a new comment for an incident
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IncidentsApi,
+} from '';
+import type { IncidentsIdCommentsPostRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IncidentsApi();
+
+  const body = {
+    // number | Incident ID
+    id: 56,
+    // WebIncidentCommentCreateRequest | Comment data
+    request: ...,
+  } satisfies IncidentsIdCommentsPostRequest;
+
+  try {
+    const data = await api.incidentsIdCommentsPost(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | Incident ID | [Defaults to `undefined`] |
+| **request** | [WebIncidentCommentCreateRequest](WebIncidentCommentCreateRequest.md) | Comment data | |
+
+### Return type
+
+[**WebIncidentComment**](WebIncidentComment.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
 - **Accept**: `application/json`
 
 

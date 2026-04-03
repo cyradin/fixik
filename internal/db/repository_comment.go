@@ -88,57 +88,56 @@ func (r *CommentRepository) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
-
-func (r *CommentRepository) ListByIncident(
-	ctx context.Context,
-	incidentID int64,
-	limit, offset int,
-) ([]Comment, error) {
-	const query = `
+func (r *CommentRepository) ListByIncident(ctx context.Context, incidentID int64, limit, offset int) (CommentListResult, error) {
+	const listQuery = `
 		SELECT
-			c.id,
-			c.author_id,
-			c.incident_id,
-			c.text,
-			c.created_at,
-			c.updated_at,
-			c.deleted_at
-		FROM comments c
-		WHERE c.incident_id = $1
-		  AND c.deleted_at IS NULL
-		ORDER BY c.created_at
+			id,
+			incident_id,
+			author_id,
+			text,
+			created_at,
+			updated_at
+		FROM comments
+		WHERE incident_id = $1 AND deleted_at IS NULL
+		ORDER BY id ASC
 		LIMIT $2 OFFSET $3
 	`
 
-	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, query, incidentID, limit, offset)
+	const countQuery = `
+		SELECT COUNT(*)
+		FROM comments
+		WHERE incident_id = $1 AND deleted_at IS NULL
+	`
+
+	rows, err := r.db.Query(ctx, listQuery, incidentID, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("db query: %w", err)
+		return CommentListResult{}, fmt.Errorf("db list query: %w", err)
 	}
 	defer rows.Close()
 
-	comments := make([]Comment, 0, limit)
-
+	var items []Comment
 	for rows.Next() {
 		var c Comment
-
 		if err := rows.Scan(
 			&c.ID,
-			&c.AuthorID,
 			&c.IncidentID,
+			&c.AuthorID,
 			&c.Text,
 			&c.CreatedAt,
 			&c.UpdatedAt,
-			&c.DeletedAt,
 		); err != nil {
-			return nil, fmt.Errorf("scan: %w", err)
+			return CommentListResult{}, fmt.Errorf("scan: %w", err)
 		}
-
-		comments = append(comments, c)
+		items = append(items, c)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("rows error: %w", err)
+	var total int
+	if err := r.db.QueryRow(ctx, countQuery, incidentID).Scan(&total); err != nil {
+		return CommentListResult{}, fmt.Errorf("db count query: %w", err)
 	}
 
-	return comments, nil
+	return CommentListResult{
+		Items: items,
+		Total: total,
+	}, nil
 }

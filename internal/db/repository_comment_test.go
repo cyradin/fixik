@@ -106,7 +106,7 @@ func (s *CommentRepositorySuite) TestDelete_SoftDelete() {
 
 	comments, err := s.repo.ListByIncident(ctx, incident.ID, 100, 0)
 	s.Require().NoError(err)
-	s.Len(comments, 0)
+	s.Len(comments.Items, 0)
 }
 
 func (s *CommentRepositorySuite) TestDelete_NotFound() {
@@ -129,46 +129,49 @@ func (s *CommentRepositorySuite) TestListByIncident() {
 	c3 := s.createComment(user.ID, incident.ID, "3")
 
 	s.Run("list all", func() {
-		list, err := s.repo.ListByIncident(ctx, incident.ID, 100, 0)
+		res, err := s.repo.ListByIncident(ctx, incident.ID, 100, 0)
 		s.Require().NoError(err)
 
-		s.Len(list, 3)
-		s.Equal(c1.ID, list[0].ID)
-		s.Equal(c2.ID, list[1].ID)
-		s.Equal(c3.ID, list[2].ID)
+		s.Len(res.Items, 3)
+		s.Equal(3, res.Total)
+		s.Equal(c1.ID, res.Items[0].ID)
+		s.Equal(c2.ID, res.Items[1].ID)
+		s.Equal(c3.ID, res.Items[2].ID)
 	})
 
 	s.Run("limit", func() {
-		list, err := s.repo.ListByIncident(ctx, incident.ID, 2, 0)
+		res, err := s.repo.ListByIncident(ctx, incident.ID, 2, 0)
 		s.Require().NoError(err)
 
-		s.Len(list, 2)
-		s.Equal(c1.ID, list[0].ID)
-		s.Equal(c2.ID, list[1].ID)
+		s.Len(res.Items, 2)
+		s.Equal(3, res.Total) // Total всегда полное количество
+		s.Equal(c1.ID, res.Items[0].ID)
+		s.Equal(c2.ID, res.Items[1].ID)
 	})
 
 	s.Run("offset", func() {
-		list, err := s.repo.ListByIncident(ctx, incident.ID, 100, 1)
+		res, err := s.repo.ListByIncident(ctx, incident.ID, 100, 1)
 		s.Require().NoError(err)
 
-		s.Len(list, 2)
-		s.Equal(c2.ID, list[0].ID)
-		s.Equal(c3.ID, list[1].ID)
+		s.Len(res.Items, 2)
+		s.Equal(3, res.Total) // Total всегда полное количество
+		s.Equal(c2.ID, res.Items[0].ID)
+		s.Equal(c3.ID, res.Items[1].ID)
 	})
 
 	s.Run("deleted not returned", func() {
 		err := s.repo.Delete(ctx, c2.ID)
 		s.Require().NoError(err)
 
-		list, err := s.repo.ListByIncident(ctx, incident.ID, 100, 0)
+		res, err := s.repo.ListByIncident(ctx, incident.ID, 100, 0)
 		s.Require().NoError(err)
 
-		s.Len(list, 2)
-		s.Equal(c1.ID, list[0].ID)
-		s.Equal(c3.ID, list[1].ID)
+		s.Len(res.Items, 2)
+		s.Equal(2, res.Total) // Total теперь учитывает только не удалённые
+		s.Equal(c1.ID, res.Items[0].ID)
+		s.Equal(c3.ID, res.Items[1].ID)
 	})
 }
-
 func (s *CommentRepositorySuite) createUser() User {
 	ctx := s.T().Context()
 

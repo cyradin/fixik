@@ -17,6 +17,9 @@ import * as runtime from '../runtime';
 import type {
   WebCreateIncidentRequest,
   WebErrorResponse,
+  WebIncidentComment,
+  WebIncidentCommentCreateRequest,
+  WebIncidentCommentListResponse,
   WebIncidentListResponse,
   WebIncidentResponse,
   WebUpdateIncidentRequest,
@@ -26,6 +29,12 @@ import {
     WebCreateIncidentRequestToJSON,
     WebErrorResponseFromJSON,
     WebErrorResponseToJSON,
+    WebIncidentCommentFromJSON,
+    WebIncidentCommentToJSON,
+    WebIncidentCommentCreateRequestFromJSON,
+    WebIncidentCommentCreateRequestToJSON,
+    WebIncidentCommentListResponseFromJSON,
+    WebIncidentCommentListResponseToJSON,
     WebIncidentListResponseFromJSON,
     WebIncidentListResponseToJSON,
     WebIncidentResponseFromJSON,
@@ -37,6 +46,17 @@ import {
 export interface IncidentsGetRequest {
     limit?: number;
     offset?: number;
+}
+
+export interface IncidentsIdCommentsGetRequest {
+    id: number;
+    limit?: number;
+    offset?: number;
+}
+
+export interface IncidentsIdCommentsPostRequest {
+    id: number;
+    request: WebIncidentCommentCreateRequest;
 }
 
 export interface IncidentsIdDeleteRequest {
@@ -105,6 +125,118 @@ export class IncidentsApi extends runtime.BaseAPI {
      */
     async incidentsGet(requestParameters: IncidentsGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebIncidentListResponse> {
         const response = await this.incidentsGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for incidentsIdCommentsGet without sending the request
+     */
+    async incidentsIdCommentsGetRequestOpts(requestParameters: IncidentsIdCommentsGetRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling incidentsIdCommentsGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/incidents/{id}/comments`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get all comments for an incident with pagination
+     * Get incident comments
+     */
+    async incidentsIdCommentsGetRaw(requestParameters: IncidentsIdCommentsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebIncidentCommentListResponse>> {
+        const requestOptions = await this.incidentsIdCommentsGetRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebIncidentCommentListResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Get all comments for an incident with pagination
+     * Get incident comments
+     */
+    async incidentsIdCommentsGet(requestParameters: IncidentsIdCommentsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebIncidentCommentListResponse> {
+        const response = await this.incidentsIdCommentsGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for incidentsIdCommentsPost without sending the request
+     */
+    async incidentsIdCommentsPostRequestOpts(requestParameters: IncidentsIdCommentsPostRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling incidentsIdCommentsPost().'
+            );
+        }
+
+        if (requestParameters['request'] == null) {
+            throw new runtime.RequiredError(
+                'request',
+                'Required parameter "request" was null or undefined when calling incidentsIdCommentsPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/incidents/{id}/comments`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: WebIncidentCommentCreateRequestToJSON(requestParameters['request']),
+        };
+    }
+
+    /**
+     * Create a new comment for an incident
+     * Create incident comment
+     */
+    async incidentsIdCommentsPostRaw(requestParameters: IncidentsIdCommentsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebIncidentComment>> {
+        const requestOptions = await this.incidentsIdCommentsPostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebIncidentCommentFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a new comment for an incident
+     * Create incident comment
+     */
+    async incidentsIdCommentsPost(requestParameters: IncidentsIdCommentsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebIncidentComment> {
+        const response = await this.incidentsIdCommentsPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

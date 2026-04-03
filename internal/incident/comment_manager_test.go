@@ -85,18 +85,8 @@ func TestCommentManager_ListByIncident(t *testing.T) {
 	ctx := context.Background()
 
 	dbComments := []db.Comment{
-		{
-			ID:         1,
-			IncidentID: 100,
-			AuthorID:   10,
-			Text:       "one",
-		},
-		{
-			ID:         2,
-			IncidentID: 100,
-			AuthorID:   11,
-			Text:       "two",
-		},
+		{ID: 1, IncidentID: 100, AuthorID: 10, Text: "one"},
+		{ID: 2, IncidentID: 100, AuthorID: 11, Text: "two"},
 	}
 
 	tests := []struct {
@@ -107,8 +97,8 @@ func TestCommentManager_ListByIncident(t *testing.T) {
 		{
 			name: "repo error",
 			mock: func(repo *commentRepoMock, up *userProviderMock) {
-				repo.listFn = func(context.Context, int64, int, int) ([]db.Comment, error) {
-					return nil, errors.New("repo error")
+				repo.listFn = func(context.Context, int64, int, int) (db.CommentListResult, error) {
+					return db.CommentListResult{}, errors.New("repo error")
 				}
 			},
 			err: true,
@@ -116,10 +106,9 @@ func TestCommentManager_ListByIncident(t *testing.T) {
 		{
 			name: "user provider error",
 			mock: func(repo *commentRepoMock, up *userProviderMock) {
-				repo.listFn = func(context.Context, int64, int, int) ([]db.Comment, error) {
-					return dbComments, nil
+				repo.listFn = func(context.Context, int64, int, int) (db.CommentListResult, error) {
+					return db.CommentListResult{Items: dbComments, Total: 2}, nil
 				}
-
 				up.getByIDManyFn = func(context.Context, []int64) ([]user.User, error) {
 					return nil, errors.New("user error")
 				}
@@ -129,14 +118,13 @@ func TestCommentManager_ListByIncident(t *testing.T) {
 		{
 			name: "user not found",
 			mock: func(repo *commentRepoMock, up *userProviderMock) {
-				repo.listFn = func(context.Context, int64, int, int) ([]db.Comment, error) {
-					return dbComments, nil
+				repo.listFn = func(context.Context, int64, int, int) (db.CommentListResult, error) {
+					return db.CommentListResult{Items: dbComments, Total: 2}, nil
 				}
-
 				up.getByIDManyFn = func(context.Context, []int64) ([]user.User, error) {
 					return []user.User{
 						{ID: 10},
-						// 11 missing
+						// 11 пропущен
 					}, nil
 				}
 			},
@@ -145,10 +133,9 @@ func TestCommentManager_ListByIncident(t *testing.T) {
 		{
 			name: "success",
 			mock: func(repo *commentRepoMock, up *userProviderMock) {
-				repo.listFn = func(context.Context, int64, int, int) ([]db.Comment, error) {
-					return dbComments, nil
+				repo.listFn = func(context.Context, int64, int, int) (db.CommentListResult, error) {
+					return db.CommentListResult{Items: dbComments, Total: 2}, nil
 				}
-
 				up.getByIDManyFn = func(ctx context.Context, ids []int64) ([]user.User, error) {
 					users := make([]user.User, 0, len(ids))
 					for _, id := range ids {
@@ -161,8 +148,8 @@ func TestCommentManager_ListByIncident(t *testing.T) {
 		{
 			name: "empty list",
 			mock: func(repo *commentRepoMock, up *userProviderMock) {
-				repo.listFn = func(context.Context, int64, int, int) ([]db.Comment, error) {
-					return []db.Comment{}, nil
+				repo.listFn = func(context.Context, int64, int, int) (db.CommentListResult, error) {
+					return db.CommentListResult{Items: []db.Comment{}, Total: 0}, nil
 				}
 			},
 		},
@@ -189,18 +176,21 @@ func TestCommentManager_ListByIncident(t *testing.T) {
 			require.NoError(t, err)
 
 			if tt.name == "empty list" {
-				require.Empty(t, res)
+				require.Empty(t, res.Items)
+				require.Equal(t, 0, res.Total)
 				return
 			}
 
-			require.Len(t, res, 2)
-			require.Equal(t, int64(1), res[0].ID)
-			require.Equal(t, int64(10), res[0].Author.ID)
-			require.Equal(t, "one", res[0].Text)
+			require.Len(t, res.Items, 2)
+			require.Equal(t, int64(1), res.Items[0].ID)
+			require.Equal(t, int64(10), res.Items[0].Author.ID)
+			require.Equal(t, "one", res.Items[0].Text)
 
-			require.Equal(t, int64(2), res[1].ID)
-			require.Equal(t, int64(11), res[1].Author.ID)
-			require.Equal(t, "two", res[1].Text)
+			require.Equal(t, int64(2), res.Items[1].ID)
+			require.Equal(t, int64(11), res.Items[1].Author.ID)
+			require.Equal(t, "two", res.Items[1].Text)
+
+			require.Equal(t, 2, res.Total)
 		})
 	}
 }
@@ -209,7 +199,7 @@ type commentRepoMock struct {
 	createFn func(context.Context, *db.Comment) error
 	updateFn func(context.Context, *db.Comment) error
 	deleteFn func(context.Context, int64) error
-	listFn   func(context.Context, int64, int, int) ([]db.Comment, error)
+	listFn   func(ctx context.Context, incidentID int64, limit, offset int) (db.CommentListResult, error)
 }
 
 func (m *commentRepoMock) Create(ctx context.Context, c *db.Comment) error {
@@ -230,6 +220,6 @@ func (m *commentRepoMock) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (m *commentRepoMock) ListByIncident(ctx context.Context, incidentID int64, limit, offset int) ([]db.Comment, error) {
+func (m *commentRepoMock) ListByIncident(ctx context.Context, incidentID int64, limit, offset int) (db.CommentListResult, error) {
 	return m.listFn(ctx, incidentID, limit, offset)
 }

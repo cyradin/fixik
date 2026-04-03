@@ -67,3 +67,8 @@ type Comment struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
+
+type CommentList struct {
+	Items []Comment
+	Total int
+}

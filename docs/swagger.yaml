@@ -141,6 +141,47 @@ definitions:
       error:
         type: string
     type: object
+  web.IncidentComment:
+    properties:
+      author:
+        $ref: '#/definitions/web.UserResponse'
+      createdAt:
+        type: string
+      id:
+        type: integer
+      incidentId:
+        type: integer
+      text:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - author
+    - createdAt
+    - id
+    - incidentId
+    - text
+    - updatedAt
+    type: object
+  web.IncidentCommentCreateRequest:
+    properties:
+      text:
+        type: string
+    required:
+    - text
+    type: object
+  web.IncidentCommentListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/web.IncidentComment'
+        type: array
+      pagination:
+        $ref: '#/definitions/web.Pagination'
+    required:
+    - items
+    - pagination
+    type: object
   web.IncidentListResponse:
     properties:
       items:
@@ -623,6 +664,87 @@ paths:
           schema:
             $ref: '#/definitions/web.ErrorResponse'
       summary: Update incident
+      tags:
+      - incidents
+  /incidents/{id}/comments:
+    get:
+      consumes:
+      - application/json
+      description: Get all comments for an incident with pagination
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - default: 100
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.IncidentCommentListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Get incident comments
+      tags:
+      - incidents
+    post:
+      consumes:
+      - application/json
+      description: Create a new comment for an incident
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Comment data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/web.IncidentCommentCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.IncidentComment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Create incident comment
       tags:
       - incidents
   /priorities:

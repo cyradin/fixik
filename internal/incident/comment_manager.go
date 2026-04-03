@@ -14,7 +14,7 @@ type commentRepo interface {
 	Create(ctx context.Context, c *db.Comment) error
 	Update(ctx context.Context, c *db.Comment) error
 	Delete(ctx context.Context, id int64) error
-	ListByIncident(ctx context.Context, incidentID int64, limit, offset int) ([]db.Comment, error)
+	ListByIncident(ctx context.Context, incidentID int64, limit, offset int) (db.CommentListResult, error)
 }
 
 type CommentManager struct {
@@ -48,20 +48,22 @@ func (m *CommentManager) Create(ctx context.Context, incidentID int64, text stri
 	return m.fromDB(dbComment, u), nil
 }
 
-func (m *CommentManager) ListByIncident(ctx context.Context, incidentID int64, limit, offset int) ([]Comment, error) {
-	items, err := m.repo.ListByIncident(ctx, incidentID, limit, offset)
+func (m *CommentManager) ListByIncident(ctx context.Context, incidentID int64, limit, offset int) (CommentList, error) {
+	res, err := m.repo.ListByIncident(ctx, incidentID, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("list comments: %w", err)
+		return CommentList{}, fmt.Errorf("list comments: %w", err)
 	}
 
-	if len(items) == 0 {
-		return []Comment{}, nil
+	if len(res.Items) == 0 {
+		return CommentList{
+			Items: []Comment{},
+			Total: res.Total,
+		}, nil
 	}
 
-	ids := make([]int64, 0, len(items))
+	ids := make([]int64, 0, len(res.Items))
 	seen := make(map[int64]struct{})
-
-	for _, c := range items {
+	for _, c := range res.Items {
 		if _, ok := seen[c.AuthorID]; !ok {
 			ids = append(ids, c.AuthorID)
 			seen[c.AuthorID] = struct{}{}
@@ -70,7 +72,7 @@ func (m *CommentManager) ListByIncident(ctx context.Context, incidentID int64, l
 
 	users, err := m.userProvider.GetByIDMany(ctx, ids)
 	if err != nil {
-		return nil, fmt.Errorf("get users: %w", err)
+		return CommentList{}, fmt.Errorf("get users: %w", err)
 	}
 
 	userMap := make(map[int64]user.User, len(users))
@@ -78,18 +80,19 @@ func (m *CommentManager) ListByIncident(ctx context.Context, incidentID int64, l
 		userMap[u.ID] = u
 	}
 
-	result := make([]Comment, 0, len(items))
-
-	for _, c := range items {
+	items := make([]Comment, 0, len(res.Items))
+	for _, c := range res.Items {
 		u, ok := userMap[c.AuthorID]
 		if !ok {
-			return nil, fmt.Errorf("user %d not found", c.AuthorID)
+			return CommentList{}, fmt.Errorf("user %d not found", c.AuthorID)
 		}
-
-		result = append(result, m.fromDB(c, u))
+		items = append(items, m.fromDB(c, u))
 	}
 
-	return result, nil
+	return CommentList{
+		Items: items,
+		Total: res.Total,
+	}, nil
 }
 
 func (m *CommentManager) fromDB(c db.Comment, u user.User) Comment {

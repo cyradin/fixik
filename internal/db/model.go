@@ -40,6 +40,11 @@ type Comment struct {
 	DeletedAt *time.Time
 }
 
+type CommentListResult struct {
+	Items []Comment
+	Total int
+}
+
 type DictEntity struct {
 	ID          int64
 	Code        string

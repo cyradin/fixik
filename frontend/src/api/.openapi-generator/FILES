@@ -22,6 +22,9 @@ docs/WebCreateUserRequest.md
 docs/WebDictEntity.md
 docs/WebDictEntityShort.md
 docs/WebErrorResponse.md
+docs/WebIncidentComment.md
+docs/WebIncidentCommentCreateRequest.md
+docs/WebIncidentCommentListResponse.md
 docs/WebIncidentListResponse.md
 docs/WebIncidentResponse.md
 docs/WebListDictEntitiesResponse.md
@@ -46,6 +49,9 @@ models/WebCreateUserRequest.ts
 models/WebDictEntity.ts
 models/WebDictEntityShort.ts
 models/WebErrorResponse.ts
+models/WebIncidentComment.ts
+models/WebIncidentCommentCreateRequest.ts
+models/WebIncidentCommentListResponse.ts
 models/WebIncidentListResponse.ts
 models/WebIncidentResponse.ts
 models/WebListDictEntitiesResponse.ts

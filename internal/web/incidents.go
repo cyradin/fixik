@@ -20,6 +20,14 @@ type incidentManager interface {
 	Delete(ctx context.Context, id int64) error
 }
 
+type commentCreater interface {
+	Create(ctx context.Context, incidentID int64, text string) (incident.Comment, error)
+}
+
+type commentByIncidentLister interface {
+	ListByIncident(ctx context.Context, incidentID int64, limit, offset int) (incident.CommentList, error)
+}
+
 type CreateIncidentRequest struct {
 	Title       string `json:"title" validate:"required"`
 	Description string `json:"description" validate:"required"`
@@ -96,8 +104,34 @@ type DictEntityShort struct {
 	Name string `json:"name" validate:"required"`
 }
 
+type IncidentCommentCreateRequest struct {
+	Text string `json:"text" validate:"required"`
+}
+
+func (r IncidentCommentCreateRequest) Validate() error {
+	return validation.ValidateStruct(
+		&r,
+		validation.Field(&r.Text, validation.Required),
+	)
+}
+
+type IncidentCommentListResponse struct {
+	Items      []IncidentComment `json:"items" validate:"required"`
+	Pagination Pagination        `json:"pagination" validate:"required"`
+}
+
+type IncidentComment struct {
+	ID         int64        `json:"id" validate:"required"`
+	IncidentID int64        `json:"incidentId" validate:"required"`
+	Author     UserResponse `json:"author" validate:"required"`
+	Text       string       `json:"text" validate:"required"`
+	CreatedAt  string       `json:"createdAt" validate:"required"`
+	UpdatedAt  string       `json:"updatedAt" validate:"required"`
+}
+
 func incidentRoutes(c *container.Container) func(r chi.Router) {
 	incidentManager := c.IncidentManager()
+	commentManager := c.CommentManager()
 
 	return func(r chi.Router) {
 		r.Post("/", createIncident(incidentManager))
@@ -105,6 +139,8 @@ func incidentRoutes(c *container.Container) func(r chi.Router) {
 		r.Get("/{id}", getIncident(incidentManager))
 		r.Patch("/{id}", updateIncident(incidentManager))
 		r.Delete("/{id}", deleteIncident(incidentManager))
+		r.Post("/{id}/comments", createIncidentComment(commentManager))
+		r.Get("/{id}/comments", getIncidentComments(commentManager))
 	}
 }
 
@@ -328,5 +364,101 @@ func toIncidentResponse(i incident.Incident) IncidentResponse {
 
 		CreatedAt: i.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: i.UpdatedAt.Format(time.RFC3339),
+	}
+}
+
+// @Summary Create incident comment
+// @Description Create a new comment for an incident
+// @Tags incidents
+// @Accept json
+// @Produce json
+// @Param id path int true "Incident ID"
+// @Param request body IncidentCommentCreateRequest true "Comment data"
+// @Success 200 {object} IncidentComment
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /incidents/{id}/comments [post]
+func createIncidentComment(manager commentCreater) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		incidentID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+		if err != nil {
+			writeError(w, http.StatusBadRequest, err)
+			return
+		}
+
+		handle(func(ctx context.Context, req IncidentCommentCreateRequest) (IncidentComment, error) {
+			if err := req.Validate(); err != nil {
+				return IncidentComment{}, err
+			}
+
+			c, err := manager.Create(ctx, incidentID, req.Text)
+			if err != nil {
+				return IncidentComment{}, err
+			}
+
+			return toIncidentCommentResponse(c), nil
+		})(w, r)
+	}
+}
+
+// @Summary Get incident comments
+// @Description Get all comments for an incident with pagination
+// @Tags incidents
+// @Accept json
+// @Produce json
+// @Param id path int true "Incident ID"
+// @Param limit query int false "Limit" default(100)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {object} IncidentCommentListResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /incidents/{id}/comments [get]
+func getIncidentComments(manager commentByIncidentLister) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		incidentID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+		if err != nil {
+			writeError(w, http.StatusBadRequest, err)
+			return
+		}
+
+		limit, offset, err := decodePagination(r, 1, 100)
+		if err != nil {
+			writeError(w, http.StatusBadRequest, err)
+			return
+		}
+
+		handle(func(ctx context.Context, _ NoBody) (IncidentCommentListResponse, error) {
+			result, err := manager.ListByIncident(ctx, incidentID, limit, offset)
+			if err != nil {
+				return IncidentCommentListResponse{}, err
+			}
+
+			resp := make([]IncidentComment, len(result.Items))
+			for i, item := range result.Items {
+				resp[i] = toIncidentCommentResponse(item)
+			}
+
+			return IncidentCommentListResponse{
+				Items: resp,
+				Pagination: Pagination{
+					Limit:  limit,
+					Offset: offset,
+					Total:  result.Total,
+				},
+			}, nil
+		})(w, r)
+	}
+}
+
+func toIncidentCommentResponse(c incident.Comment) IncidentComment {
+	return IncidentComment{
+		ID:         c.ID,
+		IncidentID: c.IncidentID,
+		Author:     toUserResponse(c.Author),
+		Text:       c.Text,
+		CreatedAt:  c.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:  c.UpdatedAt.Format(time.RFC3339),
 	}
 }
