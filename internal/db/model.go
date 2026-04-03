@@ -29,6 +29,17 @@ type IncidentListResult struct {
 	Total int
 }
 
+type Comment struct {
+	ID         int64
+	AuthorID   int64
+	IncidentID int64
+	Text       string
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
+}
+
 type DictEntity struct {
 	ID          int64
 	Code        string

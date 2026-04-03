@@ -24,6 +24,7 @@ type Container struct {
 	teamRepo     *db.DictRepository
 	incidentRepo *db.IncidentRepository
 	userRepo     *db.UserRepository
+	commentRepo  *db.CommentRepository
 
 	statusManager *status.StatusManager
 

@@ -66,3 +66,11 @@ func (c *Container) UserRepository() *db.UserRepository {
 
 	return c.userRepo
 }
+
+func (c *Container) CommentRepository() *db.CommentRepository {
+	if c.commentRepo == nil {
+		c.commentRepo = db.NewCommentRepository(c.PgPool())
+	}
+
+	return c.commentRepo
+}
