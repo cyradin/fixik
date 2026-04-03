@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUnmounted, watchEffect } from 'vue'
+import { watch } from 'vue'
 
 import { useIncidentsStore } from '@/stores/incidentsStore'
 import { useStatusesStore } from '@/stores/statusesStore'
@@ -17,25 +17,24 @@ const teamsStore = useTeamsStore()
 const usersStore = useUsersStore()
 const authStore = useAuthStore()
 
-let stopPolling = false
+watch(
+  () => authStore.isAuth,
+  (isAuth) => {
+    if (isAuth) {
+      statusesStore.fetchAll()
+      prioritiesStore.fetchAll()
+      teamsStore.fetchAll()
+      usersStore.fetchAll()
 
-watchEffect(() => {
-  if (authStore.isAuth && !stopPolling) {
-    statusesStore.fetchAll()
-    prioritiesStore.fetchAll()
-    teamsStore.fetchAll()
-    usersStore.fetchAll()
-
-    incidentsStore.startPolling(5000)
-    usersStore.startPolling(5000)
-    stopPolling = true
-  }
-})
-
-onUnmounted(() => {
-  incidentsStore.stopPolling()
-  usersStore.stopPolling()
-})
+      incidentsStore.startPolling(5000)
+      usersStore.startPolling(5000)
+    } else {
+      incidentsStore.stopPolling()
+      usersStore.stopPolling()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

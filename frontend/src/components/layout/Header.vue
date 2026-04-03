@@ -22,9 +22,8 @@ const logout = async () => {
   >
     <h1 style="margin: 0">Fixik: Система инцидентов</h1>
 
-    <el-dropdown>
-      <el-button type="text" style="display: flex; align-items: center">
-        <el-icon style="margin-right: 6px"><User /></el-icon>
+    <el-dropdown v-if="authStore.isAuth">
+      <el-button dashed :icon="User" style="display: flex; align-items: center">
         {{ userName }}
       </el-button>
 
