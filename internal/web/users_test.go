@@ -265,6 +265,145 @@ func TestListUsers(t *testing.T) {
 	})
 }
 
+func TestChangePassword(t *testing.T) {
+	t.Parallel()
+
+	t.Run("success", func(t *testing.T) {
+		t.Parallel()
+
+		changed := false
+		m := &mockPasswordChanger{
+			changeFn: func(ctx context.Context, userID int64, current, new string) error {
+				require.Equal(t, int64(42), userID)
+				require.Equal(t, "oldpass", current)
+				require.Equal(t, "newpass", new)
+
+				changed = true
+
+				return nil
+			},
+		}
+
+		reqBody := ChangePasswordRequest{CurrentPassword: "oldpass", NewPassword: "newpass"}
+		req := httptest.NewRequest(http.MethodPost, "/users/42/password", jsonBody(t, reqBody))
+		req.Header.Set("Content-Type", "application/json")
+
+		r := chi.NewRouter()
+		r.Post("/users/{id}/password", changePassword(m))
+
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+		require.True(t, changed)
+	})
+
+	t.Run("validation error", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockPasswordChanger{}
+		reqBody := ChangePasswordRequest{}
+		req := httptest.NewRequest(http.MethodPost, "/users/42/password", jsonBody(t, reqBody))
+		req.Header.Set("Content-Type", "application/json")
+
+		r := chi.NewRouter()
+		r.Post("/users/{id}/password", changePassword(m))
+
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("user not found", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockPasswordChanger{
+			changeFn: func(ctx context.Context, userID int64, current, new string) error {
+				return user.ErrUserNotFound
+			},
+		}
+		reqBody := ChangePasswordRequest{CurrentPassword: "oldpass", NewPassword: "newpass"}
+		req := httptest.NewRequest(http.MethodPost, "/users/42/password", jsonBody(t, reqBody))
+		req.Header.Set("Content-Type", "application/json")
+
+		r := chi.NewRouter()
+		r.Post("/users/{id}/password", changePassword(m))
+
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("invalid current password", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockPasswordChanger{
+			changeFn: func(ctx context.Context, userID int64, current, new string) error {
+				return user.ErrUserInvalidPassword
+			},
+		}
+		reqBody := ChangePasswordRequest{CurrentPassword: "wrongpass", NewPassword: "newpass"}
+		req := httptest.NewRequest(http.MethodPost, "/users/42/password", jsonBody(t, reqBody))
+		req.Header.Set("Content-Type", "application/json")
+
+		r := chi.NewRouter()
+		r.Post("/users/{id}/password", changePassword(m))
+
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("manager error", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockPasswordChanger{
+			changeFn: func(ctx context.Context, userID int64, current, new string) error {
+				return errors.New("fail")
+			},
+		}
+		reqBody := ChangePasswordRequest{CurrentPassword: "oldpass", NewPassword: "newpass"}
+		req := httptest.NewRequest(http.MethodPost, "/users/42/password", jsonBody(t, reqBody))
+		req.Header.Set("Content-Type", "application/json")
+
+		r := chi.NewRouter()
+		r.Post("/users/{id}/password", changePassword(m))
+
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("invalid id", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockPasswordChanger{}
+		reqBody := ChangePasswordRequest{CurrentPassword: "oldpass", NewPassword: "newpass"}
+		req := httptest.NewRequest(http.MethodPost, "/users/abc/password", jsonBody(t, reqBody))
+		req.Header.Set("Content-Type", "application/json")
+
+		r := chi.NewRouter()
+		r.Post("/users/{id}/password", changePassword(m))
+
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+}
+
+type mockPasswordChanger struct {
+	changeFn func(ctx context.Context, userID int64, current, new string) error
+}
+
+func (m *mockPasswordChanger) ChangePassword(ctx context.Context, userID int64, current, new string) error {
+	return m.changeFn(ctx, userID, current, new)
+}
+
 type mockUserManager struct {
 	createFn func(ctx context.Context, u user.CreateUser) (user.User, error)
 	getFn    func(ctx context.Context, id int64) (user.User, error)

@@ -9,7 +9,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var ErrUserNotFound = fmt.Errorf("user not found")
+var (
+	ErrUserNotFound        = fmt.Errorf("user not found")
+	ErrUserInvalidPassword = fmt.Errorf("invalid password")
+)
 
 type tokenManager interface {
 	GenerateAccessToken(userID int64) (string, error)
@@ -23,6 +26,10 @@ type userProvider interface {
 	GetByID(ctx context.Context, id int64) (db.User, error)
 }
 
+type userUpdater interface {
+	Update(ctx context.Context, u *db.User) error
+}
+
 //nolint:gosec
 type LoginResult struct {
 	User         User
@@ -32,15 +39,18 @@ type LoginResult struct {
 
 type AuthService struct {
 	userProvider userProvider
+	userUpdater  userUpdater
 	tokens       tokenManager
 }
 
 func NewAuthService(
 	userProvider userProvider,
+	userUpdater userUpdater,
 	tokenManager tokenManager,
 ) *AuthService {
 	return &AuthService{
 		userProvider: userProvider,
+		userUpdater:  userUpdater,
 		tokens:       tokenManager,
 	}
 }
@@ -114,6 +124,34 @@ func (a *AuthService) GetUserFromAccessToken(ctx context.Context, token string) 
 	}
 
 	return NewFromDB(user), nil
+}
+
+func (m *AuthService) ChangePassword(ctx context.Context, userID int64, current, new string) error {
+	u, err := m.userProvider.GetByID(ctx, userID)
+	if err != nil {
+		if errors.Is(err, db.ErrNotFound) {
+			return ErrUserNotFound
+		}
+
+		return fmt.Errorf("get user: %w", err)
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(current)); err != nil {
+		return ErrUserInvalidPassword
+	}
+
+	hashed, err := hashPassword(new)
+	if err != nil {
+		return fmt.Errorf("hash password: %w", err)
+	}
+
+	u.Password = hashed
+
+	if err := m.userUpdater.Update(ctx, &u); err != nil {
+		return fmt.Errorf("update password: %w", err)
+	}
+
+	return nil
 }
 
 func (a *AuthService) generateTokens(userID int64) (string, string, error) {

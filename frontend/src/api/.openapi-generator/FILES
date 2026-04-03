@@ -14,6 +14,7 @@ docs/StatusesApi.md
 docs/TeamsApi.md
 docs/UsersApi.md
 docs/WebAuthLoginRequest.md
+docs/WebChangePasswordRequest.md
 docs/WebCreateDictEntityRequest.md
 docs/WebCreateIncidentRequest.md
 docs/WebCreateStatusRequest.md
@@ -37,6 +38,7 @@ docs/WebUpdateUserRequest.md
 docs/WebUserResponse.md
 index.ts
 models/WebAuthLoginRequest.ts
+models/WebChangePasswordRequest.ts
 models/WebCreateDictEntityRequest.ts
 models/WebCreateIncidentRequest.ts
 models/WebCreateStatusRequest.ts

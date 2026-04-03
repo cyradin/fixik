@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -36,6 +37,10 @@ type userLister interface {
 
 type userGetter interface {
 	GetByID(ctx context.Context, id int64) (user.User, error)
+}
+
+type passwordChanger interface {
+	ChangePassword(ctx context.Context, userID int64, current, new string) error
 }
 
 type CreateUserRequest struct {
@@ -80,6 +85,19 @@ func (r UpdateUserRequest) Validate() error {
 	)
 }
 
+type ChangePasswordRequest struct {
+	CurrentPassword string `json:"currentPassword" validate:"required"` // текущий пароль
+	NewPassword     string `json:"newPassword" validate:"required"`     // новый пароль
+}
+
+func (r ChangePasswordRequest) Validate() error {
+	return validation.ValidateStruct(
+		&r,
+		validation.Field(&r.CurrentPassword, validation.Required, validation.Length(0, maxPasswordLen)),
+		validation.Field(&r.NewPassword, validation.Required, validation.Length(minPasswordLen, maxPasswordLen)),
+	)
+}
+
 type UserResponse struct {
 	ID       int64  `json:"id" validate:"required"`
 	Name     string `json:"name" validate:"required"`
@@ -95,6 +113,7 @@ type ListUsersResponse struct {
 
 func userRoutes(c *container.Container) func(r chi.Router) {
 	manager := c.UserManager()
+	authService := c.AuthService()
 
 	return func(r chi.Router) {
 		r.Post("/", createUser(manager))
@@ -102,6 +121,7 @@ func userRoutes(c *container.Container) func(r chi.Router) {
 		r.Get("/{id}", getUser(manager))
 		r.Patch("/{id}", updateUser(manager))
 		r.Delete("/{id}", deleteUser(manager))
+		r.Post("/{id}/password", changePassword(authService))
 	}
 }
 
@@ -262,6 +282,44 @@ func listUsers(manager userLister) http.HandlerFunc {
 			}
 
 			return ListUsersResponse{Items: resp}, nil
+		})(w, r)
+	}
+}
+
+// @Summary Change user password
+// @Description Change current user's password
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Param request body ChangePasswordRequest true "Password data"
+// @Success 200
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /users/{id}/password [post]
+func changePassword(passwordChanger passwordChanger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+		if err != nil {
+			writeError(w, http.StatusBadRequest, err)
+			return
+		}
+
+		handle(func(ctx context.Context, req ChangePasswordRequest) (NoBody, error) {
+			if err := req.Validate(); err != nil {
+				return NoBody{}, err
+			}
+
+			if err := passwordChanger.ChangePassword(ctx, userID, req.CurrentPassword, req.NewPassword); err != nil {
+				if errors.Is(err, user.ErrUserNotFound) || errors.Is(err, user.ErrUserInvalidPassword) {
+					return NoBody{}, UnauthorizedError{Err: err}
+				}
+
+				return NoBody{}, err
+			}
+
+			return NoBody{}, nil
 		})(w, r)
 	}
 }

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/cyradin/fixik/internal/db"
@@ -93,11 +94,12 @@ func TestAuthService_Login(t *testing.T) {
 			t.Parallel()
 
 			userRepo := &userProviderMock{}
+			userUpdater := &userUpdaterMock{}
 			tokenManager := &tokenManagerMock{}
 
 			tt.mock(userRepo, tokenManager)
 
-			svc := NewAuthService(userRepo, tokenManager)
+			svc := NewAuthService(userRepo, userUpdater, tokenManager)
 
 			password := "password"
 			if tt.name == "wrong password" {
@@ -212,11 +214,12 @@ func TestAuthService_Refresh(t *testing.T) {
 			t.Parallel()
 
 			userRepo := &userProviderMock{}
+			userUpdater := &userUpdaterMock{}
 			tokenManager := &tokenManagerMock{}
 
 			tt.mock(userRepo, tokenManager)
 
-			svc := NewAuthService(userRepo, tokenManager)
+			svc := NewAuthService(userRepo, userUpdater, tokenManager)
 
 			res, err := svc.Refresh(context.Background(), "old-refresh-token")
 
@@ -231,6 +234,124 @@ func TestAuthService_Refresh(t *testing.T) {
 			require.Equal(t, "new-refresh-token", res.RefreshToken)
 		})
 	}
+}
+
+func TestAuthService_ChangePassword(t *testing.T) {
+	t.Parallel()
+
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("oldpass"), bcrypt.DefaultCost)
+
+	dbUser := db.User{
+		ID:       1,
+		Name:     "Alice",
+		Username: "alice",
+		Password: string(hashedPassword),
+	}
+
+	updated := db.User{}
+
+	t.Run("success", func(t *testing.T) {
+		t.Parallel()
+
+		userUpdater := &userUpdaterMock{
+			updateFn: func(ctx context.Context, u *db.User) error {
+				updated = *u
+				return nil
+			},
+		}
+
+		userRepo := &userProviderMock{
+			getByIDFn: func(ctx context.Context, id int64) (db.User, error) {
+				return dbUser, nil
+			},
+		}
+
+		svc := NewAuthService(userRepo, userUpdater, nil)
+
+		err := svc.ChangePassword(context.Background(), 1, "oldpass", "newpass")
+		require.NoError(t, err)
+
+		err = bcrypt.CompareHashAndPassword([]byte(updated.Password), []byte("newpass"))
+		require.NoError(t, err)
+		require.Equal(t, dbUser.ID, updated.ID)
+	})
+
+	t.Run("wrong current password", func(t *testing.T) {
+		t.Parallel()
+
+		userUpdater := &userUpdaterMock{
+			updateFn: func(ctx context.Context, u *db.User) error {
+				updated = *u
+				return nil
+			},
+		}
+
+		userRepo := &userProviderMock{
+			getByIDFn: func(ctx context.Context, id int64) (db.User, error) {
+				return dbUser, nil
+			},
+		}
+
+		svc := NewAuthService(userRepo, userUpdater, nil)
+
+		err := svc.ChangePassword(context.Background(), 1, "wrong", "newpass")
+		require.Error(t, err)
+		require.ErrorIs(t, err, ErrUserInvalidPassword)
+	})
+
+	t.Run("user not found", func(t *testing.T) {
+		t.Parallel()
+
+		userUpdater := &userUpdaterMock{
+			updateFn: func(ctx context.Context, u *db.User) error {
+				updated = *u
+				return nil
+			},
+		}
+
+		userRepo := &userProviderMock{
+			getByIDFn: func(ctx context.Context, id int64) (db.User, error) {
+				return dbUser, nil
+			},
+		}
+
+		svc := NewAuthService(userRepo, userUpdater, nil)
+
+		userRepo.getByIDFn = func(ctx context.Context, id int64) (db.User, error) {
+			return db.User{}, db.ErrNotFound
+		}
+
+		err := svc.ChangePassword(context.Background(), 2, "oldpass", "newpass")
+		require.Error(t, err)
+		require.ErrorIs(t, err, ErrUserNotFound)
+	})
+
+	t.Run("repo error", func(t *testing.T) {
+		t.Parallel()
+
+		userUpdater := &userUpdaterMock{
+			updateFn: func(ctx context.Context, u *db.User) error {
+				updated = *u
+				return nil
+			},
+		}
+
+		userRepo := &userProviderMock{
+			getByIDFn: func(ctx context.Context, id int64) (db.User, error) {
+				return dbUser, nil
+			},
+		}
+
+		svc := NewAuthService(userRepo, userUpdater, nil)
+
+		userRepo.getByIDFn = func(ctx context.Context, id int64) (db.User, error) {
+			return db.User{}, fmt.Errorf("expected error")
+		}
+
+		err := svc.ChangePassword(context.Background(), 2, "oldpass", "newpass")
+		require.Error(t, err)
+		require.NotErrorIs(t, err, ErrUserNotFound)
+	})
 }
 
 type userProviderMock struct {
@@ -278,4 +399,16 @@ func (m *tokenManagerMock) ValidateRefreshToken(tokenStr string) (int64, error) 
 	}
 
 	return m.validateRefreshTokenFn(tokenStr)
+}
+
+type userUpdaterMock struct {
+	updateFn func(ctx context.Context, u *db.User) error
+}
+
+func (m *userUpdaterMock) Update(ctx context.Context, u *db.User) error {
+	if m.updateFn == nil {
+		return nil
+	}
+
+	return m.updateFn(ctx, u)
 }

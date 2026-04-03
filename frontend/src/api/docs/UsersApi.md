@@ -7,6 +7,7 @@ All URIs are relative to *http://localhost:8080/api*
 | [**usersGet**](UsersApi.md#usersget) | **GET** /users | List users |
 | [**usersIdDelete**](UsersApi.md#usersiddelete) | **DELETE** /users/{id} | Delete user |
 | [**usersIdGet**](UsersApi.md#usersidget) | **GET** /users/{id} | Get user by ID |
+| [**usersIdPasswordPost**](UsersApi.md#usersidpasswordpost) | **POST** /users/{id}/password | Change user password |
 | [**usersIdPatch**](UsersApi.md#usersidpatch) | **PATCH** /users/{id} | Update user |
 | [**usersPost**](UsersApi.md#userspost) | **POST** /users | Create user |
 
@@ -211,6 +212,79 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
+| **500** | Internal Server Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## usersIdPasswordPost
+
+> usersIdPasswordPost(id, request)
+
+Change user password
+
+Change current user\&#39;s password
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UsersApi,
+} from '';
+import type { UsersIdPasswordPostRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new UsersApi();
+
+  const body = {
+    // number | User ID
+    id: 56,
+    // WebChangePasswordRequest | Password data
+    request: ...,
+  } satisfies UsersIdPasswordPostRequest;
+
+  try {
+    const data = await api.usersIdPasswordPost(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | User ID | [Defaults to `undefined`] |
+| **request** | [WebChangePasswordRequest](WebChangePasswordRequest.md) | Password data | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
 - **Accept**: `application/json`
 
 

@@ -10,6 +10,18 @@ definitions:
     - password
     - username
     type: object
+  web.ChangePasswordRequest:
+    properties:
+      currentPassword:
+        description: текущий пароль
+        type: string
+      newPassword:
+        description: новый пароль
+        type: string
+    required:
+    - currentPassword
+    - newPassword
+    type: object
   web.CreateDictEntityRequest:
     properties:
       code:
@@ -1275,6 +1287,43 @@ paths:
           schema:
             $ref: '#/definitions/web.ErrorResponse'
       summary: Update user
+      tags:
+      - users
+  /users/{id}/password:
+    post:
+      consumes:
+      - application/json
+      description: Change current user's password
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Password data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/web.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Change user password
       tags:
       - users
 schemes:

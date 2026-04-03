@@ -30,6 +30,7 @@ func (c *Container) AuthService() *user.AuthService {
 	if c.authService == nil {
 		c.authService = user.NewAuthService(
 			c.UserRepository(),
+			c.UserRepository(),
 			c.JWTManager(),
 		)
 	}

@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './WebAuthLoginRequest';
+export * from './WebChangePasswordRequest';
 export * from './WebCreateDictEntityRequest';
 export * from './WebCreateIncidentRequest';
 export * from './WebCreateStatusRequest';
