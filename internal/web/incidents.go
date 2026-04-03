@@ -426,7 +426,7 @@ func getIncidentComments(manager commentByIncidentLister) http.HandlerFunc {
 			return
 		}
 
-		limit, offset, err := decodePagination(r, 1, 100)
+		limit, offset, err := decodePagination(r, 1, 100) //nolint:mnd
 		if err != nil {
 			writeError(w, http.StatusBadRequest, err)
 			return

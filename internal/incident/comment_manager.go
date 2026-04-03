@@ -63,6 +63,7 @@ func (m *CommentManager) ListByIncident(ctx context.Context, incidentID int64, l
 
 	ids := make([]int64, 0, len(res.Items))
 	seen := make(map[int64]struct{})
+
 	for _, c := range res.Items {
 		if _, ok := seen[c.AuthorID]; !ok {
 			ids = append(ids, c.AuthorID)
@@ -86,6 +87,7 @@ func (m *CommentManager) ListByIncident(ctx context.Context, incidentID int64, l
 		if !ok {
 			return CommentList{}, fmt.Errorf("user %d not found", c.AuthorID)
 		}
+
 		items = append(items, m.fromDB(c, u))
 	}
 

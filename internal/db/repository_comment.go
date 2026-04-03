@@ -116,6 +116,7 @@ func (r *CommentRepository) ListByIncident(ctx context.Context, incidentID int64
 	defer rows.Close()
 
 	var items []Comment
+
 	for rows.Next() {
 		var c Comment
 		if err := rows.Scan(
@@ -128,6 +129,7 @@ func (r *CommentRepository) ListByIncident(ctx context.Context, incidentID int64
 		); err != nil {
 			return CommentListResult{}, fmt.Errorf("scan: %w", err)
 		}
+
 		items = append(items, c)
 	}
 

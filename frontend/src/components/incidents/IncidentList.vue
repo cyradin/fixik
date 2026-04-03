@@ -1,9 +1,7 @@
 <template>
   <div>
-    <!-- фильтры -->
     <IncidentFilters />
 
-    <!-- канбан -->
     <el-row :gutter="16">
       <el-col v-for="status in statusesStore.items" :key="status.code" :span="6">
         <el-card shadow="hover">

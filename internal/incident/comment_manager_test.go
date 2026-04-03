@@ -16,6 +16,7 @@ func TestCommentManager_Create(t *testing.T) {
 
 	ctx := context.Background()
 
+	//nolint:containedctx
 	tests := []struct {
 		name string
 		ctx  context.Context
@@ -46,6 +47,7 @@ func TestCommentManager_Create(t *testing.T) {
 					c.ID = 10
 					c.CreatedAt = time.Now()
 					c.UpdatedAt = time.Now()
+
 					return nil
 				}
 			},
@@ -141,6 +143,7 @@ func TestCommentManager_ListByIncident(t *testing.T) {
 					for _, id := range ids {
 						users = append(users, user.User{ID: id})
 					}
+
 					return users, nil
 				}
 			},
@@ -178,6 +181,7 @@ func TestCommentManager_ListByIncident(t *testing.T) {
 			if tt.name == "empty list" {
 				require.Empty(t, res.Items)
 				require.Equal(t, 0, res.Total)
+
 				return
 			}
 
@@ -210,6 +214,7 @@ func (m *commentRepoMock) Update(ctx context.Context, c *db.Comment) error {
 	if m.updateFn != nil {
 		return m.updateFn(ctx, c)
 	}
+
 	return nil
 }
 
@@ -217,6 +222,7 @@ func (m *commentRepoMock) Delete(ctx context.Context, id int64) error {
 	if m.deleteFn != nil {
 		return m.deleteFn(ctx, id)
 	}
+
 	return nil
 }
 

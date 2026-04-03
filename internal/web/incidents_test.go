@@ -347,9 +347,11 @@ func TestCreateIncidentComment(t *testing.T) {
 		t.Parallel()
 
 		var createdID int64
+
 		m := &mockCommentManager{
 			createFn: func(ctx context.Context, incidentID int64, text string) (incident.Comment, error) {
 				createdID = incidentID
+
 				return incident.Comment{
 					ID:         1,
 					IncidentID: incidentID,
@@ -369,7 +371,9 @@ func TestCreateIncidentComment(t *testing.T) {
 		require.NoError(t, json.NewEncoder(buf).Encode(reqBody))
 
 		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf)
+
 		req.Header.Set("Content-Type", "application/json")
+
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 
@@ -377,6 +381,7 @@ func TestCreateIncidentComment(t *testing.T) {
 		require.Equal(t, int64(1), createdID)
 
 		var resp IncidentComment
+
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
 		require.Equal(t, "test comment", resp.Text)
@@ -395,6 +400,7 @@ func TestCreateIncidentComment(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf)
 		req.Header.Set("Content-Type", "application/json")
+
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 
@@ -419,6 +425,7 @@ func TestCreateIncidentComment(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf)
 		req.Header.Set("Content-Type", "application/json")
+
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 
@@ -468,6 +475,7 @@ func TestGetIncidentComments(t *testing.T) {
 		require.Equal(t, http.StatusOK, rr.Code)
 
 		var resp IncidentCommentListResponse
+
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
 		require.Len(t, resp.Items, 2)

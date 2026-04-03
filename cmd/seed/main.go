@@ -550,6 +550,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 	return nil
 }
 
+//nolint:gocognit
 func seedComments(ctx context.Context, c *container.Container, teamIDs map[string]int64) error {
 	incidents, err := c.IncidentManager().List(ctx, 1000, 0) //nolint:mnd
 	if err != nil {
@@ -563,6 +564,7 @@ func seedComments(ctx context.Context, c *container.Container, teamIDs map[strin
 				return &u
 			}
 		}
+
 		return nil
 	}
 
@@ -570,6 +572,7 @@ func seedComments(ctx context.Context, c *container.Container, teamIDs map[strin
 		TeamID int64
 		Texts  []string
 	}
+
 	incidentCommentsMap := map[string][]commentSeed{
 		"main_page_error": {
 			{
