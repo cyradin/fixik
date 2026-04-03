@@ -142,7 +142,7 @@ No authorization required
 
 ## authRefreshPost
 
-> authRefreshPost()
+> WebUserResponse authRefreshPost()
 
 Refresh
 
@@ -179,7 +179,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-`void` (Empty response body)
+[**WebUserResponse**](WebUserResponse.md)
 
 ### Authorization
 

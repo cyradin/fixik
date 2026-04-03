@@ -17,12 +17,15 @@ import * as runtime from '../runtime';
 import type {
   WebAuthLoginRequest,
   WebErrorResponse,
+  WebUserResponse,
 } from '../models/index';
 import {
     WebAuthLoginRequestFromJSON,
     WebAuthLoginRequestToJSON,
     WebErrorResponseFromJSON,
     WebErrorResponseToJSON,
+    WebUserResponseFromJSON,
+    WebUserResponseToJSON,
 } from '../models/index';
 
 export interface AuthLoginPostRequest {
@@ -143,19 +146,20 @@ export class AuthApi extends runtime.BaseAPI {
      * Refresh access and refresh tokens using refresh cookie
      * Refresh
      */
-    async authRefreshPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async authRefreshPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebUserResponse>> {
         const requestOptions = await this.authRefreshPostRequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebUserResponseFromJSON(jsonValue));
     }
 
     /**
      * Refresh access and refresh tokens using refresh cookie
      * Refresh
      */
-    async authRefreshPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.authRefreshPostRaw(initOverrides);
+    async authRefreshPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebUserResponse> {
+        const response = await this.authRefreshPostRaw(initOverrides);
+        return await response.value();
     }
 
 }

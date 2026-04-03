@@ -105,7 +105,10 @@ const docTemplate = `{
                 "summary": "Refresh",
                 "responses": {
                     "200": {
-                        "description": "Sets new access and refresh cookies"
+                        "description": "Sets new access and refresh cookies",
+                        "schema": {
+                            "$ref": "#/definitions/web.UserResponse"
+                        }
                     },
                     "401": {
                         "description": "Unauthorized",

@@ -112,27 +112,27 @@ func authLogout(secureCookies bool) http.HandlerFunc {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Success 200 "Sets new access and refresh cookies"
+// @Success 200 {object} UserResponse "Sets new access and refresh cookies"
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /auth/refresh [post]
 func authRefresh(srv tokenRefresher, accessTTL, refreshTTL time.Duration, secureCookies bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		handle(func(ctx context.Context, req NoBody) (NoBody, error) {
+		handle(func(ctx context.Context, req NoBody) (UserResponse, error) {
 			rtCookie, err := r.Cookie(refreshTokenCookie)
 			if err != nil {
-				return NoBody{}, UnauthorizedError{Err: fmt.Errorf("refresh token missing")}
+				return UserResponse{}, UnauthorizedError{Err: fmt.Errorf("refresh token missing")}
 			}
 
 			result, err := srv.Refresh(ctx, rtCookie.Value)
 			if err != nil {
-				return NoBody{}, UnauthorizedError{Err: err}
+				return UserResponse{}, UnauthorizedError{Err: err}
 			}
 
 			setAccessToken(w, result.AccessToken, accessTTL, secureCookies)
 			setRefreshToken(w, result.RefreshToken, refreshTTL, secureCookies)
 
-			return NoBody{}, nil
+			return toUserResponse(result.User), nil
 		})(w, r)
 	}
 }
