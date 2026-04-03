@@ -5,8 +5,10 @@ import { authApi } from '@/api/client'
 
 export interface CurrentUser {
   id: number
+  name: string
   username: string
-  roles: string[]
+  email: string
+  role: string
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -21,7 +23,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const data = await authApi.authLoginPost({ request: { username, password } })
       isAuth.value = true
-      user.value = data.user // предполагаем, что сервер вернул { user: { id, username, roles } }
+      user.value = data // предполагаем, что сервер вернул { user: { id, username, roles } }
       error.value = ''
     } catch (e: any) {
       error.value = e.message || 'Login failed'
@@ -43,7 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const data = await authApi.authRefreshPost()
       isAuth.value = true
-      user.value = data.user // <-- тоже из ответа сервера
+      user.value = data
     } catch (e) {
       isAuth.value = false
       user.value = null
