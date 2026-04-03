@@ -3,7 +3,7 @@
     <el-button
       v-for="priority in sortedPriorities"
       :key="priority.id"
-      size="medium"
+      size="default"
       :type="incidentsStore.filters.priorityIds.includes(priority.id) ? 'primary' : 'default'"
       @click="incidentsStore.togglePriority(priority.id)"
     >
@@ -11,14 +11,14 @@
     </el-button>
 
     <el-button
-      size="medium"
+      size="default"
       :type="incidentsStore.filters.unassignedOnly ? 'danger' : 'default'"
       @click="incidentsStore.toggleUnassigned"
     >
       Не назначенные
     </el-button>
 
-    <el-button size="medium" @click="incidentsStore.resetFilters"> Сбросить </el-button>
+    <el-button size="default" @click="incidentsStore.resetFilters"> Сбросить </el-button>
   </el-space>
 </template>
 

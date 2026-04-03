@@ -8,6 +8,8 @@ import { useTeamsStore } from '@/stores/teamsStore'
 import { useUsersStore } from '@/stores/usersStore'
 import { useAuthStore } from '@/stores/authStore'
 
+import Header from '@/components/layout/Header.vue'
+
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()
 const prioritiesStore = usePrioritiesStore()
@@ -38,11 +40,8 @@ onUnmounted(() => {
 
 <template>
   <el-config-provider>
-    <el-container v-if="authStore.initialized" style="padding: 20px">
-      <el-header>
-        <h1>Fixik: Система инцидентов</h1>
-      </el-header>
-
+    <el-container v-if="authStore.initialized" style="height: 100vh; flex-direction: column">
+      <Header />
       <el-main>
         <router-view />
       </el-main>
@@ -56,5 +55,6 @@ onUnmounted(() => {
 body {
   margin: 0;
   font-family: 'Helvetica Neue', Arial, sans-serif;
+  height: 100vh;
 }
 </style>
