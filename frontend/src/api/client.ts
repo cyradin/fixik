@@ -1,3 +1,4 @@
+import { AuthApi } from './apis/AuthApi'
 import { IncidentsApi } from './apis/IncidentsApi'
 import { PrioritiesApi } from './apis/PrioritiesApi'
 import { RolesApi } from './apis/RolesApi'
@@ -8,8 +9,12 @@ import { Configuration } from './runtime'
 
 const basePath = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 
-const configuration = new Configuration({ basePath })
+const configuration = new Configuration({
+  basePath,
+  credentials: 'include',
+})
 
+export const authApi = new AuthApi(configuration)
 export const incidentsApi = new IncidentsApi(configuration)
 export const prioritiesApi = new PrioritiesApi(configuration)
 export const rolesApi = new RolesApi(configuration)
