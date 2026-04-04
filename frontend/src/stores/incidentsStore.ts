@@ -212,6 +212,16 @@ export const useIncidentsStore = defineStore('incidents', {
       }
     },
 
+    async delete(id: number) {
+      try {
+        await incidentsApi.incidentsIdDelete({ id })
+        this.items = this.items.filter((i) => i.id !== id)
+      } catch (e) {
+        console.error('Ошибка удаления инцидента', e)
+        throw e
+      }
+    },
+
     startPolling(interval = 5000): void {
       this.stopPolling()
       this.fetchAll()

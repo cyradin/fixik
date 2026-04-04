@@ -4,6 +4,10 @@
   <el-card v-if="incident" shadow="hover">
     <h2>#{{ incident.id }} {{ incident.title }}</h2>
 
+    <el-button type="danger" @click="deleteIncident" style="float: right" :loading="loading.delete">
+      Удалить
+    </el-button>
+
     <p v-if="incident.author">
       <b>Автор:</b>
       <UserLink :user="incident.author" :is-link="true" />
@@ -147,6 +151,7 @@ const loading = reactive({
   priority: false,
   team: false,
   user: false,
+  delete: false,
 })
 
 const statuses = computed(() => statusesStore.items)
@@ -201,6 +206,33 @@ const updateField = async (field: Field, value: any) => {
     console.error(`Ошибка при обновлении ${field}`, e)
   } finally {
     loading[field] = false
+  }
+}
+
+const deleteIncident = async () => {
+  if (!incident.value) return
+  if (!confirm(`Вы уверены, что хотите удалить инцидент #${incident.value.id}?`)) return
+
+  loading.delete = true
+  const id = incident.value.id
+
+  try {
+    await incidentsStore.delete(id) // нужно добавить delete в стор
+    ElMessage({
+      message: `Инцидент #${id} удалён`,
+      type: 'success',
+      duration: 3000,
+    })
+    router.push('/')
+  } catch (e) {
+    ElMessage({
+      message: `Не удалось удалить инцидент #${id}`,
+      type: 'error',
+      duration: 3000,
+    })
+    console.error('Ошибка удаления инцидента', e)
+  } finally {
+    loading.delete = false
   }
 }
 
