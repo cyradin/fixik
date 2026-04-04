@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { prioritiesApi } from '@/api/client'
+import { notifyError } from '@/utils/notify'
 
 export interface Priority {
   id: number
@@ -24,6 +25,7 @@ export const usePrioritiesStore = defineStore('priorities', {
         const resp = await prioritiesApi.prioritiesGet({})
         this.items = resp.items
       } catch (e) {
+        notifyError('Не удалось обновить список приоритетов инцидентов')
         console.error('priorities fetch error:', e)
       }
     },

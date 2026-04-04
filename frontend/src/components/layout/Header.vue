@@ -2,8 +2,9 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
-import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElButton, ElIcon } from 'element-plus'
+import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElButton, ElNotification } from 'element-plus'
 import { User } from '@element-plus/icons-vue'
+import { notifyError } from '@/utils/notify'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -11,8 +12,12 @@ const router = useRouter()
 const userName = computed(() => authStore.user?.name || authStore.user?.username || 'Пользователь')
 
 const logout = async () => {
-  await authStore.logout()
-  router.push('/login')
+  try {
+    await authStore.logout()
+    router.push('/login')
+  } catch {
+    notifyError('Не удалось выйти из системы')
+  }
 }
 </script>
 

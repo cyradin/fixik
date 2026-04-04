@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { usersApi } from '@/api/client'
+import { notifyError } from '@/utils/notify'
 
 export interface User {
   id: number
@@ -47,6 +48,7 @@ export const useUsersStore = defineStore('users', {
 
         this.items = allItems
       } catch (e) {
+        notifyError('Не удалось обновить список пользователей')
         console.error('users fetch error:', e)
       }
     },

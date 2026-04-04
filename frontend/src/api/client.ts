@@ -1,4 +1,4 @@
-// client.ts
+import { notifyError } from '@/utils/notify'
 import { AuthApi } from './apis/AuthApi'
 import { IncidentsApi } from './apis/IncidentsApi'
 import { PrioritiesApi } from './apis/PrioritiesApi'
@@ -31,6 +31,7 @@ function withAuthRefresh<T extends (...args: any[]) => Promise<any>>(fn: T): T {
 
         return fn(...args)
       }
+      notifyError('Ошибка запроса к серверу')
       throw e
     }
   }) as T
@@ -48,7 +49,6 @@ function wrapApiWithAuthRefresh<T extends object>(api: T): T {
   })
 }
 
-// экспортируем все API уже обёрнутыми
 export const incidentsApi = wrapApiWithAuthRefresh(new IncidentsApi(configuration))
 export const prioritiesApi = wrapApiWithAuthRefresh(new PrioritiesApi(configuration))
 export const rolesApi = wrapApiWithAuthRefresh(new RolesApi(configuration))

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { teamsApi } from '@/api/client'
+import { notifyError } from '@/utils/notify'
 
 export interface Team {
   id: number
@@ -24,6 +25,7 @@ export const useTeamsStore = defineStore('teams', {
         const resp = await teamsApi.teamsGet({})
         this.items = resp.items
       } catch (e) {
+        notifyError('Не удалось обновить список команд')
         console.error('teams fetch error:', e)
       }
     },

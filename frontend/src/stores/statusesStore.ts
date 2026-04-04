@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { statusesApi } from '@/api/client'
+import { notifyError } from '@/utils/notify'
 
 export interface Status {
   id: number
@@ -26,6 +27,7 @@ export const useStatusesStore = defineStore('statuses', {
         const resp = await statusesApi.statusesGet({})
         this.items = resp.items.sort((a, b) => a.sort - b.sort)
       } catch (e) {
+        notifyError('Не удалось обновить список статусов инцидентов')
         console.error('statuses fetch error:', e)
       }
     },

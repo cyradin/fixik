@@ -4,6 +4,7 @@ import { useStatusesStore } from '@/stores/statusesStore'
 import { usePrioritiesStore } from '@/stores/prioritiesStore'
 import { useTeamsStore } from '@/stores/teamsStore'
 import { useUsersStore } from '@/stores/usersStore'
+import { notifyError } from '@/utils/notify'
 
 export interface IncidentStatus {
   id: number
@@ -129,6 +130,7 @@ export const useIncidentsStore = defineStore('incidents', {
 
         this.items = allItems
       } catch (e) {
+        notifyError('Не удалось обновить список инцидентов')
         console.error('incidents fetch error:', e)
       }
     },
