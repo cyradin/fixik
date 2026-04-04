@@ -26,7 +26,12 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = data
       error.value = ''
     } catch (e: any) {
-      error.value = e.message || 'Login failed'
+      if (e.response?.status === 401) {
+        error.value = 'Неверный логин или пароль'
+      } else {
+        error.value = 'Что-то пошло не так. Попробуйте позже'
+      }
+
       isAuth.value = false
       user.value = null
       throw e
@@ -54,5 +59,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { isAuth, loading, error, initialized, user, login, logout, refresh }
+  const clearError = () => {
+    error.value = ''
+  }
+
+  return { isAuth, loading, error, initialized, user, login, logout, refresh, clearError }
 })

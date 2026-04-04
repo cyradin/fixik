@@ -37,6 +37,7 @@ const onSubmit = async () => {
             type="error"
             show-icon
             style="margin-bottom: 12px"
+            @close="authStore.clearError()"
           />
 
           <el-button
