@@ -204,5 +204,7 @@ const updateField = async (field: Field, value: any) => {
   }
 }
 
-const goBack = () => router.back()
+const goBack = () => {
+  router.push('/')
+}
 </script>

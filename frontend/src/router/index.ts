@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/authStore'
 
 import IncidentList from '@/components/incidents/IncidentList.vue'
 import IncidentDetail from '@/components/incidents/IncidentDetail.vue'
+import IncidentCreate from '@/components/incidents/IncidentCreate.vue'
 import LoginForm from '@/components/auth/LoginForm.vue'
 
 const routes = [
@@ -13,6 +14,12 @@ const routes = [
   {
     path: '/',
     component: IncidentList,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/incident/create',
+    component: IncidentCreate,
+    props: true,
     meta: { requiresAuth: true },
   },
   {

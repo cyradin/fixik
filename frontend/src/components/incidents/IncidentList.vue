@@ -2,6 +2,11 @@
   <div>
     <IncidentFilters />
 
+    <el-row justify="space-between" align="middle" style="margin-bottom: 16px">
+      <h2 style="margin: 0">Инциденты</h2>
+
+      <el-button type="primary" size="large" @click="goToCreate"> + Создать инцидент </el-button>
+    </el-row>
     <el-row :gutter="16">
       <el-col v-for="status in statusesStore.items" :key="status.code" :span="6">
         <el-card shadow="hover">
@@ -83,6 +88,10 @@ const router = useRouter()
 
 const goToIncident = (id: number) => {
   router.push(`/incident/${id}`)
+}
+
+const goToCreate = () => {
+  router.push('/incident/create')
 }
 
 const getChildPayload = (statusCode: string) => (index: number) => {

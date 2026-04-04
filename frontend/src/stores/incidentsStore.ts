@@ -43,6 +43,15 @@ export interface Incident {
   commentsCount: number
 }
 
+interface CreateIncident {
+  title: string
+  description: string
+  statusId: number
+  priorityId: number
+  teamId?: number
+  userId?: number
+}
+
 interface IncidentsState {
   items: Incident[]
   pollingId: ReturnType<typeof setInterval> | null
@@ -92,37 +101,7 @@ export const useIncidentsStore = defineStore('incidents', {
           const resp = await incidentsApi.incidentsGet({ limit, offset })
           const items = resp.items ?? []
 
-          allItems = allItems.concat(
-            items.map((item) => ({
-              ...item,
-              status: {
-                id: item.status.id ?? 0,
-                code: item.status.code,
-                name: item.status.name,
-              },
-              user: item.user
-                ? {
-                    id: item.user.id,
-                    name: item.user.name,
-                    username: item.user.username,
-                  }
-                : null,
-              author: item.author
-                ? {
-                    id: item.author.id,
-                    name: item.author.name,
-                    username: item.author.username,
-                  }
-                : null,
-              team: item.team
-                ? {
-                    id: item.team.id,
-                    name: item.team.name,
-                    code: item.team.code,
-                  }
-                : null,
-            })),
-          )
+          allItems = allItems.concat(items.map(mapApiIncidentToIncident))
 
           if (items.length < limit) break
           offset += limit
@@ -218,6 +197,21 @@ export const useIncidentsStore = defineStore('incidents', {
       }
     },
 
+    async create(dto: CreateIncident) {
+      try {
+        const res = await incidentsApi.incidentsPost({ request: dto })
+        const incident = mapApiIncidentToIncident(res)
+
+        this.items.push(incident)
+
+        return incident
+      } catch (e) {
+        notifyError('Не удалось создать инцидент')
+        console.error(e)
+        throw e
+      }
+    },
+
     startPolling(interval = 5000): void {
       this.stopPolling()
       this.fetchAll()
@@ -250,3 +244,32 @@ export const useIncidentsStore = defineStore('incidents', {
     },
   },
 })
+
+function mapApiIncidentToIncident(item: any): Incident {
+  const statusesStore = useStatusesStore()
+  const prioritiesStore = usePrioritiesStore()
+  const teamsStore = useTeamsStore()
+  const usersStore = useUsersStore()
+
+  return {
+    ...item,
+    status: {
+      id: item.status.id ?? 0,
+      code: item.status.code,
+      name: item.status.name,
+    },
+    priority: item.priority
+      ? { id: item.priority.id, name: item.priority.name }
+      : { id: 0, name: 'Неизвестный' },
+    user: item.user
+      ? { id: item.user.id, name: item.user.name, username: item.user.username }
+      : null,
+    author: item.author
+      ? { id: item.author.id, name: item.author.name, username: item.author.username }
+      : null,
+    team: item.team ? { id: item.team.id, name: item.team.name, code: item.team.code } : null,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+    commentsCount: item.commentsCount ?? 0,
+  }
+}
