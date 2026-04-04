@@ -19,7 +19,9 @@
       @blur="updateField('description', editable.description)"
       placeholder="Введите описание"
     />
-    <el-spinner v-if="loading.description" size="small" />
+    <el-icon v-if="loading.description" class="is-loading" style="margin-left: 8px">
+      <Loading />
+    </el-icon>
 
     <el-row :gutter="16">
       <el-col :span="12">
@@ -33,7 +35,9 @@
         >
           <el-option v-for="s in statuses" :key="s.id" :label="s.name" :value="s.id" />
         </el-select>
-        <el-spinner v-if="loading.status" size="small" />
+        <el-icon v-if="loading.status" class="is-loading" style="margin-left: 8px">
+          <Loading />
+        </el-icon>
 
         <p style="margin-top: 16px"><b>Команда:</b></p>
         <el-select
@@ -46,7 +50,9 @@
         >
           <el-option v-for="t in teams" :key="t.id" :label="t.name" :value="t.id" />
         </el-select>
-        <el-spinner v-if="loading.team" size="small" />
+        <el-icon v-if="loading.team" class="is-loading" style="margin-left: 8px">
+          <Loading />
+        </el-icon>
       </el-col>
 
       <el-col :span="12">
@@ -60,7 +66,9 @@
         >
           <el-option v-for="p in priorities" :key="p.id" :label="p.name" :value="p.id" />
         </el-select>
-        <el-spinner v-if="loading.priority" size="small" />
+        <el-icon v-if="loading.priority" class="is-loading" style="margin-left: 8px">
+          <Loading />
+        </el-icon>
 
         <p style="margin-top: 16px"><b>Исполнитель:</b></p>
         <el-select
@@ -73,7 +81,9 @@
         >
           <el-option v-for="u in users" :key="u.id" :label="u.name" :value="u.id" />
         </el-select>
-        <el-spinner v-if="loading.user" size="small" />
+        <el-icon v-if="loading.user" class="is-loading" style="margin-left: 8px">
+          <Loading />
+        </el-icon>
       </el-col>
     </el-row>
   </el-card>
@@ -83,8 +93,9 @@
 
 <script setup lang="ts">
 import { reactive, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Loading } from '@element-plus/icons-vue'
 import { useIncidentsStore } from '@/stores/incidentsStore'
 import { useStatusesStore } from '@/stores/statusesStore'
 import { useUsersStore } from '@/stores/usersStore'
@@ -94,16 +105,18 @@ import { formatDateTime } from '@/utils/date'
 import { watch } from 'vue'
 import UserLink from '@/components/users/UserLink.vue'
 
-const route = useRoute()
 const router = useRouter()
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()
 const prioritiesStore = usePrioritiesStore()
 const teamsStore = useTeamsStore()
 const usersStore = useUsersStore()
+const props = defineProps<{
+  id: string
+}>()
 
 const incident = computed(() => {
-  const id = Number(route.params.id)
+  const id = Number(props.id)
   return incidentsStore.items.find((i) => i.id === id) || null
 })
 
