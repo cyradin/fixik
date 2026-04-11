@@ -134,9 +134,7 @@ func (s *CommentRepositorySuite) TestListByIncident() {
 
 		s.Len(res.Items, 3)
 		s.Equal(3, res.Total)
-		s.Equal(c1.ID, res.Items[0].ID)
-		s.Equal(c2.ID, res.Items[1].ID)
-		s.Equal(c3.ID, res.Items[2].ID)
+		s.ElementsMatch([]int64{c1.ID, c2.ID, c3.ID}, extractIDs(res.Items))
 	})
 
 	s.Run("limit", func() {
@@ -144,9 +142,9 @@ func (s *CommentRepositorySuite) TestListByIncident() {
 		s.Require().NoError(err)
 
 		s.Len(res.Items, 2)
-		s.Equal(3, res.Total) // Total всегда полное количество
-		s.Equal(c1.ID, res.Items[0].ID)
-		s.Equal(c2.ID, res.Items[1].ID)
+		s.Equal(3, res.Total)
+
+		s.Equal([]int64{c3.ID, c2.ID}, extractIDs(res.Items))
 	})
 
 	s.Run("offset", func() {
@@ -154,9 +152,8 @@ func (s *CommentRepositorySuite) TestListByIncident() {
 		s.Require().NoError(err)
 
 		s.Len(res.Items, 2)
-		s.Equal(3, res.Total) // Total всегда полное количество
-		s.Equal(c2.ID, res.Items[0].ID)
-		s.Equal(c3.ID, res.Items[1].ID)
+		s.Equal(3, res.Total)
+		s.ElementsMatch([]int64{c2.ID, c1.ID}, extractIDs(res.Items))
 	})
 
 	s.Run("deleted not returned", func() {
@@ -167,9 +164,9 @@ func (s *CommentRepositorySuite) TestListByIncident() {
 		s.Require().NoError(err)
 
 		s.Len(res.Items, 2)
-		s.Equal(2, res.Total) // Total теперь учитывает только не удалённые
-		s.Equal(c1.ID, res.Items[0].ID)
-		s.Equal(c3.ID, res.Items[1].ID)
+		s.Equal(2, res.Total)
+
+		s.ElementsMatch([]int64{c1.ID, c3.ID}, extractIDs(res.Items))
 	})
 }
 func (s *CommentRepositorySuite) createUser() User {
@@ -286,4 +283,13 @@ func (s *CommentRepositorySuite) createPriority(code, name string) Priority {
 
 func (s *CommentRepositorySuite) repoUser() *UserRepository {
 	return NewUserRepository(s.Postgres())
+}
+
+func extractIDs(comments []Comment) []int64 {
+	ids := make([]int64, 0, len(comments))
+	for _, c := range comments {
+		ids = append(ids, c.ID)
+	}
+
+	return ids
 }

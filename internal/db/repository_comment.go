@@ -99,7 +99,7 @@ func (r *CommentRepository) ListByIncident(ctx context.Context, incidentID int64
 			updated_at
 		FROM comments
 		WHERE incident_id = $1 AND deleted_at IS NULL
-		ORDER BY id ASC
+		ORDER BY updated_at DESC, id ASC
 		LIMIT $2 OFFSET $3
 	`
 
