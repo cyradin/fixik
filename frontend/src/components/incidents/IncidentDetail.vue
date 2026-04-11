@@ -204,7 +204,7 @@ const updateField = async (field: Field, value: any) => {
         break
     }
   } catch (e) {
-    ElMessage.error(`Не удалось обновить ${field}`)
+    notifyError(`Не удалось обновить ${field}`)
   } finally {
     loading[field] = false
   }
@@ -246,10 +246,10 @@ const deleteIncident = () => {
 
   msg = ElMessage({
     type: 'warning',
-    duration: 3000,
+    duration: 5000,
     showClose: true,
     message: h('span', [
-      `Инцидент #${id} будет удален через 3 секунды`,
+      `Инцидент #${id} будет удален через 5 секунд`,
       h(
         'span',
         {
@@ -274,7 +274,7 @@ const deleteIncident = () => {
 
     cleanup()
     msg?.close()
-  }, 3000)
+  }, 5000)
 
   router.push('/')
 }

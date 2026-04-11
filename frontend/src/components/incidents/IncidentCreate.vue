@@ -2,21 +2,19 @@
   <el-button link @click="goBack"> ← Назад </el-button>
 
   <el-card shadow="hover">
-    <el-form label-position="top">
-      <el-form-item label="Название">
+    <el-form ref="formRef" :model="model" :rules="rules" label-position="top">
+      <el-form-item label="Название" prop="title">
         <el-input v-model="model.title" placeholder="Введите название" />
       </el-form-item>
 
-      <el-form-item label="Описание">
+      <el-form-item label="Описание" prop="description">
         <el-input type="textarea" v-model="model.description" placeholder="Введите описание" />
       </el-form-item>
 
       <el-row :gutter="16">
         <el-col :span="12">
           <el-form-item label="Статус">
-            <el-select v-model="model.statusId" placeholder="Выберите статус">
-              <el-option v-for="s in statuses" :key="s.id" :label="s.name" :value="s.id" />
-            </el-select>
+            <el-input :model-value="defaultStatus?.name || ''" disabled />
           </el-form-item>
 
           <el-form-item label="Команда">
@@ -27,7 +25,7 @@
         </el-col>
 
         <el-col :span="12">
-          <el-form-item label="Приоритет">
+          <el-form-item label="Приоритет" prop="priorityId">
             <el-select v-model="model.priorityId" placeholder="Выберите приоритет">
               <el-option v-for="p in priorities" :key="p.id" :label="p.name" :value="p.id" />
             </el-select>
@@ -49,12 +47,12 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { useIncidentsStore, Incident } from '@/stores/incidentsStore'
+import { useIncidentsStore } from '@/stores/incidentsStore'
 import { useStatusesStore } from '@/stores/statusesStore'
 import { useUsersStore } from '@/stores/usersStore'
 import { useTeamsStore } from '@/stores/teamsStore'
 import { usePrioritiesStore } from '@/stores/prioritiesStore'
+import { notifyError, notifySuccess } from '@/utils/notify'
 
 const router = useRouter()
 const incidentsStore = useIncidentsStore()
@@ -62,6 +60,8 @@ const statusesStore = useStatusesStore()
 const prioritiesStore = usePrioritiesStore()
 const teamsStore = useTeamsStore()
 const usersStore = useUsersStore()
+
+const formRef = ref()
 
 const model = reactive({
   title: '',
@@ -72,51 +72,51 @@ const model = reactive({
   userId: null as number | null,
 })
 
+const rules = {
+  title: [{ required: true, message: 'Введите название', trigger: 'blur' }],
+  description: [{ required: true, message: 'Введите описание', trigger: 'blur' }],
+  priorityId: [{ required: true, message: 'Выберите приоритет', trigger: 'change' }],
+}
+
 const statuses = computed(() => statusesStore.items)
 const priorities = computed(() => prioritiesStore.items)
 const teams = computed(() => teamsStore.items)
 const users = computed(() => usersStore.items)
 
+const defaultStatus = computed(() => {
+  if (!statuses.value.length) return null
+  return [...statuses.value].sort((a: any, b: any) => (a.sort ?? 0) - (b.sort ?? 0))[0] ?? null
+})
+
+if (!model.statusId && defaultStatus.value) {
+  model.statusId = defaultStatus.value.id
+}
+
 const loading = ref(false)
 
 const submit = async () => {
-  if (!model.title || !model.statusId || !model.priorityId || !model.description) {
-    ElMessage({ message: 'Заполните название, описание статус и приоритет', type: 'warning' })
-    return
-  }
+  const valid = await formRef.value.validate().catch(() => false)
+  if (!valid) return
 
   loading.value = true
   try {
-    const status = statusesStore.items.find((s) => s.id === model.statusId)
+    const status = defaultStatus.value
     const priority = prioritiesStore.items.find((p) => p.id === model.priorityId)
-
-    if (!status || !priority) {
-      ElMessage({ message: 'Выберите статус и приоритет', type: 'warning' })
-      return
-    }
-
-    let userId
-    if (model.userId) {
-      userId = model.userId
-    }
-
-    let teamId
-    if (model.teamId) {
-      teamId = model.teamId
-    }
 
     const newIncident = await incidentsStore.create({
       title: model.title,
       description: model.description,
-      statusId: status.id,
-      priorityId: priority.id,
-      userId: userId,
-      teamId: teamId,
+      statusId: status!.id,
+      priorityId: priority!.id,
+      userId: model.userId || undefined,
+      teamId: model.teamId || undefined,
     })
-    ElMessage({ message: `Инцидент #${newIncident.id} создан`, type: 'success' })
+
+    notifySuccess(`Инцидент #${newIncident.id} создан`)
+
     router.push(`/incident/${newIncident.id}`)
   } catch (e) {
-    ElMessage({ message: 'Не удалось создать инцидент', type: 'error' })
+    notifyError('Не удалось создать инцидент')
     console.error(e)
   } finally {
     loading.value = false

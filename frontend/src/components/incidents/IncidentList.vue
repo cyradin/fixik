@@ -74,13 +74,13 @@
 import { useIncidentsStore } from '@/stores/incidentsStore'
 import { useStatusesStore } from '@/stores/statusesStore'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { Container, Draggable } from 'vue3-smooth-dnd'
 import { User, ChatDotRound } from '@element-plus/icons-vue'
 import IncidentPriorityColor from '@/components/incidents/IncidentPriorityColor.vue'
 import UserLink from '@/components/users/UserLink.vue'
 import { formatDateTime } from '@/utils/date'
 import IncidentFilters from '@/components/incidents/IncidentFilters.vue'
+import { notifyError } from '@/utils/notify'
 
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()
@@ -112,11 +112,7 @@ const onDrop = async (statusCode: string, dropResult: any) => {
   try {
     await incidentsStore.updateStatus(movedItem.id, status.id)
   } catch (err) {
-    ElMessage({
-      message: `Не удалось обновить статус инцидента #${movedItem.id}`,
-      type: 'error',
-      duration: 3000,
-    })
+    notifyError(`Не удалось обновить статус инцидента #${movedItem.id}`)
   }
 }
 </script>
