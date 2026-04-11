@@ -90,6 +90,9 @@
         </el-icon>
       </el-col>
     </el-row>
+    <el-row>
+      <IncidentComments :incident-id="Number(id)" />
+    </el-row>
   </el-card>
 
   <el-empty v-else description="Инцидент не найден" />
@@ -98,6 +101,7 @@
 <script setup lang="ts">
 import { reactive, computed, watch, h } from 'vue'
 import { useRouter } from 'vue-router'
+import IncidentComments from '@/components/incidents/IncidentComments.vue'
 import { ElMessage } from 'element-plus'
 import { Loading } from '@element-plus/icons-vue'
 
