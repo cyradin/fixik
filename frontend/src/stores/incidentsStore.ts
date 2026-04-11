@@ -91,6 +91,21 @@ export const useIncidentsStore = defineStore('incidents', {
   },
 
   actions: {
+    set(items: Incident[]) {
+      this.items = items
+    },
+
+    addLocal(incident: Incident) {
+      const exists = this.items.find((i) => i.id === incident.id)
+      if (!exists) {
+        this.items.push(incident)
+      }
+    },
+
+    removeLocal(id: number) {
+      this.items = this.items.filter((i) => i.id !== id)
+    },
+
     async fetchAll(): Promise<void> {
       try {
         let allItems: Incident[] = []
@@ -202,7 +217,7 @@ export const useIncidentsStore = defineStore('incidents', {
         const res = await incidentsApi.incidentsPost({ request: dto })
         const incident = mapApiIncidentToIncident(res)
 
-        this.items.push(incident)
+        this.addLocal(incident)
 
         return incident
       } catch (e) {
@@ -215,7 +230,7 @@ export const useIncidentsStore = defineStore('incidents', {
     async delete(id: number) {
       try {
         await incidentsApi.incidentsIdDelete({ id })
-        this.items = this.items.filter((i) => i.id !== id)
+        this.removeLocal(id)
       } catch (e) {
         console.error('Ошибка удаления инцидента', e)
         throw e

@@ -96,25 +96,28 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
+import { reactive, computed, watch, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Loading } from '@element-plus/icons-vue'
+
 import { useIncidentsStore } from '@/stores/incidentsStore'
 import { useStatusesStore } from '@/stores/statusesStore'
 import { useUsersStore } from '@/stores/usersStore'
 import { useTeamsStore } from '@/stores/teamsStore'
 import { usePrioritiesStore } from '@/stores/prioritiesStore'
 import { formatDateTime } from '@/utils/date'
-import { watch } from 'vue'
 import UserLink from '@/components/users/UserLink.vue'
+import { notifyError, notifySuccess } from '@/utils/notify'
 
 const router = useRouter()
+
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()
 const prioritiesStore = usePrioritiesStore()
 const teamsStore = useTeamsStore()
 const usersStore = useUsersStore()
+
 const props = defineProps<{
   id: string
 }>()
@@ -125,11 +128,11 @@ const incident = computed(() => {
 })
 
 const editable = reactive({
-  description: incident.value?.description || '',
-  statusId: incident.value?.status.id || null,
-  priorityId: incident.value?.priority.id || null,
-  teamId: incident.value?.team?.id || null,
-  userId: incident.value?.user?.id || null,
+  description: '',
+  statusId: null as number | null,
+  priorityId: null as number | null,
+  teamId: null as number | null,
+  userId: null as number | null,
 })
 
 watch(
@@ -157,10 +160,10 @@ const loading = reactive({
 const statuses = computed(() => statusesStore.items)
 const priorities = computed(() => prioritiesStore.items)
 const teams = computed(() => teamsStore.items)
+
 const users = computed(() => {
-  const userStore = usersStore
   const teamId = editable.teamId
-  return userStore.byTeam(teamId ?? undefined)
+  return usersStore.byTeam(teamId ?? undefined)
 })
 
 type Field = keyof typeof loading
@@ -175,16 +178,19 @@ const updateField = async (field: Field, value: any) => {
         await incidentsStore.updateDescription(incident.value.id, value)
         incident.value.description = value
         break
+
       case 'status':
         await incidentsStore.updateStatus(incident.value.id, value)
         const status = statusesStore.items.find((s) => s.id === value)
         if (status) incident.value.status = { ...status }
         break
+
       case 'priority':
         await incidentsStore.updatePriority(incident.value.id, value)
         const priority = prioritiesStore.items.find((p) => p.id === value)
         if (priority) incident.value.priority = { ...priority }
         break
+
       case 'team':
         await incidentsStore.updateTeam(incident.value.id, value ?? undefined)
         const team = teamsStore.items.find((t) => t.id === value)
@@ -198,42 +204,79 @@ const updateField = async (field: Field, value: any) => {
         break
     }
   } catch (e) {
-    ElMessage({
-      message: `Не удалось обновить ${field} инцидента #${incident.value.id}`,
-      type: 'error',
-      duration: 3000,
-    })
-    console.error(`Ошибка при обновлении ${field}`, e)
+    ElMessage.error(`Не удалось обновить ${field}`)
   } finally {
     loading[field] = false
   }
 }
 
-const deleteIncident = async () => {
-  if (!incident.value) return
-  if (!confirm(`Вы уверены, что хотите удалить инцидент #${incident.value.id}?`)) return
+let deleteTimer: ReturnType<typeof setTimeout> | null = null
+let pendingDeleteId: number | null = null
+let pendingBackup: any = null
 
-  loading.delete = true
+const cleanup = () => {
+  if (deleteTimer) {
+    clearTimeout(deleteTimer)
+    deleteTimer = null
+  }
+  pendingDeleteId = null
+  pendingBackup = null
+}
+
+const deleteIncident = () => {
+  if (!incident.value) return
+
   const id = incident.value.id
 
-  try {
-    await incidentsStore.delete(id) // нужно добавить delete в стор
-    ElMessage({
-      message: `Инцидент #${id} удалён`,
-      type: 'success',
-      duration: 3000,
-    })
-    router.push('/')
-  } catch (e) {
-    ElMessage({
-      message: `Не удалось удалить инцидент #${id}`,
-      type: 'error',
-      duration: 3000,
-    })
-    console.error('Ошибка удаления инцидента', e)
-  } finally {
-    loading.delete = false
+  pendingDeleteId = id
+  pendingBackup = { ...incident.value }
+
+  incidentsStore.removeLocal(id)
+
+  let msg: any = null
+
+  const undo = () => {
+    if (!pendingDeleteId) return
+
+    incidentsStore.addLocal(pendingBackup)
+    msg?.close()
+    notifySuccess(`Инцидент #${pendingDeleteId} не удалён`, 'Удаление отменено')
+    cleanup()
   }
+
+  msg = ElMessage({
+    type: 'warning',
+    duration: 3000,
+    showClose: true,
+    message: h('span', [
+      `Инцидент #${id} будет удален через 3 секунды`,
+      h(
+        'span',
+        {
+          style: 'color: var(--el-color-primary); cursor: pointer; margin-left: 8px;',
+          onClick: undo,
+        },
+        'Отменить',
+      ),
+    ]),
+  })
+
+  deleteTimer = setTimeout(async () => {
+    if (!pendingDeleteId) return
+
+    try {
+      await incidentsStore.delete(pendingDeleteId)
+      notifySuccess(`Инцидент #${pendingDeleteId} удалён окончательно`, 'Инцидент удален')
+    } catch (e) {
+      incidentsStore.addLocal(pendingBackup)
+      notifyError('Ошибка удаления, восстановлено')
+    }
+
+    cleanup()
+    msg?.close()
+  }, 3000)
+
+  router.push('/')
 }
 
 const goBack = () => {
