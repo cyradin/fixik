@@ -2034,7 +2034,6 @@ const docTemplate = `{
             "required": [
                 "code",
                 "description",
-                "id",
                 "name",
                 "sort"
             ],
@@ -2044,9 +2043,6 @@ const docTemplate = `{
                 },
                 "description": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -2087,7 +2083,6 @@ const docTemplate = `{
             "required": [
                 "code",
                 "description",
-                "id",
                 "isFinal",
                 "name",
                 "sort"
@@ -2098,9 +2093,6 @@ const docTemplate = `{
                 },
                 "description": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "isFinal": {
                     "type": "boolean"

@@ -2031,7 +2031,6 @@
             "required": [
                 "code",
                 "description",
-                "id",
                 "name",
                 "sort"
             ],
@@ -2041,9 +2040,6 @@
                 },
                 "description": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -2084,7 +2080,6 @@
             "required": [
                 "code",
                 "description",
-                "id",
                 "isFinal",
                 "name",
                 "sort"
@@ -2095,9 +2090,6 @@
                 },
                 "description": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "isFinal": {
                     "type": "boolean"

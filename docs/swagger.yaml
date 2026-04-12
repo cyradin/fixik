@@ -320,8 +320,6 @@ definitions:
         type: string
       description:
         type: string
-      id:
-        type: integer
       name:
         type: string
       sort:
@@ -329,7 +327,6 @@ definitions:
     required:
     - code
     - description
-    - id
     - name
     - sort
     type: object
@@ -356,8 +353,6 @@ definitions:
         type: string
       description:
         type: string
-      id:
-        type: integer
       isFinal:
         type: boolean
       name:
@@ -367,7 +362,6 @@ definitions:
     required:
     - code
     - description
-    - id
     - isFinal
     - name
     - sort

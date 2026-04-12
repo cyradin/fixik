@@ -8,7 +8,6 @@ Name | Type
 ------------ | -------------
 `code` | string
 `description` | string
-`id` | number
 `name` | string
 `sort` | number
 
@@ -21,7 +20,6 @@ import type { WebUpdateDictEntityRequest } from ''
 const example = {
   "code": null,
   "description": null,
-  "id": null,
   "name": null,
   "sort": null,
 } satisfies WebUpdateDictEntityRequest

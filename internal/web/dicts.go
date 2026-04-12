@@ -40,7 +40,6 @@ func (r CreateDictEntityRequest) Validate() error {
 }
 
 type UpdateDictEntityRequest struct {
-	ID          int64  `path:"id" validate:"required"`
 	Name        string `json:"name" validate:"required"`
 	Code        string `json:"code" validate:"required"`
 	Description string `json:"description" validate:"required"`

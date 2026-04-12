@@ -21,8 +21,6 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { ElIcon } from 'element-plus'
-import { ChatLineRound } from '@element-plus/icons-vue'
 
 interface User {
   id: number

@@ -33,12 +33,6 @@ export interface WebUpdateDictEntityRequest {
     description: string;
     /**
      * 
-     * @type {number}
-     * @memberof WebUpdateDictEntityRequest
-     */
-    id: number;
-    /**
-     * 
      * @type {string}
      * @memberof WebUpdateDictEntityRequest
      */
@@ -57,7 +51,6 @@ export interface WebUpdateDictEntityRequest {
 export function instanceOfWebUpdateDictEntityRequest(value: object): value is WebUpdateDictEntityRequest {
     if (!('code' in value) || value['code'] === undefined) return false;
     if (!('description' in value) || value['description'] === undefined) return false;
-    if (!('id' in value) || value['id'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('sort' in value) || value['sort'] === undefined) return false;
     return true;
@@ -75,7 +68,6 @@ export function WebUpdateDictEntityRequestFromJSONTyped(json: any, ignoreDiscrim
         
         'code': json['code'],
         'description': json['description'],
-        'id': json['id'],
         'name': json['name'],
         'sort': json['sort'],
     };
@@ -94,7 +86,6 @@ export function WebUpdateDictEntityRequestToJSONTyped(value?: WebUpdateDictEntit
         
         'code': value['code'],
         'description': value['description'],
-        'id': value['id'],
         'name': value['name'],
         'sort': value['sort'],
     };

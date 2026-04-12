@@ -33,12 +33,6 @@ export interface WebUpdateStatusRequest {
     description: string;
     /**
      * 
-     * @type {number}
-     * @memberof WebUpdateStatusRequest
-     */
-    id: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof WebUpdateStatusRequest
      */
@@ -63,7 +57,6 @@ export interface WebUpdateStatusRequest {
 export function instanceOfWebUpdateStatusRequest(value: object): value is WebUpdateStatusRequest {
     if (!('code' in value) || value['code'] === undefined) return false;
     if (!('description' in value) || value['description'] === undefined) return false;
-    if (!('id' in value) || value['id'] === undefined) return false;
     if (!('isFinal' in value) || value['isFinal'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('sort' in value) || value['sort'] === undefined) return false;
@@ -82,7 +75,6 @@ export function WebUpdateStatusRequestFromJSONTyped(json: any, ignoreDiscriminat
         
         'code': json['code'],
         'description': json['description'],
-        'id': json['id'],
         'isFinal': json['isFinal'],
         'name': json['name'],
         'sort': json['sort'],
@@ -102,7 +94,6 @@ export function WebUpdateStatusRequestToJSONTyped(value?: WebUpdateStatusRequest
         
         'code': value['code'],
         'description': value['description'],
-        'id': value['id'],
         'isFinal': value['isFinal'],
         'name': value['name'],
         'sort': value['sort'],

@@ -8,7 +8,6 @@ Name | Type
 ------------ | -------------
 `code` | string
 `description` | string
-`id` | number
 `isFinal` | boolean
 `name` | string
 `sort` | number
@@ -22,7 +21,6 @@ import type { WebUpdateStatusRequest } from ''
 const example = {
   "code": null,
   "description": null,
-  "id": null,
   "isFinal": null,
   "name": null,
   "sort": null,
