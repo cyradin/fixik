@@ -470,6 +470,38 @@ paths:
       summary: Logout
       tags:
       - auth
+  /auth/password:
+    post:
+      consumes:
+      - application/json
+      description: Change authorized user's password
+      parameters:
+      - description: Password data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/web.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Change user password
+      tags:
+      - auth
   /auth/refresh:
     post:
       consumes:
@@ -1412,43 +1444,6 @@ paths:
           schema:
             $ref: '#/definitions/web.ErrorResponse'
       summary: Update user
-      tags:
-      - users
-  /users/{id}/password:
-    post:
-      consumes:
-      - application/json
-      description: Change current user's password
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Password data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/web.ChangePasswordRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/web.ErrorResponse'
-      summary: Change user password
       tags:
       - users
 schemes:

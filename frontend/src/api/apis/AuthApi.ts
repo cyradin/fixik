@@ -16,12 +16,15 @@
 import * as runtime from '../runtime';
 import type {
   WebAuthLoginRequest,
+  WebChangePasswordRequest,
   WebErrorResponse,
   WebUserResponse,
 } from '../models/index';
 import {
     WebAuthLoginRequestFromJSON,
     WebAuthLoginRequestToJSON,
+    WebChangePasswordRequestFromJSON,
+    WebChangePasswordRequestToJSON,
     WebErrorResponseFromJSON,
     WebErrorResponseToJSON,
     WebUserResponseFromJSON,
@@ -30,6 +33,10 @@ import {
 
 export interface AuthLoginPostRequest {
     request: WebAuthLoginRequest;
+}
+
+export interface AuthPasswordPostRequest {
+    request: WebChangePasswordRequest;
 }
 
 /**
@@ -122,6 +129,54 @@ export class AuthApi extends runtime.BaseAPI {
      */
     async authLogoutPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.authLogoutPostRaw(initOverrides);
+    }
+
+    /**
+     * Creates request options for authPasswordPost without sending the request
+     */
+    async authPasswordPostRequestOpts(requestParameters: AuthPasswordPostRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['request'] == null) {
+            throw new runtime.RequiredError(
+                'request',
+                'Required parameter "request" was null or undefined when calling authPasswordPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/auth/password`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: WebChangePasswordRequestToJSON(requestParameters['request']),
+        };
+    }
+
+    /**
+     * Change authorized user\'s password
+     * Change user password
+     */
+    async authPasswordPostRaw(requestParameters: AuthPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.authPasswordPostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Change authorized user\'s password
+     * Change user password
+     */
+    async authPasswordPost(requestParameters: AuthPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.authPasswordPostRaw(requestParameters, initOverrides);
     }
 
     /**

@@ -274,7 +274,7 @@ func TestChangePassword(t *testing.T) {
 		changed := false
 		m := &mockPasswordChanger{
 			changeFn: func(ctx context.Context, userID int64, current, new string) error {
-				require.Equal(t, int64(42), userID)
+				require.Equal(t, int64(1), userID)
 				require.Equal(t, "oldpass", current)
 				require.Equal(t, "newpass", new)
 
@@ -285,11 +285,13 @@ func TestChangePassword(t *testing.T) {
 		}
 
 		reqBody := ChangePasswordRequest{CurrentPassword: "oldpass", NewPassword: "newpass"}
-		req := httptest.NewRequest(http.MethodPost, "/users/42/password", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPost, "/auth/password", jsonBody(t, reqBody)).WithContext(
+			user.WithContext(t.Context(), user.User{ID: 1}),
+		)
 		req.Header.Set("Content-Type", "application/json")
 
 		r := chi.NewRouter()
-		r.Post("/users/{id}/password", changePassword(m))
+		r.Post("/auth/password", changePassword(m))
 
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
@@ -303,11 +305,13 @@ func TestChangePassword(t *testing.T) {
 
 		m := &mockPasswordChanger{}
 		reqBody := ChangePasswordRequest{}
-		req := httptest.NewRequest(http.MethodPost, "/users/42/password", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPost, "/auth/password", jsonBody(t, reqBody)).WithContext(
+			user.WithContext(t.Context(), user.User{ID: 1}),
+		)
 		req.Header.Set("Content-Type", "application/json")
 
 		r := chi.NewRouter()
-		r.Post("/users/{id}/password", changePassword(m))
+		r.Post("/auth/password", changePassword(m))
 
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)

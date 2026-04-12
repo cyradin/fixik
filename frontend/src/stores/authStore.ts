@@ -67,8 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
       const id = user.value?.id
       if (!id) throw new Error('User not initialized')
 
-      await usersApi.usersIdPasswordPost({
-        id,
+      await authApi.authPasswordPost({
         request: {
           currentPassword,
           newPassword,

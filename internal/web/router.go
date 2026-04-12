@@ -33,11 +33,6 @@ func (e UnauthorizedError) Unwrap() error {
 	return e.Err
 }
 
-var (
-	ErrUnauthorized = fmt.Errorf("unauthorized")
-	ErrForbidden    = fmt.Errorf("forbidden")
-)
-
 func NewRouter(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 	r := chi.NewRouter()
 

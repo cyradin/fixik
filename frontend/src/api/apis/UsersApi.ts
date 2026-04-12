@@ -15,7 +15,6 @@
 
 import * as runtime from '../runtime';
 import type {
-  WebChangePasswordRequest,
   WebCreateUserRequest,
   WebErrorResponse,
   WebListUsersResponse,
@@ -23,8 +22,6 @@ import type {
   WebUserResponse,
 } from '../models/index';
 import {
-    WebChangePasswordRequestFromJSON,
-    WebChangePasswordRequestToJSON,
     WebCreateUserRequestFromJSON,
     WebCreateUserRequestToJSON,
     WebErrorResponseFromJSON,
@@ -48,11 +45,6 @@ export interface UsersIdDeleteRequest {
 
 export interface UsersIdGetRequest {
     id: number;
-}
-
-export interface UsersIdPasswordPostRequest {
-    id: number;
-    request: WebChangePasswordRequest;
 }
 
 export interface UsersIdPatchRequest {
@@ -221,62 +213,6 @@ export class UsersApi extends runtime.BaseAPI {
     async usersIdGet(requestParameters: UsersIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebUserResponse> {
         const response = await this.usersIdGetRaw(requestParameters, initOverrides);
         return await response.value();
-    }
-
-    /**
-     * Creates request options for usersIdPasswordPost without sending the request
-     */
-    async usersIdPasswordPostRequestOpts(requestParameters: UsersIdPasswordPostRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling usersIdPasswordPost().'
-            );
-        }
-
-        if (requestParameters['request'] == null) {
-            throw new runtime.RequiredError(
-                'request',
-                'Required parameter "request" was null or undefined when calling usersIdPasswordPost().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-
-        let urlPath = `/users/{id}/password`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-
-        return {
-            path: urlPath,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: WebChangePasswordRequestToJSON(requestParameters['request']),
-        };
-    }
-
-    /**
-     * Change current user\'s password
-     * Change user password
-     */
-    async usersIdPasswordPostRaw(requestParameters: UsersIdPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.usersIdPasswordPostRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Change current user\'s password
-     * Change user password
-     */
-    async usersIdPasswordPost(requestParameters: UsersIdPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.usersIdPasswordPostRaw(requestParameters, initOverrides);
     }
 
     /**

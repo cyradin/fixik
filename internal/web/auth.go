@@ -56,6 +56,11 @@ func authRoutes(c *container.Container) func(r chi.Router) {
 			c.Cfg().Auth.RefreshTokenTTL,
 			c.Cfg().Auth.SecureCookies,
 		))
+
+		r.Group(func(r chi.Router) {
+			r.Use(AuthMiddleware(c.AuthService()))
+			r.Post("/password", changePassword(authService))
+		})
 	}
 }
 
@@ -133,6 +138,42 @@ func authRefresh(srv tokenRefresher, accessTTL, refreshTTL time.Duration, secure
 			setRefreshToken(w, result.RefreshToken, refreshTTL, secureCookies)
 
 			return toUserResponse(result.User), nil
+		})(w, r)
+	}
+}
+
+// @Summary Change user password
+// @Description Change authorized user's password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body ChangePasswordRequest true "Password data"
+// @Success 200
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /auth/password [post]
+func changePassword(passwordChanger passwordChanger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		handle(func(ctx context.Context, req ChangePasswordRequest) (NoBody, error) {
+			u, ok := user.FromContext(r.Context())
+			if !ok {
+				return NoBody{}, UnauthorizedError{Err: fmt.Errorf("no user in context")}
+			}
+
+			if err := req.Validate(); err != nil {
+				return NoBody{}, err
+			}
+
+			if err := passwordChanger.ChangePassword(ctx, u.ID, req.CurrentPassword, req.NewPassword); err != nil {
+				if errors.Is(err, user.ErrUserNotFound) || errors.Is(err, user.ErrUserInvalidPassword) {
+					return NoBody{}, UnauthorizedError{Err: err}
+				}
+
+				return NoBody{}, err
+			}
+
+			return NoBody{}, nil
 		})(w, r)
 	}
 }
