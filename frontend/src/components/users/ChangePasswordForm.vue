@@ -1,25 +1,21 @@
 <template>
-  <Back />
-  <el-card style="max-width: 500px; margin: 40px auto">
-    <template #header>
-      <span>Профиль</span>
-    </template>
+  <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
+    <el-form-item label="Текущий пароль" prop="currentPassword">
+      <el-input v-model="form.currentPassword" type="password" show-password />
+    </el-form-item>
 
-    <UserData :user="authStore.user" />
+    <el-form-item label="Новый пароль" prop="newPassword">
+      <el-input v-model="form.newPassword" type="password" show-password />
+    </el-form-item>
 
-    <el-divider>Смена пароля</el-divider>
-
-    <ChangePasswordForm />
-  </el-card>
+    <el-button type="primary" :loading="loading" @click="submit"> Сменить пароль </el-button>
+  </el-form>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { notifyError, notifySuccess } from '@/utils/notify'
-import ChangePasswordForm from '@/components/users/ChangePasswordForm.vue'
-import UserData from '@/components/users/UserData.vue'
-import Back from '@/components/layout/Back.vue'
 
 const authStore = useAuthStore()
 

@@ -1,13 +1,18 @@
 <template>
   <span v-if="user">
-    <el-link v-if="isLink" type="primary" @click="goToUser">
+    <span v-if="isLink" class="user-link" @click="goToUser">
       <el-tooltip v-if="user.username" placement="top">
         <template #content>
           <span>@{{ user.username }}</span>
         </template>
         {{ user.name }}
       </el-tooltip>
-    </el-link>
+
+      <template v-else>
+        {{ user.name }}
+      </template>
+    </span>
+
     <span v-else>
       <el-tooltip v-if="user.username" placement="top">
         <template #content>
@@ -15,6 +20,10 @@
         </template>
         {{ user.name }}
       </el-tooltip>
+
+      <template v-else>
+        {{ user.name }}
+      </template>
     </span>
   </span>
 </template>
@@ -40,3 +49,20 @@ const goToUser = () => {
   router.push(`/user/${props.user.id}`)
 }
 </script>
+
+<style scoped>
+.user-link {
+  color: var(--el-color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition:
+    text-decoration-color 0.2s,
+    opacity 0.2s;
+}
+
+.user-link:hover {
+  text-decoration-color: currentColor;
+  opacity: 0.85;
+}
+</style>

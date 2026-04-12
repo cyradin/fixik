@@ -13,6 +13,11 @@
       <UserLink :user="incident.author" :is-link="true" />
     </p>
 
+    <p v-if="incident.user">
+      <b>Исполнитель:</b>
+      <UserLink :user="incident.user" :is-link="true" />
+    </p>
+
     <p><b>Создан:</b> {{ formatDateTime(incident.createdAt) }}</p>
     <p><b>Обновлён:</b> {{ formatDateTime(incident.updatedAt) }}</p>
 

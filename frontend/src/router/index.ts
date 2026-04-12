@@ -12,6 +12,7 @@ import AdminTeams from '@/views/admin/Teams.vue'
 import AdminUsers from '@/views/admin/Users.vue'
 
 import UserProfile from '@/views/user/Profile.vue'
+import UserInfo from '@/views/user/Info.vue'
 
 const routes = [
   {
@@ -59,6 +60,10 @@ const routes = [
     path: '/profile',
     component: UserProfile,
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/user/:id',
+    component: UserInfo,
   },
 ]
 
