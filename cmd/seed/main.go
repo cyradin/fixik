@@ -23,6 +23,8 @@ const (
 	teamFrontend = "frontend"
 	teamBackend  = "backend"
 	teamInfra    = "infra"
+
+	defaultPassword = "123456"
 )
 
 func main() {
@@ -216,7 +218,7 @@ func createAdmin(ctx context.Context, c *container.Container) error {
 		Name:     "Администратор",
 		Username: "admin",
 		Email:    "admin@example.com",
-		Password: "1234",
+		Password: defaultPassword,
 		Role:     "admin",
 	})
 	if err != nil {
@@ -232,7 +234,7 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 			Name:     "Алексей Смирнов",
 			Username: "alexey.smirnov",
 			Email:    "alexey.smirnov@example.com",
-			Password: "1234",
+			Password: defaultPassword,
 			Role:     "manager",
 			TeamID:   new(teamIDs[teamFrontend]),
 		},
@@ -240,7 +242,7 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 			Name:     "Мария Иванова",
 			Username: "maria.ivanova",
 			Email:    "maria.ivanova@example.com",
-			Password: "1234",
+			Password: defaultPassword,
 			Role:     "user",
 			TeamID:   new(teamIDs[teamFrontend]),
 		},
@@ -248,7 +250,7 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 			Name:     "Илья Кузнецов",
 			Username: "ilya.kuznetsov",
 			Email:    "ilya.kuznetsov@example.com",
-			Password: "1234",
+			Password: defaultPassword,
 			Role:     "user",
 			TeamID:   new(teamIDs[teamFrontend]),
 		},
@@ -256,7 +258,7 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 			Name:     "Дмитрий Петров",
 			Username: "dmitry.petrov",
 			Email:    "dmitry.petrov@example.com",
-			Password: "1234",
+			Password: defaultPassword,
 			Role:     "manager",
 			TeamID:   new(teamIDs[teamBackend]),
 		},
@@ -264,7 +266,7 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 			Name:     "Анна Соколова",
 			Username: "anna.sokolova",
 			Email:    "anna.sokolova@example.com",
-			Password: "1234",
+			Password: defaultPassword,
 			Role:     "user",
 			TeamID:   new(teamIDs[teamBackend]),
 		},
@@ -272,7 +274,7 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 			Name:     "Сергей Волков",
 			Username: "sergey.volkov",
 			Email:    "sergey.volkov@example.com",
-			Password: "1234",
+			Password: defaultPassword,
 			Role:     "user",
 			TeamID:   new(teamIDs[teamBackend]),
 		},
@@ -280,7 +282,7 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 			Name:     "Андрей Попов",
 			Username: "andrey.popov",
 			Email:    "andrey.popov@example.com",
-			Password: "1234",
+			Password: defaultPassword,
 			Role:     "manager",
 			TeamID:   new(teamIDs[teamInfra]),
 		},
@@ -288,7 +290,7 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 			Name:     "Екатерина Морозова",
 			Username: "ekaterina.morozova",
 			Email:    "ekaterina.morozova@example.com",
-			Password: "1234",
+			Password: defaultPassword,
 			Role:     "user",
 			TeamID:   new(teamIDs[teamInfra]),
 		},
@@ -296,7 +298,7 @@ func createUsers(ctx context.Context, c *container.Container, teamIDs map[string
 			Name:     "Никита Лебедев",
 			Username: "nikita.lebedev",
 			Email:    "nikita.lebedev@example.com",
-			Password: "1234",
+			Password: defaultPassword,
 			Role:     "user",
 			TeamID:   new(teamIDs[teamInfra]),
 		},
