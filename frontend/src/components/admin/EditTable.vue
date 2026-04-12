@@ -4,7 +4,7 @@
       <span>{{ title }}</span>
     </template>
 
-    <el-form :model="formModel" :rules="rules" ref="formRef">
+    <el-form :model="formModel" :rules="rules" ref="formRef" show-message inline-message>
       <el-table :data="rows" style="width: 100%">
         <el-table-column
           v-for="col in columns"
@@ -105,6 +105,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['refresh'])
 
+const activeEditUid = ref<number | null>(null)
+
 const rows = reactive<Row[]>([])
 const original = new Map<number, any>()
 
@@ -195,10 +197,14 @@ const formatValue = (value: any, col: Column) => {
 }
 
 const edit = (row: Row) => {
+  closeActiveEdit()
+
   original.set(row._uid, { ...row })
   row._editing = true
 
   formModel.rows[row._uid] = { ...row }
+
+  activeEditUid.value = row._uid
 
   props.onEditRow?.(row, formModel.rows[row._uid])
 }
@@ -207,16 +213,26 @@ const cancel = (row: Row) => {
   if (row._isNew) {
     const index = rows.indexOf(row)
     if (index !== -1) rows.splice(index, 1)
-    return
-  }
-
-  const orig = original.get(row._uid)
-  if (orig) {
-    Object.assign(row, orig)
-    formModel.rows[row._uid] = { ...orig }
+  } else {
+    const orig = original.get(row._uid)
+    if (orig) {
+      Object.assign(row, orig)
+      formModel.rows[row._uid] = { ...orig }
+    }
   }
 
   row._editing = false
+
+  if (activeEditUid.value === row._uid) {
+    activeEditUid.value = null
+  }
+}
+
+const closeActiveEdit = () => {
+  if (activeEditUid.value !== null) {
+    const prev = rows.find((r) => r._uid === activeEditUid.value)
+    if (prev) cancel(prev)
+  }
 }
 
 const save = async (row: Row) => {
@@ -258,6 +274,8 @@ const remove = async (row: Row) => {
 }
 
 const addRow = () => {
+  closeActiveEdit()
+
   const uid = Date.now()
 
   const base = props.defaultRow ? props.defaultRow() : {}
@@ -272,5 +290,7 @@ const addRow = () => {
 
   rows.unshift(empty)
   formModel.rows[uid] = { ...empty }
+
+  activeEditUid.value = uid
 }
 </script>
