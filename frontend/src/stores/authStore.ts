@@ -1,7 +1,6 @@
-// stores/authStore.ts
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { authApi } from '@/api/client'
+import { authApi, usersApi } from '@/api/client'
 
 export interface CurrentUser {
   id: number
@@ -63,9 +62,41 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      const id = user.value?.id
+      if (!id) throw new Error('User not initialized')
+
+      await usersApi.usersIdPasswordPost({
+        id,
+        request: {
+          currentPassword,
+          newPassword,
+        },
+      })
+    } catch (e: any) {
+      if (e?.response?.status === 401) {
+        throw new Error('Неверный текущий пароль')
+      }
+
+      throw e
+    }
+  }
+
   const clearError = () => {
     error.value = ''
   }
 
-  return { isAuth, loading, error, initialized, user, login, logout, refresh, clearError }
+  return {
+    isAuth,
+    loading,
+    error,
+    initialized,
+    user,
+    login,
+    logout,
+    refresh,
+    clearError,
+    changePassword,
+  }
 })

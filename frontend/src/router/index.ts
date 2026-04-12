@@ -11,6 +11,8 @@ import AdminPriorities from '@/views/admin/Priorities.vue'
 import AdminTeams from '@/views/admin/Teams.vue'
 import AdminUsers from '@/views/admin/Users.vue'
 
+import UserProfile from '@/views/user/Profile.vue'
+
 const routes = [
   {
     path: '/login',
@@ -51,6 +53,11 @@ const routes = [
   {
     path: '/admin/users',
     component: AdminUsers,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/profile',
+    component: UserProfile,
     meta: { requiresAuth: true },
   },
 ]
