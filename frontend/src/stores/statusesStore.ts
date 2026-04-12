@@ -7,6 +7,7 @@ export interface Status {
   code: string
   name: string
   sort: number
+  description: string
   isFinal: boolean
 }
 
