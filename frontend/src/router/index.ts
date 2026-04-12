@@ -9,6 +9,7 @@ import LoginForm from '@/views/auth/Login.vue'
 import AdminStatuses from '@/views/admin/Statuses.vue'
 import AdminPriorities from '@/views/admin/Priorities.vue'
 import AdminTeams from '@/views/admin/Teams.vue'
+import AdminUsers from '@/views/admin/Users.vue'
 
 const routes = [
   {
@@ -45,6 +46,11 @@ const routes = [
   {
     path: '/admin/teams',
     component: AdminTeams,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/users',
+    component: AdminUsers,
     meta: { requiresAuth: true },
   },
 ]

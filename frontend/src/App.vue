@@ -9,6 +9,7 @@ import { useUsersStore } from '@/stores/usersStore'
 import { useAuthStore } from '@/stores/authStore'
 
 import Header from '@/components/layout/Header.vue'
+import { useRolesStore } from './stores/rolesStore'
 
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()
@@ -16,6 +17,7 @@ const prioritiesStore = usePrioritiesStore()
 const teamsStore = useTeamsStore()
 const usersStore = useUsersStore()
 const authStore = useAuthStore()
+const rolesStore = useRolesStore()
 
 watch(
   () => authStore.isAuth,
@@ -26,12 +28,14 @@ watch(
       teamsStore.startPolling()
       usersStore.startPolling()
       incidentsStore.startPolling()
+      rolesStore.startPolling()
     } else {
       statusesStore.stopPolling()
       prioritiesStore.stopPolling()
       teamsStore.stopPolling()
       usersStore.stopPolling()
       incidentsStore.stopPolling()
+      rolesStore.stopPolling()
     }
   },
   { immediate: true },

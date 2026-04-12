@@ -23,7 +23,16 @@
                 v-model="formModel.rows[row._uid][col.key]"
                 v-bind="col.editorProps"
                 @keyup.enter="save(row)"
-              />
+              >
+                <template v-if="col.editor === 'el-select'">
+                  <el-option
+                    v-for="opt in col.options"
+                    :key="opt.value"
+                    :label="opt.label"
+                    :value="opt.value"
+                  />
+                </template>
+              </component>
             </el-form-item>
 
             <span v-else @click="edit(row)">
@@ -55,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, computed, ref } from 'vue'
+import { reactive, watch, computed, ref, ComputedRef } from 'vue'
 
 interface Column {
   key: string
@@ -65,6 +74,14 @@ interface Column {
   editorProps?: Record<string, any>
   required?: boolean
   formatter?: (value: any) => string
+  options?: { label: string; value: any }[]
+
+  validation?: {
+    min?: number
+    max?: number
+    pattern?: RegExp
+    message?: string
+  }
 }
 
 interface Row {
@@ -83,6 +100,7 @@ const props = defineProps<{
   update: (id: number, data: any) => Promise<void>
   remove: (id: number) => Promise<void>
   defaultRow?: () => any
+  onEditRow?: (row: any, formRow: any) => void
 }>()
 
 const emit = defineEmits(['refresh'])
@@ -120,17 +138,45 @@ const rules = computed(() => {
 
   rows.forEach((row) => {
     props.columns.forEach((col) => {
-      if (!col.required) return
-
       const path = `rows.${row._uid}.${col.key}`
 
-      r[path] = [
-        {
+      const fieldRules: any[] = []
+
+      if (col.required) {
+        fieldRules.push({
           required: true,
           message: `${col.label} обязательно`,
           trigger: ['blur', 'change'],
-        },
-      ]
+        })
+      }
+
+      if (col.validation?.min !== undefined) {
+        fieldRules.push({
+          min: col.validation.min,
+          message: col.validation.message || `${col.label} минимум ${col.validation.min}`,
+          trigger: ['blur', 'change'],
+        })
+      }
+
+      if (col.validation?.max !== undefined) {
+        fieldRules.push({
+          max: col.validation.max,
+          message: col.validation.message || `${col.label} максимум ${col.validation.max}`,
+          trigger: ['blur', 'change'],
+        })
+      }
+
+      if (col.validation?.pattern) {
+        fieldRules.push({
+          pattern: col.validation.pattern,
+          message: col.validation.message || `${col.label} некорректный формат`,
+          trigger: ['blur'],
+        })
+      }
+
+      if (fieldRules.length) {
+        r[path] = fieldRules
+      }
     })
   })
 
@@ -139,6 +185,12 @@ const rules = computed(() => {
 
 const formatValue = (value: any, col: Column) => {
   if (col.formatter) return col.formatter(value)
+
+  if (col.options?.length) {
+    const found = col.options.find((o) => o.value === value)
+    return found ? found.label : value
+  }
+
   return value
 }
 
@@ -147,6 +199,8 @@ const edit = (row: Row) => {
   row._editing = true
 
   formModel.rows[row._uid] = { ...row }
+
+  props.onEditRow?.(row, formModel.rows[row._uid])
 }
 
 const cancel = (row: Row) => {
