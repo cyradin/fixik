@@ -1,11 +1,12 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 
-import IncidentList from '@/components/incidents/IncidentList.vue'
-import IncidentDetail from '@/components/incidents/IncidentDetail.vue'
-import IncidentCreate from '@/components/incidents/IncidentCreate.vue'
-import LoginForm from '@/components/auth/LoginForm.vue'
-import StatusesView from '@/components/admin/Statuses.vue'
+import IncidentList from '@/views/incidents/List.vue'
+import IncidentDetail from '@/views/incidents/Detail.vue'
+import IncidentCreate from '@/views/incidents/Create.vue'
+
+import LoginForm from '@/views/auth/Login.vue'
+import AdminStatuses from '@/views/admin/Statuses.vue'
 
 const routes = [
   {
@@ -31,7 +32,7 @@ const routes = [
   },
   {
     path: '/admin/statuses',
-    component: StatusesView,
+    component: AdminStatuses,
     meta: { requiresAuth: true },
   },
 ]
