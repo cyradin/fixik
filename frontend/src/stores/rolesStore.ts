@@ -19,6 +19,16 @@ export const useRolesStore = defineStore('roles', {
     pollingId: null,
   }),
 
+  getters: {
+    byCode: (state) => (code?: string) =>
+      code ? state.items.find((r) => r.code === code) || null : null,
+
+    nameByCode: (state) => (code?: string) => {
+      const role = state.items.find((r) => r.code === code)
+      return role?.name || code
+    },
+  },
+
   actions: {
     async fetchAll(): Promise<void> {
       try {
