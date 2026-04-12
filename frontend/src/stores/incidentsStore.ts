@@ -81,6 +81,12 @@ export const useIncidentsStore = defineStore('incidents', {
 
   getters: {
     filteredItems: (state) => {
+      const prioritiesStore = usePrioritiesStore()
+
+      const getPrioritySort = (priorityId: number) => {
+        return prioritiesStore.items.find((p) => p.id === priorityId)?.sort ?? 0
+      }
+
       return state.items
         .filter((incident) => !state.pendingDeletes.has(incident.id))
         .filter((incident) => {
@@ -110,6 +116,17 @@ export const useIncidentsStore = defineStore('incidents', {
           }
 
           return true
+        })
+        .sort((a, b) => {
+          const aSort = getPrioritySort(a.priority.id)
+          const bSort = getPrioritySort(b.priority.id)
+
+          if (aSort !== bSort) {
+            return aSort - bSort // ASC
+          }
+
+          // updatedAt DESC
+          return Date.parse(b.updatedAt) - Date.parse(a.updatedAt)
         })
     },
   },
