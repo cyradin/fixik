@@ -21,6 +21,10 @@ func (c *Container) PgPool() *pgxpool.Pool {
 			panic(fmt.Errorf("init database: %w", err))
 		}
 
+		if err := pool.Ping(ctx); err != nil {
+			panic(err)
+		}
+
 		c.pgPool = pool
 	}
 
