@@ -4,8 +4,10 @@ import { notifyError } from '@/utils/notify'
 
 export interface Team {
   id: number
-  code: string
   name: string
+  code: string
+  description: string
+  sort: number
 }
 
 interface TeamsState {
@@ -23,7 +25,7 @@ export const useTeamsStore = defineStore('teams', {
     async fetchAll(): Promise<void> {
       try {
         const resp = await teamsApi.teamsGet({})
-        this.items = resp.items
+        this.items = resp.items.sort((a, b) => a.sort - b.sort)
       } catch (e) {
         notifyError('Не удалось обновить список команд')
         console.error('teams fetch error:', e)
@@ -40,6 +42,46 @@ export const useTeamsStore = defineStore('teams', {
       if (this.pollingId) {
         clearInterval(this.pollingId)
         this.pollingId = null
+      }
+    },
+
+    async create(data: any) {
+      try {
+        const res = await teamsApi.teamsPost({
+          request: data,
+        })
+
+        this.items.push(res)
+        return res
+      } catch (e) {
+        console.error('team create error:', e)
+        throw e
+      }
+    },
+
+    async update(id: number, data: any) {
+      try {
+        await teamsApi.teamsIdPut({
+          id,
+          request: data,
+        })
+
+        const item = this.items.find((i) => i.id === id)
+        if (item) Object.assign(item, data)
+      } catch (e) {
+        console.error('team update error:', e)
+        throw e
+      }
+    },
+
+    async remove(id: number) {
+      try {
+        await teamsApi.teamsIdDelete({ id })
+
+        this.items = this.items.filter((i) => i.id !== id)
+      } catch (e) {
+        console.error('team delete error:', e)
+        throw e
       }
     },
   },

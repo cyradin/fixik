@@ -31,6 +31,7 @@ const logout = async () => {
       <el-menu-item index="/">Инциденты</el-menu-item>
       <el-menu-item index="/admin/statuses">Статусы</el-menu-item>
       <el-menu-item index="/admin/priorities">Приоритеты</el-menu-item>
+      <el-menu-item index="/admin/teams">Команды</el-menu-item>
     </el-menu>
 
     <el-dropdown v-if="authStore.isAuth">

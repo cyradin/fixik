@@ -8,6 +8,7 @@ import IncidentCreate from '@/views/incidents/Create.vue'
 import LoginForm from '@/views/auth/Login.vue'
 import AdminStatuses from '@/views/admin/Statuses.vue'
 import AdminPriorities from '@/views/admin/Priorities.vue'
+import AdminTeams from '@/views/admin/Teams.vue'
 
 const routes = [
   {
@@ -39,6 +40,11 @@ const routes = [
   {
     path: '/admin/priorities',
     component: AdminPriorities,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/teams',
+    component: AdminTeams,
     meta: { requiresAuth: true },
   },
 ]
