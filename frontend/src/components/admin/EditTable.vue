@@ -4,37 +4,49 @@
       <span>{{ title }}</span>
     </template>
 
-    <el-table :data="rows" style="width: 100%">
-      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :width="col.width">
-        <template #default="{ row }">
-          <component
-            v-if="row._editing"
-            :is="col.editor"
-            v-model="row[col.key]"
-            v-bind="col.editorProps"
-          />
+    <el-form :model="formModel" :rules="rules" ref="formRef">
+      <el-table :data="rows" style="width: 100%">
+        <el-table-column
+          v-for="col in columns"
+          :key="col.key"
+          :label="col.label"
+          :width="col.width"
+        >
+          <template #default="{ row }">
+            <el-form-item
+              v-if="row._editing"
+              :prop="`rows.${row._uid}.${col.key}`"
+              style="margin-bottom: 0"
+            >
+              <component
+                :is="col.editor"
+                v-model="formModel.rows[row._uid][col.key]"
+                v-bind="col.editorProps"
+                @keyup.enter="save(row)"
+              />
+            </el-form-item>
 
-          <span v-else @click="edit(row)">
-            {{ formatValue(row[col.key], col) }}
-          </span>
-        </template>
-      </el-table-column>
-
-      <!-- ACTIONS -->
-      <el-table-column width="160">
-        <template #default="{ row }">
-          <template v-if="row._editing">
-            <el-button size="small" @click="save(row)">💾</el-button>
-            <el-button size="small" @click="cancel(row)">❌</el-button>
+            <span v-else @click="edit(row)">
+              {{ formatValue(row[col.key], col) }}
+            </span>
           </template>
+        </el-table-column>
 
-          <template v-else>
-            <el-button size="small" @click="edit(row)">✏️</el-button>
-            <el-button size="small" type="danger" @click="remove(row)">🗑</el-button>
+        <el-table-column width="160">
+          <template #default="{ row }">
+            <template v-if="row._editing">
+              <el-button size="small" @click="save(row)">💾</el-button>
+              <el-button size="small" @click="cancel(row)">❌</el-button>
+            </template>
+
+            <template v-else>
+              <el-button size="small" @click="edit(row)">✏️</el-button>
+              <el-button size="small" type="danger" @click="remove(row)">🗑</el-button>
+            </template>
           </template>
-        </template>
-      </el-table-column>
-    </el-table>
+        </el-table-column>
+      </el-table>
+    </el-form>
 
     <div style="margin-top: 10px">
       <el-button @click="addRow"> + Добавить </el-button>
@@ -43,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
+import { reactive, watch, computed, ref } from 'vue'
 
 interface Column {
   key: string
@@ -51,11 +63,13 @@ interface Column {
   width?: string
   editor: any
   editorProps?: Record<string, any>
+  required?: boolean
   formatter?: (value: any) => string
 }
 
 interface Row {
   id: number
+  _uid: number
   _editing?: boolean
   _isNew?: boolean
   [key: string]: any
@@ -67,7 +81,8 @@ const props = defineProps<{
   columns: Column[]
   create: (data: any) => Promise<any>
   update: (id: number, data: any) => Promise<void>
-  delete: (id: number) => Promise<void>
+  remove: (id: number) => Promise<void>
+  defaultRow?: () => any
 }>()
 
 const emit = defineEmits(['refresh'])
@@ -75,14 +90,52 @@ const emit = defineEmits(['refresh'])
 const rows = reactive<Row[]>([])
 const original = new Map<number, any>()
 
-// sync with props
+const formRef = ref()
+
+const formModel = reactive({
+  rows: {} as Record<number, any>,
+})
+
 watch(
   () => props.items,
   (items) => {
-    rows.splice(0, rows.length, ...items.map((i) => ({ ...i })))
+    rows.splice(
+      0,
+      rows.length,
+      ...items.map((i) => ({
+        ...i,
+        _uid: i.id,
+      })),
+    )
+
+    rows.forEach((row) => {
+      formModel.rows[row._uid] = { ...row }
+    })
   },
   { immediate: true },
 )
+
+const rules = computed(() => {
+  const r: any = {}
+
+  rows.forEach((row) => {
+    props.columns.forEach((col) => {
+      if (!col.required) return
+
+      const path = `rows.${row._uid}.${col.key}`
+
+      r[path] = [
+        {
+          required: true,
+          message: `${col.label} обязательно`,
+          trigger: ['blur', 'change'],
+        },
+      ]
+    })
+  })
+
+  return r
+})
 
 const formatValue = (value: any, col: Column) => {
   if (col.formatter) return col.formatter(value)
@@ -90,8 +143,10 @@ const formatValue = (value: any, col: Column) => {
 }
 
 const edit = (row: Row) => {
-  original.set(row.id, { ...row })
+  original.set(row._uid, { ...row })
   row._editing = true
+
+  formModel.rows[row._uid] = { ...row }
 }
 
 const cancel = (row: Row) => {
@@ -101,20 +156,27 @@ const cancel = (row: Row) => {
     return
   }
 
-  const orig = original.get(row.id)
-  if (orig) Object.assign(row, orig)
+  const orig = original.get(row._uid)
+  if (orig) {
+    Object.assign(row, orig)
+    formModel.rows[row._uid] = { ...orig }
+  }
 
   row._editing = false
 }
 
 const save = async (row: Row) => {
   try {
-    const payload = { ...row }
+    await formRef.value.validate()
+
+    const payload = { ...formModel.rows[row._uid] }
     delete payload._editing
     delete payload._isNew
+    delete payload._uid
 
     if (row._isNew) {
-      await props.create(payload)
+      const res = await props.create(payload)
+      Object.assign(row, res)
     } else {
       await props.update(row.id, payload)
     }
@@ -124,15 +186,17 @@ const save = async (row: Row) => {
 
     emit('refresh')
   } catch (e) {
-    console.error(e)
+    throw e
   }
 }
 
 const remove = async (row: Row) => {
   if (!row.id) return
 
+  if (!confirm('Удалить?')) return
+
   try {
-    await props.delete(row.id)
+    await props.remove(row.id)
     emit('refresh')
   } catch (e) {
     console.error(e)
@@ -140,16 +204,19 @@ const remove = async (row: Row) => {
 }
 
 const addRow = () => {
+  const uid = Date.now()
+
+  const base = props.defaultRow ? props.defaultRow() : {}
+
   const empty: Row = {
-    id: Date.now(),
+    id: 0,
+    _uid: uid,
     _editing: true,
     _isNew: true,
+    ...base,
   }
 
-  props.columns.forEach((c) => {
-    empty[c.key] = null
-  })
-
   rows.unshift(empty)
+  formModel.rows[uid] = { ...empty }
 }
 </script>

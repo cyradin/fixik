@@ -5,7 +5,8 @@
     :columns="columns"
     :create="create"
     :update="update"
-    :delete="remove"
+    :remove="remove"
+    :default-row="getDefaultRow"
     @refresh="refresh"
   />
 </template>
@@ -24,35 +25,17 @@ onMounted(() => {
 })
 
 const columns = [
-  {
-    key: 'id',
-    label: 'ID',
-    width: '80',
-    editor: 'span',
-  },
-  {
-    key: 'code',
-    label: 'Code',
-    editor: 'el-input',
-  },
-  {
-    key: 'name',
-    label: 'Название',
-    editor: 'el-input',
-  },
-  {
-    key: 'description',
-    label: 'Описание',
-    editor: 'el-input',
-  },
+  { key: 'id', label: 'ID', width: '80', editor: 'span' },
+  { key: 'code', label: 'Code', editor: 'el-input', required: true },
+  { key: 'name', label: 'Название', editor: 'el-input', required: true },
+  { key: 'description', label: 'Описание', editor: 'el-input', required: true },
   {
     key: 'sort',
     label: 'Sort',
-    width: '100',
+    width: '160',
     editor: 'el-input-number',
-    editorProps: {
-      min: 0,
-    },
+    required: true,
+    editorProps: { min: 0 },
   },
   {
     key: 'isFinal',
@@ -63,32 +46,57 @@ const columns = [
   },
 ]
 
+const getDefaultSort = () => {
+  if (!store.items.length) return 10
+  const max = Math.max(...store.items.map((i) => i.sort || 0))
+
+  return max + 10
+}
+
+const getDefaultRow = () => ({
+  code: '',
+  name: '',
+  description: '',
+  sort: getDefaultSort(),
+  isFinal: false,
+})
+
 const create = async (data: any) => {
-  if (!data.code || !data.name) {
-    notifyError('Заполните code и name')
-    throw new Error('validation')
+  try {
+    const res = await statusesApi.statusesPost({
+      request: data,
+    })
+
+    notifySuccess('Статус создан')
+    return res
+  } catch (e) {
+    notifyError('Ошибка создания статуса')
+    throw e
   }
-
-  const res = await statusesApi.statusesPost({
-    request: data,
-  })
-
-  notifySuccess('Статус создан')
-  return res
 }
 
 const update = async (id: number, data: any) => {
-  await statusesApi.statusesIdPut({
-    id,
-    request: data,
-  })
+  try {
+    await statusesApi.statusesIdPut({
+      id,
+      request: data,
+    })
 
-  notifySuccess('Сохранено')
+    notifySuccess('Статус обновлен')
+  } catch (e) {
+    notifyError('Ошибка обновления статуса')
+    throw e
+  }
 }
 
 const remove = async (id: number) => {
-  await statusesApi.statusesIdDelete({ id })
-  notifySuccess('Удалено')
+  try {
+    await statusesApi.statusesIdDelete({ id })
+    notifySuccess('Удалено')
+  } catch (e) {
+    notifyError('Ошибка удаления статуса')
+    throw e
+  }
 }
 
 const refresh = () => {
