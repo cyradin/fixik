@@ -7,8 +7,8 @@
 
       <el-button type="primary" size="large" @click="goToCreate"> + Создать инцидент </el-button>
     </el-row>
-    <el-row :gutter="16">
-      <el-col v-for="status in statusesStore.items" :key="status.code" :span="6">
+    <div class="statuses-scroll">
+      <div v-for="status in statusesStore.items" :key="status.code" class="status-column">
         <el-card shadow="hover">
           <h3>{{ status.name }}</h3>
           <Container
@@ -65,8 +65,8 @@
             </Draggable>
           </Container>
         </el-card>
-      </el-col>
-    </el-row>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -116,3 +116,16 @@ const onDrop = async (statusCode: string, dropResult: any) => {
   }
 }
 </script>
+
+<style scoped>
+.statuses-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.status-column {
+  flex: 0 0 320px;
+}
+</style>

@@ -84,7 +84,7 @@ const update = async (id: number, data: any) => {
 const remove = async (id: number) => {
   try {
     await store.remove(id)
-    notifySuccess('Удалено')
+    notifySuccess('Команда удалена')
   } catch (e) {
     notifyError('Ошибка удаления команды')
     throw e

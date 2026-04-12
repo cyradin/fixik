@@ -67,9 +67,7 @@ const getDefaultRow = () => ({
 
 const create = async (data: any) => {
   try {
-    const res = await store.create({
-      request: data,
-    })
+    const res = await store.create(data)
 
     notifySuccess('Статус создан')
     return res
@@ -93,7 +91,7 @@ const update = async (id: number, data: any) => {
 const remove = async (id: number) => {
   try {
     await store.remove(id)
-    notifySuccess('Удалено')
+    notifySuccess('Статус удален')
   } catch (e) {
     notifyError('Ошибка удаления статуса')
     throw e

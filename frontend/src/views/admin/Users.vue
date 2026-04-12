@@ -19,6 +19,7 @@ import EditableAdminTable from '@/components/admin/EditTable.vue'
 import { useUsersStore } from '@/stores/usersStore'
 import { useTeamsStore } from '@/stores/teamsStore'
 import { useRolesStore } from '@/stores/rolesStore'
+import { notifyError, notifySuccess } from '@/utils/notify'
 
 const usersStore = useUsersStore()
 const teamsStore = useTeamsStore()
@@ -100,15 +101,34 @@ const getDefaultRow = () => ({
 })
 
 const create = async (data: any) => {
-  return await store.create(data)
+  try {
+    const res = await store.create(data)
+    notifySuccess('Пользователь создан')
+    return res
+  } catch (e) {
+    notifyError('Ошибка создания пользователя')
+    throw e
+  }
 }
 
 const update = async (id: number, data: any) => {
-  return await store.update(id, data)
+  try {
+    await store.update(id, data)
+    notifySuccess('Пользователь обновлён')
+  } catch (e) {
+    notifyError('Ошибка обновления пользователя')
+    throw e
+  }
 }
 
 const remove = async (id: number) => {
-  return await store.remove(id)
+  try {
+    await store.remove(id)
+    notifySuccess('Пользователь удален')
+  } catch (e) {
+    notifyError('Ошибка удаления пользователя')
+    throw e
+  }
 }
 
 const refresh = () => {
