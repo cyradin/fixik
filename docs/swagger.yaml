@@ -243,6 +243,8 @@ definitions:
         items:
           $ref: '#/definitions/web.Role'
         type: array
+    required:
+    - items
     type: object
   web.ListStatusesResponse:
     properties:

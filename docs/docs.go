@@ -1918,6 +1918,9 @@ const docTemplate = `{
         },
         "web.ListRolesResponse": {
             "type": "object",
+            "required": [
+                "items"
+            ],
             "properties": {
                 "items": {
                     "type": "array",

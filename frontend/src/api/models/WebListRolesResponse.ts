@@ -32,13 +32,14 @@ export interface WebListRolesResponse {
      * @type {Array<WebRole>}
      * @memberof WebListRolesResponse
      */
-    items?: Array<WebRole>;
+    items: Array<WebRole>;
 }
 
 /**
  * Check if a given object implements the WebListRolesResponse interface.
  */
 export function instanceOfWebListRolesResponse(value: object): value is WebListRolesResponse {
+    if (!('items' in value) || value['items'] === undefined) return false;
     return true;
 }
 
@@ -52,7 +53,7 @@ export function WebListRolesResponseFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         
-        'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(WebRoleFromJSON)),
+        'items': ((json['items'] as Array<any>).map(WebRoleFromJSON)),
     };
 }
 
@@ -67,7 +68,7 @@ export function WebListRolesResponseToJSONTyped(value?: WebListRolesResponse | n
 
     return {
         
-        'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(WebRoleToJSON)),
+        'items': ((value['items'] as Array<any>).map(WebRoleToJSON)),
     };
 }
 

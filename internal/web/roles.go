@@ -10,7 +10,7 @@ import (
 )
 
 type ListRolesResponse struct {
-	Items []Role `json:"items"`
+	Items []Role `json:"items" validate:"required"`
 }
 
 type Role struct {
