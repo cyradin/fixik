@@ -205,6 +205,14 @@ func (m *IncidentManager) List(ctx context.Context, limit, offset int) (Incident
 				userIDSet[id] = struct{}{}
 			}
 		}
+
+		if r.AuthorID != nil {
+			id := *r.AuthorID
+			if _, exists := userIDSet[id]; !exists {
+				userIDs = append(userIDs, id)
+				userIDSet[id] = struct{}{}
+			}
+		}
 	}
 
 	usersMap := make(map[int64]user.User)
