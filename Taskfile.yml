@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 
-version: '3'
+version: "3"
 
 vars:
   COMMIT:
@@ -8,12 +8,12 @@ vars:
   BINARY_NAME: fixik
   MIGRATE_COMMAND: go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
 
-dotenv: ['.env']
+dotenv: [".env"]
 
 tasks:
   build:
     deps: [build-frontend, build-backend]
-  
+
   build-frontend:
     cmds:
       - cd frontend && npm run build
@@ -21,10 +21,10 @@ tasks:
   build-backend:
     cmds:
       - go build
-          -tags prod
-          -ldflags "-X main.GitCommit={{.COMMIT}}"
-          -o dist/{{.BINARY_NAME}}
-          ./cmd/{{.BINARY_NAME}}
+        -tags prod
+        -ldflags "-X main.GitCommit={{.COMMIT}}"
+        -o dist/{{.BINARY_NAME}}
+        ./cmd/{{.BINARY_NAME}}
 
   dev:
     cmds:
@@ -36,7 +36,7 @@ tasks:
   swagger-backend:
     cmds:
       - go run github.com/swaggo/swag/cmd/swag@v1.16.6 init  -d cmd/fixik,internal/web
-  
+
   swagger-frontend:
     cmds:
       - cd frontend && npm run swagger
@@ -51,24 +51,24 @@ tasks:
 
   migrate:
     cmds:
-      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL up"
+      - "{{.MIGRATE_COMMAND}} -path migrations -database $FIXIK_POSTGRES_URL up"
 
   migrate-down:
     cmds:
-      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL down 1"
+      - "{{.MIGRATE_COMMAND}} -path migrations -database $FIXIK_POSTGRES_URL down 1"
 
   migrate-down-all:
     cmds:
-      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL down"
+      - "{{.MIGRATE_COMMAND}} -path migrations -database $FIXIK_POSTGRES_URL down"
 
   migrate-version:
     cmds:
-      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL version"
+      - "{{.MIGRATE_COMMAND}} -path migrations -database $FIXIK_POSTGRES_URL version"
 
   migrate-create:
     cmds:
-      - "{{.MIGRATE_COMMAND}} create -ext sql -seq -dir $FIXIK_POSTGRES_MIGRATIONS_DIR {{.CLI_ARGS}}"
+      - "{{.MIGRATE_COMMAND}} create -ext sql -seq -dir migrations {{.CLI_ARGS}}"
 
   migrate-force:
     cmds:
-      - "{{.MIGRATE_COMMAND}} -path $FIXIK_POSTGRES_MIGRATIONS_DIR -database $FIXIK_POSTGRES_URL force {{.CLI_ARGS}}"
+      - "{{.MIGRATE_COMMAND}} -path migrations -database $FIXIK_POSTGRES_URL force {{.CLI_ARGS}}"
