@@ -53,8 +53,10 @@ import { useUsersStore } from '@/stores/usersStore'
 import { useTeamsStore } from '@/stores/teamsStore'
 import { usePrioritiesStore } from '@/stores/prioritiesStore'
 import { notifyError, notifySuccess } from '@/utils/notify'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()
 const prioritiesStore = usePrioritiesStore()
@@ -110,6 +112,7 @@ const submit = async () => {
       priorityId: priority!.id,
       userId: model.userId || undefined,
       teamId: model.teamId || undefined,
+      authorId: authStore.user?.id,
     })
 
     notifySuccess(`Инцидент #${newIncident.id} создан`)

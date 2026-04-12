@@ -564,6 +564,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  d.PriorityID,
 			TeamID:      d.TeamID,
 			UserID:      d.UserID,
+			AuthorID:    d.AuthorID,
 		})
 		if err != nil {
 			return fmt.Errorf("create incident %s: %w", d.Title, err)

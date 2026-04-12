@@ -50,6 +50,7 @@ interface CreateIncident {
   priorityId: number
   teamId?: number
   userId?: number
+  authorId?: number
 }
 
 interface IncidentsState {

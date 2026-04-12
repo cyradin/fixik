@@ -65,6 +65,7 @@ func (m *IncidentManager) Create(ctx context.Context, incident CreateIncident) (
 		PriorityID:  incident.PriorityID,
 		TeamID:      incident.TeamID,
 		UserID:      incident.UserID,
+		AuthorID:    incident.AuthorID,
 	}
 
 	if err := m.repo.Create(ctx, &dbIncident); err != nil {
