@@ -16,80 +16,8 @@
     <p><b>Создан:</b> {{ formatDateTime(incident.createdAt) }}</p>
     <p><b>Обновлён:</b> {{ formatDateTime(incident.updatedAt) }}</p>
 
-    <el-input
-      type="textarea"
-      v-model="editable.description"
-      :disabled="loading.description"
-      @blur="updateDescription(editable.description)"
-      placeholder="Введите описание"
-    />
-    <el-icon v-if="loading.description" class="is-loading" style="margin-left: 8px">
-      <Loading />
-    </el-icon>
+    <IncidentEditForm :id="id" />
 
-    <el-row :gutter="16">
-      <el-col :span="12">
-        <p><b>Статус:</b></p>
-        <el-select
-          v-model="editable.statusId"
-          :disabled="loading.status"
-          placeholder="Выберите статус"
-          style="width: 100%"
-          @change="updateStatus(editable.statusId)"
-        >
-          <el-option v-for="s in statuses" :key="s.id" :label="s.name" :value="s.id" />
-        </el-select>
-        <el-icon v-if="loading.status" class="is-loading" style="margin-left: 8px">
-          <Loading />
-        </el-icon>
-
-        <p style="margin-top: 16px"><b>Команда:</b></p>
-        <el-select
-          v-model="editable.teamId"
-          clearable
-          :disabled="loading.team"
-          placeholder="Выберите команду"
-          style="width: 100%"
-          @change="updateTeam(editable.teamId)"
-        >
-          <el-option v-for="t in teams" :key="t.id" :label="t.name" :value="t.id" />
-        </el-select>
-        <el-icon v-if="loading.team" class="is-loading" style="margin-left: 8px">
-          <Loading />
-        </el-icon>
-      </el-col>
-
-      <el-col :span="12">
-        <p><b>Приоритет:</b></p>
-        <el-select
-          v-model="editable.priorityId"
-          :disabled="loading.priority"
-          placeholder="Выберите приоритет"
-          style="width: 100%"
-          @change="updatePriority(editable.priorityId)"
-        >
-          <el-option v-for="p in priorities" :key="p.id" :label="p.name" :value="p.id" />
-        </el-select>
-        <el-icon v-if="loading.priority" class="is-loading" style="margin-left: 8px">
-          <Loading />
-        </el-icon>
-
-        <p style="margin-top: 16px"><b>Исполнитель:</b></p>
-        <el-select
-          v-model="editable.userId"
-          clearable
-          :disabled="loading.user"
-          placeholder="Выберите исполнителя"
-          style="width: 100%"
-          @change="updateUser(editable.userId)"
-        >
-          <el-option v-for="u in users" :key="u.id" :label="u.name" :value="u.id" />
-        </el-select>
-        <el-icon v-if="loading.user" class="is-loading" style="margin-left: 8px">
-          <Loading />
-        </el-icon>
-      </el-col>
-    </el-row>
     <el-row>
       <IncidentComments :incident-id="Number(id)" />
     </el-row>
@@ -102,14 +30,10 @@
 import { reactive, computed, watch, h } from 'vue'
 import { useRouter } from 'vue-router'
 import IncidentComments from '@/components/incidents/IncidentComments.vue'
+import IncidentEditForm from '@/components/incidents/IncidentEditForm.vue'
 import { ElMessage } from 'element-plus'
-import { Loading } from '@element-plus/icons-vue'
 
 import { useIncidentsStore } from '@/stores/incidentsStore'
-import { useStatusesStore } from '@/stores/statusesStore'
-import { useUsersStore } from '@/stores/usersStore'
-import { useTeamsStore } from '@/stores/teamsStore'
-import { usePrioritiesStore } from '@/stores/prioritiesStore'
 import { formatDateTime } from '@/utils/date'
 import UserLink from '@/components/users/UserLink.vue'
 import { notifyError, notifySuccess } from '@/utils/notify'
@@ -117,10 +41,6 @@ import { notifyError, notifySuccess } from '@/utils/notify'
 const router = useRouter()
 
 const incidentsStore = useIncidentsStore()
-const statusesStore = useStatusesStore()
-const prioritiesStore = usePrioritiesStore()
-const teamsStore = useTeamsStore()
-const usersStore = useUsersStore()
 
 const props = defineProps<{
   id: string
@@ -131,122 +51,9 @@ const incident = computed(() => {
   return incidentsStore.items.find((i) => i.id === id) || null
 })
 
-const editable = reactive({
-  description: '',
-  statusId: 0,
-  priorityId: 0,
-  teamId: null as number | null,
-  userId: null as number | null,
-})
-
-watch(
-  incident,
-  (inc) => {
-    if (!inc) return
-    editable.description = inc.description
-    editable.statusId = inc.status?.id ?? null
-    editable.priorityId = inc.priority?.id ?? null
-    editable.teamId = inc.team?.id ?? null
-    editable.userId = inc.user?.id ?? null
-  },
-  { immediate: true },
-)
-
 const loading = reactive({
-  description: false,
-  status: false,
-  priority: false,
-  team: false,
-  user: false,
   delete: false,
 })
-
-const statuses = computed(() => statusesStore.items)
-const priorities = computed(() => prioritiesStore.items)
-const teams = computed(() => teamsStore.items)
-
-const users = computed(() => {
-  const teamId = editable.teamId
-  return usersStore.byTeam(teamId ?? undefined)
-})
-
-const updateDescription = async (value: string) => {
-  if (!incident.value) return
-
-  loading.description = true
-  try {
-    await incidentsStore.updateDescription(incident.value.id, value)
-    incident.value.description = value
-  } catch (e) {
-    notifyError('Ошибка обновления описания')
-  } finally {
-    loading.description = false
-  }
-}
-
-const updateStatus = async (value: number) => {
-  if (!incident.value) return
-
-  loading.status = true
-  try {
-    await incidentsStore.updateStatus(incident.value.id, value)
-
-    const status = statusesStore.items.find((s) => s.id === value)
-    if (status) incident.value.status = { ...status }
-  } catch (e) {
-    notifyError('Ошибка обновления статуса')
-  } finally {
-    loading.status = false
-  }
-}
-
-const updatePriority = async (value: number) => {
-  if (!incident.value) return
-
-  loading.priority = true
-  try {
-    await incidentsStore.updatePriority(incident.value.id, value)
-
-    const priority = prioritiesStore.items.find((p) => p.id === value)
-    if (priority) incident.value.priority = { ...priority }
-  } catch (e) {
-    notifyError('Ошибка обновления приоритета')
-  } finally {
-    loading.priority = false
-  }
-}
-
-const updateTeam = async (value: number | null) => {
-  if (!incident.value) return
-
-  loading.team = true
-  try {
-    await incidentsStore.updateTeam(incident.value.id, value ?? undefined)
-
-    const team = teamsStore.items.find((t) => t.id === value)
-    incident.value.team = team ? { ...team } : null
-  } catch (e) {
-    notifyError('Ошибка обновления команды')
-  } finally {
-    loading.team = false
-  }
-}
-
-const updateUser = async (value: number | null) => {
-  if (!incident.value) return
-
-  loading.user = true
-  try {
-    await incidentsStore.updateUser(incident.value.id, value ?? undefined)
-
-    const user = usersStore.items.find((u) => u.id === value)
-    incident.value.user = user ? { ...user } : null
-  } catch (e) {
-    notifyError('Ошибка обновления исполнителя')
-  } finally {
-    loading.user = false
-  }
-}
 
 let deleteTimer: ReturnType<typeof setTimeout> | null = null
 let pendingDeleteId: number | null = null
