@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { usersApi } from '@/api/client'
 import { notifyError } from '@/utils/notify'
-import { WebUserResponse } from '@/api'
+import { WebUpdateUserRequestRoleEnum, WebUserResponse } from '@/api'
 
 export interface User {
   id: number
@@ -16,8 +16,8 @@ type CreateUserRequest = {
   name: string
   username: string
   email: string
-  role: string
-  teamId: number | null
+  role: WebUpdateUserRequestRoleEnum
+  teamId?: number
   password: string
 }
 
@@ -25,8 +25,8 @@ type UpdateUserRequest = {
   name?: string
   username?: string
   email?: string
-  role?: string
-  teamId?: number | null
+  role?: WebUpdateUserRequestRoleEnum
+  teamId?: number
   password?: string
 }
 
