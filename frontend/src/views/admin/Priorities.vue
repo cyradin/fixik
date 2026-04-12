@@ -1,6 +1,6 @@
 <template>
   <EditableAdminTable
-    title="Статусы"
+    title="Приоритеты"
     :items="store.items"
     :columns="columns"
     :create="create"
@@ -14,10 +14,10 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
 import EditableAdminTable from '@/components/admin/EditTable.vue'
-import { useStatusesStore } from '@/stores/statusesStore'
+import { usePrioritiesStore } from '@/stores/prioritiesStore'
 import { notifyError, notifySuccess } from '@/utils/notify'
 
-const store = useStatusesStore()
+const store = usePrioritiesStore()
 
 onMounted(() => {
   store.fetchAll()
@@ -30,9 +30,13 @@ onUnmounted(() => {
 
 const columns = [
   { key: 'id', label: 'ID', width: '80', editor: 'span' },
-  { key: 'code', label: 'Code', editor: 'el-input', required: true },
+
+  { key: 'code', label: 'Код', editor: 'el-input', required: true },
+
   { key: 'name', label: 'Название', editor: 'el-input', required: true },
+
   { key: 'description', label: 'Описание', editor: 'el-input', required: true },
+
   {
     key: 'sort',
     label: 'Сортировка',
@@ -41,19 +45,11 @@ const columns = [
     required: true,
     editorProps: { min: 0 },
   },
-  {
-    key: 'isFinal',
-    label: 'Финальный',
-    width: '120',
-    editor: 'el-switch',
-    formatter: (v: boolean) => (v ? 'Да' : 'Нет'),
-  },
 ]
 
 const getDefaultSort = () => {
   if (!store.items.length) return 10
   const max = Math.max(...store.items.map((i) => i.sort || 0))
-
   return max + 10
 }
 
@@ -62,19 +58,15 @@ const getDefaultRow = () => ({
   name: '',
   description: '',
   sort: getDefaultSort(),
-  isFinal: false,
 })
 
 const create = async (data: any) => {
   try {
-    const res = await store.create({
-      request: data,
-    })
-
-    notifySuccess('Статус создан')
+    const res = await store.create(data)
+    notifySuccess('Приоритет создан')
     return res
   } catch (e) {
-    notifyError('Ошибка создания статуса')
+    notifyError('Ошибка создания приоритета')
     throw e
   }
 }
@@ -82,10 +74,9 @@ const create = async (data: any) => {
 const update = async (id: number, data: any) => {
   try {
     await store.update(id, data)
-
-    notifySuccess('Статус обновлен')
+    notifySuccess('Приоритет обновлён')
   } catch (e) {
-    notifyError('Ошибка обновления статуса')
+    notifyError('Ошибка обновления приоритета')
     throw e
   }
 }
@@ -95,7 +86,7 @@ const remove = async (id: number) => {
     await store.remove(id)
     notifySuccess('Удалено')
   } catch (e) {
-    notifyError('Ошибка удаления статуса')
+    notifyError('Ошибка удаления приоритета')
     throw e
   }
 }

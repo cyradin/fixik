@@ -29,7 +29,8 @@ const logout = async () => {
 
     <el-menu v-if="authStore.isAuth" mode="horizontal" :ellipsis="false" router>
       <el-menu-item index="/">Инциденты</el-menu-item>
-      <el-menu-item index="/admin/statuses">Админка</el-menu-item>
+      <el-menu-item index="/admin/statuses">Статусы</el-menu-item>
+      <el-menu-item index="/admin/priorities">Приоритеты</el-menu-item>
     </el-menu>
 
     <el-dropdown v-if="authStore.isAuth">

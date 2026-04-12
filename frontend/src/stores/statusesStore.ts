@@ -45,5 +45,46 @@ export const useStatusesStore = defineStore('statuses', {
         this.pollingId = null
       }
     },
+
+    async create(data: any) {
+      try {
+        const res = await statusesApi.statusesPost({
+          request: data,
+        })
+
+        this.items.push(res)
+
+        return res
+      } catch (e) {
+        console.error('status create error:', e)
+        throw e
+      }
+    },
+
+    async update(id: number, data: any) {
+      try {
+        await statusesApi.statusesIdPut({
+          id,
+          request: data,
+        })
+
+        const item = this.items.find((i) => i.id === id)
+        if (item) Object.assign(item, data)
+      } catch (e) {
+        console.error('status update error:', e)
+        throw e
+      }
+    },
+
+    async remove(id: number) {
+      try {
+        await statusesApi.statusesIdDelete({ id })
+
+        this.items = this.items.filter((i) => i.id !== id)
+      } catch (e) {
+        console.error('status delete error:', e)
+        throw e
+      }
+    },
   },
 })

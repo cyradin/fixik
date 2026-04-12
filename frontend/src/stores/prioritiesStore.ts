@@ -5,6 +5,8 @@ import { notifyError } from '@/utils/notify'
 export interface Priority {
   id: number
   name: string
+  code: string
+  description: string
   sort: number
 }
 
@@ -23,9 +25,9 @@ export const usePrioritiesStore = defineStore('priorities', {
     async fetchAll(): Promise<void> {
       try {
         const resp = await prioritiesApi.prioritiesGet({})
-        this.items = resp.items
+        this.items = resp.items.sort((a, b) => a.sort - b.sort)
       } catch (e) {
-        notifyError('Не удалось обновить список приоритетов инцидентов')
+        notifyError('Не удалось обновить список приоритетов')
         console.error('priorities fetch error:', e)
       }
     },
@@ -40,6 +42,45 @@ export const usePrioritiesStore = defineStore('priorities', {
       if (this.pollingId) {
         clearInterval(this.pollingId)
         this.pollingId = null
+      }
+    },
+
+    async create(data: any) {
+      try {
+        const res = await prioritiesApi.prioritiesPost({
+          request: data,
+        })
+
+        this.items.push(res)
+        return res
+      } catch (e) {
+        console.error('priority create error:', e)
+        throw e
+      }
+    },
+
+    async update(id: number, data: any) {
+      try {
+        await prioritiesApi.prioritiesIdPut({
+          id,
+          request: data,
+        })
+
+        const item = this.items.find((i) => i.id === id)
+        if (item) Object.assign(item, data)
+      } catch (e) {
+        console.error('priority update error:', e)
+        throw e
+      }
+    },
+
+    async remove(id: number) {
+      try {
+        await prioritiesApi.prioritiesIdDelete({ id })
+        this.items = this.items.filter((i) => i.id !== id)
+      } catch (e) {
+        console.error('priority delete error:', e)
+        throw e
       }
     },
   },
