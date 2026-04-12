@@ -221,8 +221,7 @@ export const useIncidentsStore = defineStore('incidents', {
 
         return incident
       } catch (e) {
-        notifyError('Не удалось создать инцидент')
-        console.error(e)
+        console.error('incident create error:', e)
         throw e
       }
     },
@@ -232,7 +231,7 @@ export const useIncidentsStore = defineStore('incidents', {
         await incidentsApi.incidentsIdDelete({ id })
         this.removeLocal(id)
       } catch (e) {
-        console.error('Ошибка удаления инцидента', e)
+        console.error('incident delete error:', e)
         throw e
       }
     },

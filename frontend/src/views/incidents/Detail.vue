@@ -20,7 +20,7 @@
       type="textarea"
       v-model="editable.description"
       :disabled="loading.description"
-      @blur="updateField('description', editable.description)"
+      @blur="updateDescription(editable.description)"
       placeholder="Введите описание"
     />
     <el-icon v-if="loading.description" class="is-loading" style="margin-left: 8px">
@@ -35,7 +35,7 @@
           :disabled="loading.status"
           placeholder="Выберите статус"
           style="width: 100%"
-          @change="updateField('status', editable.statusId)"
+          @change="updateStatus(editable.statusId)"
         >
           <el-option v-for="s in statuses" :key="s.id" :label="s.name" :value="s.id" />
         </el-select>
@@ -50,7 +50,7 @@
           :disabled="loading.team"
           placeholder="Выберите команду"
           style="width: 100%"
-          @change="updateField('team', editable.teamId)"
+          @change="updateTeam(editable.teamId)"
         >
           <el-option v-for="t in teams" :key="t.id" :label="t.name" :value="t.id" />
         </el-select>
@@ -66,7 +66,7 @@
           :disabled="loading.priority"
           placeholder="Выберите приоритет"
           style="width: 100%"
-          @change="updateField('priority', editable.priorityId)"
+          @change="updatePriority(editable.priorityId)"
         >
           <el-option v-for="p in priorities" :key="p.id" :label="p.name" :value="p.id" />
         </el-select>
@@ -81,7 +81,7 @@
           :disabled="loading.user"
           placeholder="Выберите исполнителя"
           style="width: 100%"
-          @change="updateField('user', editable.userId)"
+          @change="updateUser(editable.userId)"
         >
           <el-option v-for="u in users" :key="u.id" :label="u.name" :value="u.id" />
         </el-select>
@@ -133,8 +133,8 @@ const incident = computed(() => {
 
 const editable = reactive({
   description: '',
-  statusId: null as number | null,
-  priorityId: null as number | null,
+  statusId: 0,
+  priorityId: 0,
   teamId: null as number | null,
   userId: null as number | null,
 })
@@ -170,47 +170,81 @@ const users = computed(() => {
   return usersStore.byTeam(teamId ?? undefined)
 })
 
-type Field = keyof typeof loading
-
-const updateField = async (field: Field, value: any) => {
+const updateDescription = async (value: string) => {
   if (!incident.value) return
 
-  loading[field] = true
+  loading.description = true
   try {
-    switch (field) {
-      case 'description':
-        await incidentsStore.updateDescription(incident.value.id, value)
-        incident.value.description = value
-        break
-
-      case 'status':
-        await incidentsStore.updateStatus(incident.value.id, value)
-        const status = statusesStore.items.find((s) => s.id === value)
-        if (status) incident.value.status = { ...status }
-        break
-
-      case 'priority':
-        await incidentsStore.updatePriority(incident.value.id, value)
-        const priority = prioritiesStore.items.find((p) => p.id === value)
-        if (priority) incident.value.priority = { ...priority }
-        break
-
-      case 'team':
-        await incidentsStore.updateTeam(incident.value.id, value ?? undefined)
-        const team = teamsStore.items.find((t) => t.id === value)
-        incident.value.team = team ? { ...team } : null
-        break
-
-      case 'user':
-        await incidentsStore.updateUser(incident.value.id, value ?? undefined)
-        const user = usersStore.items.find((u) => u.id === value)
-        incident.value.user = user ? { ...user } : null
-        break
-    }
+    await incidentsStore.updateDescription(incident.value.id, value)
+    incident.value.description = value
   } catch (e) {
-    notifyError(`Не удалось обновить ${field}`)
+    notifyError('Ошибка обновления описания')
   } finally {
-    loading[field] = false
+    loading.description = false
+  }
+}
+
+const updateStatus = async (value: number) => {
+  if (!incident.value) return
+
+  loading.status = true
+  try {
+    await incidentsStore.updateStatus(incident.value.id, value)
+
+    const status = statusesStore.items.find((s) => s.id === value)
+    if (status) incident.value.status = { ...status }
+  } catch (e) {
+    notifyError('Ошибка обновления статуса')
+  } finally {
+    loading.status = false
+  }
+}
+
+const updatePriority = async (value: number) => {
+  if (!incident.value) return
+
+  loading.priority = true
+  try {
+    await incidentsStore.updatePriority(incident.value.id, value)
+
+    const priority = prioritiesStore.items.find((p) => p.id === value)
+    if (priority) incident.value.priority = { ...priority }
+  } catch (e) {
+    notifyError('Ошибка обновления приоритета')
+  } finally {
+    loading.priority = false
+  }
+}
+
+const updateTeam = async (value: number | null) => {
+  if (!incident.value) return
+
+  loading.team = true
+  try {
+    await incidentsStore.updateTeam(incident.value.id, value ?? undefined)
+
+    const team = teamsStore.items.find((t) => t.id === value)
+    incident.value.team = team ? { ...team } : null
+  } catch (e) {
+    notifyError('Ошибка обновления команды')
+  } finally {
+    loading.team = false
+  }
+}
+
+const updateUser = async (value: number | null) => {
+  if (!incident.value) return
+
+  loading.user = true
+  try {
+    await incidentsStore.updateUser(incident.value.id, value ?? undefined)
+
+    const user = usersStore.items.find((u) => u.id === value)
+    incident.value.user = user ? { ...user } : null
+  } catch (e) {
+    notifyError('Ошибка обновления исполнителя')
+  } finally {
+    loading.user = false
   }
 }
 
