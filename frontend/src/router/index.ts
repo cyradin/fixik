@@ -5,6 +5,7 @@ import IncidentList from '@/components/incidents/IncidentList.vue'
 import IncidentDetail from '@/components/incidents/IncidentDetail.vue'
 import IncidentCreate from '@/components/incidents/IncidentCreate.vue'
 import LoginForm from '@/components/auth/LoginForm.vue'
+import StatusesView from '@/components/admin/Statuses.vue'
 
 const routes = [
   {
@@ -26,6 +27,11 @@ const routes = [
     path: '/incident/:id',
     component: IncidentDetail,
     props: true,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/statuses',
+    component: StatusesView,
     meta: { requiresAuth: true },
   },
 ]

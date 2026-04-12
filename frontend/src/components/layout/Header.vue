@@ -27,6 +27,11 @@ const logout = async () => {
   >
     <h1 style="margin: 0">Fixik: Система инцидентов</h1>
 
+    <el-menu mode="horizontal" :ellipsis="false" router>
+      <el-menu-item index="/">Инциденты</el-menu-item>
+      <el-menu-item index="/admin/statuses">Админка</el-menu-item>
+    </el-menu>
+
     <el-dropdown v-if="authStore.isAuth">
       <el-button dashed :icon="User" style="display: flex; align-items: center">
         {{ userName }}
