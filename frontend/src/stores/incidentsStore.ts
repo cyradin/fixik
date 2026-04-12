@@ -55,6 +55,7 @@ interface CreateIncident {
 interface IncidentsState {
   items: Incident[]
   pollingId: ReturnType<typeof setInterval> | null
+  pendingDeletes: Map<number, { backup: Incident; timer: ReturnType<typeof setTimeout> }>
   filters: {
     priorityIds: number[]
     unassignedOnly: boolean
@@ -65,6 +66,7 @@ export const useIncidentsStore = defineStore('incidents', {
   state: (): IncidentsState => ({
     items: [],
     pollingId: null,
+    pendingDeletes: new Map(),
     filters: {
       priorityIds: [],
       unassignedOnly: false,
@@ -73,20 +75,22 @@ export const useIncidentsStore = defineStore('incidents', {
 
   getters: {
     filteredItems: (state) => {
-      return state.items.filter((incident) => {
-        if (
-          state.filters.priorityIds.length > 0 &&
-          !state.filters.priorityIds.includes(incident.priority.id)
-        ) {
-          return false
-        }
+      return state.items
+        .filter((incident) => !state.pendingDeletes.has(incident.id))
+        .filter((incident) => {
+          if (
+            state.filters.priorityIds.length > 0 &&
+            !state.filters.priorityIds.includes(incident.priority.id)
+          ) {
+            return false
+          }
 
-        if (state.filters.unassignedOnly && incident.user) {
-          return false
-        }
+          if (state.filters.unassignedOnly && incident.user) {
+            return false
+          }
 
-        return true
-      })
+          return true
+        })
     },
   },
 
@@ -226,14 +230,42 @@ export const useIncidentsStore = defineStore('incidents', {
       }
     },
 
-    async delete(id: number) {
-      try {
-        await incidentsApi.incidentsIdDelete({ id })
-        this.removeLocal(id)
-      } catch (e) {
-        console.error('incident delete error:', e)
-        throw e
+    async delete(id: number, delay = 5000) {
+      const item = this.items.find((i) => i.id === id)
+      if (!item) return
+
+      const backup = { ...item }
+
+      this.removeLocal(id)
+
+      const existing = this.pendingDeletes.get(id)
+      if (existing) {
+        clearTimeout(existing.timer)
       }
+
+      const timer = setTimeout(async () => {
+        try {
+          await incidentsApi.incidentsIdDelete({ id })
+        } catch (e) {
+          console.error('incident delete error:', e)
+          notifyError('Ошибка удаления, восстановлено')
+          this.addLocal(backup)
+        } finally {
+          this.pendingDeletes.delete(id)
+        }
+      }, delay)
+
+      this.pendingDeletes.set(id, { backup, timer })
+    },
+
+    undoDelete(id: number) {
+      const pending = this.pendingDeletes.get(id)
+      if (!pending) return
+
+      clearTimeout(pending.timer)
+
+      this.addLocal(pending.backup)
+      this.pendingDeletes.delete(id)
     },
 
     startPolling(interval = 5000): void {

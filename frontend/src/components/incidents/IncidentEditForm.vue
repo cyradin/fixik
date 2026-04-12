@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- DESCRIPTION -->
     <el-input
       type="textarea"
       v-model="editable.description"

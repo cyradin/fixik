@@ -10,52 +10,30 @@ import { ElMessage } from 'element-plus'
 import { useIncidentsStore } from '@/stores/incidentsStore'
 import { notifyError, notifySuccess } from '@/utils/notify'
 
-const props = defineProps<{
-  id: number
-}>()
-
-const incident = computed(() => {
-  const id = Number(props.id)
-  return incidentsStore.items.find((i) => i.id === id) || null
-})
+const props = defineProps<{ id: number }>()
 
 const router = useRouter()
 const incidentsStore = useIncidentsStore()
 
 const loading = ref(false)
 
-let deleteTimer: ReturnType<typeof setTimeout> | null = null
-let pendingDeleteId: number | null = null
-let pendingBackup: any = null
-
-const cleanup = () => {
-  if (deleteTimer) {
-    clearTimeout(deleteTimer)
-    deleteTimer = null
-  }
-  pendingDeleteId = null
-  pendingBackup = null
-}
+const incident = computed(() => {
+  return incidentsStore.items.find((i) => i.id === props.id) || null
+})
 
 const deleteIncident = () => {
   if (!incident.value) return
 
   const id = incident.value.id
 
-  pendingDeleteId = id
-  pendingBackup = { ...incident.value }
-
-  incidentsStore.removeLocal(id)
+  incidentsStore.delete(id)
 
   let msg: any = null
 
   const undo = () => {
-    if (!pendingDeleteId) return
-
-    incidentsStore.addLocal(pendingBackup)
+    incidentsStore.undoDelete(id)
     msg?.close()
-    notifySuccess(`Инцидент #${pendingDeleteId} не удалён`, 'Удаление отменено')
-    cleanup()
+    notifySuccess(`Инцидент #${id} не удалён`, 'Удаление отменено')
   }
 
   msg = ElMessage({
@@ -74,21 +52,6 @@ const deleteIncident = () => {
       ),
     ]),
   })
-
-  deleteTimer = setTimeout(async () => {
-    if (!pendingDeleteId) return
-
-    try {
-      await incidentsStore.delete(pendingDeleteId)
-      notifySuccess(`Инцидент #${pendingDeleteId} удалён окончательно`, 'Инцидент удален')
-    } catch (e) {
-      incidentsStore.addLocal(pendingBackup)
-      notifyError('Ошибка удаления, восстановлено')
-    }
-
-    cleanup()
-    msg?.close()
-  }, 5000)
 
   router.push('/')
 }
