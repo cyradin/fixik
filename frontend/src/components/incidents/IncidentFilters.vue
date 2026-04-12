@@ -10,13 +10,42 @@
       {{ priority.name }}
     </el-button>
 
-    <el-button
-      size="default"
-      :type="incidentsStore.filters.unassignedOnly ? 'danger' : 'default'"
-      @click="incidentsStore.toggleUnassigned"
+    <el-select
+      v-model="incidentsStore.filters.authorIds"
+      multiple
+      clearable
+      collapse-tags
+      placeholder="Автор"
+      style="min-width: 220px"
     >
-      Не назначенные
-    </el-button>
+      <el-option v-for="u in usersStore.items" :key="u.id" :label="u.name" :value="u.id" />
+    </el-select>
+
+    <el-select
+      v-model="incidentsStore.filters.userIds"
+      multiple
+      clearable
+      collapse-tags
+      placeholder="Исполнитель"
+      style="min-width: 220px"
+    >
+      <el-option label="Не назначено" :value="null" />
+
+      <el-option v-for="u in usersStore.items" :key="u.id" :label="u.name" :value="u.id" />
+    </el-select>
+
+    <el-select
+      v-model="incidentsStore.filters.teamIds"
+      multiple
+      clearable
+      collapse-tags
+      placeholder="Команда"
+      style="min-width: 220px"
+    >
+      <el-option label="Не назначено" :value="null" />
+
+      <el-option v-for="t in teamsStore.items" :key="t.id" :label="t.name" :value="t.id" />
+    </el-select>
 
     <el-button size="default" @click="incidentsStore.resetFilters"> Сбросить </el-button>
   </el-space>
@@ -26,7 +55,11 @@
 import { computed, onMounted } from 'vue'
 import { useIncidentsStore } from '@/stores/incidentsStore'
 import { usePrioritiesStore } from '@/stores/prioritiesStore'
+import { useUsersStore } from '@/stores/usersStore'
+import { useTeamsStore } from '@/stores/teamsStore'
 
+const usersStore = useUsersStore()
+const teamsStore = useTeamsStore()
 const incidentsStore = useIncidentsStore()
 const prioritiesStore = usePrioritiesStore()
 

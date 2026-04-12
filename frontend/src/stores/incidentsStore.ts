@@ -59,7 +59,10 @@ interface IncidentsState {
   pendingDeletes: Map<number, { backup: Incident; timer: ReturnType<typeof setTimeout> }>
   filters: {
     priorityIds: number[]
-    unassignedOnly: boolean
+
+    authorIds: number[]
+    userIds: (number | null)[]
+    teamIds: (number | null)[]
   }
 }
 
@@ -69,8 +72,10 @@ export const useIncidentsStore = defineStore('incidents', {
     pollingId: null,
     pendingDeletes: new Map(),
     filters: {
-      priorityIds: [],
-      unassignedOnly: false,
+      priorityIds: [] as number[],
+      authorIds: [] as number[],
+      userIds: [] as (number | null)[],
+      teamIds: [] as (number | null)[],
     },
   }),
 
@@ -86,8 +91,22 @@ export const useIncidentsStore = defineStore('incidents', {
             return false
           }
 
-          if (state.filters.unassignedOnly && incident.user) {
-            return false
+          if (state.filters.authorIds.length) {
+            if (!incident.author) return false
+            if (!state.filters.authorIds.includes(incident.author.id)) return false
+          }
+
+          if (state.filters.userIds.length) {
+            if (!incident.user) {
+              if (!state.filters.userIds.includes(null)) return false
+            } else {
+              if (!state.filters.userIds.includes(incident.user.id)) return false
+            }
+          }
+
+          if (state.filters.teamIds.length) {
+            const teamId = incident.team?.id ?? null
+            if (!state.filters.teamIds.includes(teamId)) return false
           }
 
           return true
@@ -291,13 +310,12 @@ export const useIncidentsStore = defineStore('incidents', {
       }
     },
 
-    toggleUnassigned() {
-      this.filters.unassignedOnly = !this.filters.unassignedOnly
-    },
-
     resetFilters() {
       this.filters.priorityIds = []
-      this.filters.unassignedOnly = false
+
+      this.filters.authorIds = []
+      this.filters.userIds = []
+      this.filters.teamIds = []
     },
   },
 })
