@@ -367,6 +367,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 		PriorityID  int64
 		TeamID      *int64
 		UserID      *int64
+		AuthorID    *int64
 	}
 
 	data := []incidentSeed{
@@ -377,6 +378,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p1"],
 			TeamID:      nil,
 			UserID:      nil,
+			AuthorID:    new(frontendUsers[0]),
 		},
 		{
 			Title:       "Ошибка авторизации",
@@ -385,6 +387,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p2"],
 			TeamID:      nil,
 			UserID:      nil,
+			AuthorID:    new(frontendUsers[0]),
 		},
 		{
 			Title:       "Медленная загрузка каталога",
@@ -393,6 +396,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p3"],
 			TeamID:      nil,
 			UserID:      nil,
+			AuthorID:    new(frontendUsers[0]),
 		},
 		{
 			Title:       "Проблема с CSS",
@@ -401,6 +405,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p4"],
 			TeamID:      nil,
 			UserID:      nil,
+			AuthorID:    new(frontendUsers[0]),
 		},
 		{
 			Title:       "Кнопка оплаты не работает",
@@ -409,6 +414,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p2"],
 			TeamID:      new(teamIDs[teamFrontend]),
 			UserID:      nil,
+			AuthorID:    new(frontendUsers[0]),
 		},
 		{
 			Title:       "Неверная верстка Safari",
@@ -417,6 +423,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p3"],
 			TeamID:      new(teamIDs[teamFrontend]),
 			UserID:      nil,
+			AuthorID:    new(frontendUsers[0]),
 		},
 		{
 			Title:       "Ошибка API заказов",
@@ -425,6 +432,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p1"],
 			TeamID:      new(teamIDs[teamBackend]),
 			UserID:      nil,
+			AuthorID:    new(backendUsers[0]),
 		},
 		{
 			Title:       "Медленный SQL запрос",
@@ -433,6 +441,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p2"],
 			TeamID:      new(teamIDs[teamBackend]),
 			UserID:      nil,
+			AuthorID:    new(backendUsers[0]),
 		},
 		{
 			Title:       "Ошибка Redis кэша",
@@ -441,6 +450,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p3"],
 			TeamID:      new(teamIDs[teamBackend]),
 			UserID:      nil,
+			AuthorID:    new(backendUsers[0]),
 		},
 		{
 			Title:       "Падает CI pipeline",
@@ -449,6 +459,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p1"],
 			TeamID:      new(teamIDs[teamInfra]),
 			UserID:      nil,
+			AuthorID:    new(infraUsers[0]),
 		},
 		{
 			Title:       "Недостаточно места на диске",
@@ -457,6 +468,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p2"],
 			TeamID:      new(teamIDs[teamInfra]),
 			UserID:      nil,
+			AuthorID:    new(infraUsers[0]),
 		},
 
 		{
@@ -466,6 +478,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p2"],
 			TeamID:      new(teamIDs[teamFrontend]),
 			UserID:      new(frontendUsers[0]),
+			AuthorID:    new(frontendUsers[0]),
 		},
 		{
 			Title:       "React exception в production",
@@ -474,6 +487,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p1"],
 			TeamID:      new(teamIDs[teamFrontend]),
 			UserID:      new(frontendUsers[1]),
+			AuthorID:    new(frontendUsers[0]),
 		},
 		{
 			Title:       "Форма регистрации ломается",
@@ -482,6 +496,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p3"],
 			TeamID:      new(teamIDs[teamFrontend]),
 			UserID:      new(frontendUsers[2]),
+			AuthorID:    new(frontendUsers[0]),
 		},
 
 		{
@@ -491,6 +506,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p1"],
 			TeamID:      new(teamIDs[teamBackend]),
 			UserID:      new(backendUsers[0]),
+			AuthorID:    new(backendUsers[0]),
 		},
 		{
 			Title:       "Некорректная сериализация JSON",
@@ -499,6 +515,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p3"],
 			TeamID:      new(teamIDs[teamBackend]),
 			UserID:      new(backendUsers[1]),
+			AuthorID:    new(backendUsers[0]),
 		},
 		{
 			Title:       "Проблема с поиском",
@@ -507,6 +524,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p2"],
 			TeamID:      new(teamIDs[teamBackend]),
 			UserID:      new(backendUsers[2]),
+			AuthorID:    new(backendUsers[0]),
 		},
 
 		{
@@ -516,6 +534,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p1"],
 			TeamID:      new(teamIDs[teamInfra]),
 			UserID:      new(infraUsers[0]),
+			AuthorID:    new(infraUsers[0]),
 		},
 		{
 			Title:       "Ошибка деплоя Helm",
@@ -524,6 +543,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p2"],
 			TeamID:      new(teamIDs[teamInfra]),
 			UserID:      new(infraUsers[1]),
+			AuthorID:    new(infraUsers[0]),
 		},
 		{
 			Title:       "Проблема с балансировщиком",
@@ -532,6 +552,7 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			PriorityID:  priorityMap["p2"],
 			TeamID:      new(teamIDs[teamInfra]),
 			UserID:      new(infraUsers[2]),
+			AuthorID:    new(infraUsers[0]),
 		},
 	}
 
