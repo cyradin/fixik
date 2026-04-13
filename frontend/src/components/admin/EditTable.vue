@@ -247,8 +247,11 @@ const save = async (row: Row) => {
     if (row._isNew) {
       const res = await props.create(payload)
       Object.assign(row, res)
+      original.set(row._uid, { ...row })
     } else {
       await props.update(row.id, payload)
+
+      original.set(row._uid, { ...formModel.rows[row._uid] })
     }
 
     row._editing = false
