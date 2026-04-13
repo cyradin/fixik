@@ -22,22 +22,6 @@ definitions:
     - currentPassword
     - newPassword
     type: object
-  web.CreateDictEntityRequest:
-    properties:
-      code:
-        type: string
-      description:
-        type: string
-      name:
-        type: string
-      sort:
-        type: integer
-    required:
-    - code
-    - description
-    - name
-    - sort
-    type: object
   web.CreateIncidentRequest:
     properties:
       authorId:
@@ -59,6 +43,22 @@ definitions:
     - priorityId
     - statusId
     - title
+    type: object
+  web.CreatePriorityRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - name
+    - sort
     type: object
   web.CreateStatusRequest:
     properties:
@@ -119,25 +119,6 @@ definitions:
     - password
     - role
     - username
-    type: object
-  web.DictEntity:
-    properties:
-      code:
-        type: string
-      description:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      sort:
-        type: integer
-    required:
-    - code
-    - description
-    - id
-    - name
-    - sort
     type: object
   web.DictEntityShort:
     properties:
@@ -251,11 +232,11 @@ definitions:
     - title
     - updatedAt
     type: object
-  web.ListDictEntitiesResponse:
+  web.ListPrioritiesResponse:
     properties:
       items:
         items:
-          $ref: '#/definitions/web.DictEntity'
+          $ref: '#/definitions/web.Priority'
         type: array
     required:
     - items
@@ -315,6 +296,25 @@ definitions:
         type: string
     required:
     - code
+    type: object
+  web.Priority:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - id
+    - name
+    - sort
     type: object
   web.Role:
     properties:
@@ -379,22 +379,6 @@ definitions:
     - name
     - sort
     type: object
-  web.UpdateDictEntityRequest:
-    properties:
-      code:
-        type: string
-      description:
-        type: string
-      name:
-        type: string
-      sort:
-        type: integer
-    required:
-    - code
-    - description
-    - name
-    - sort
-    type: object
   web.UpdateIncidentRequest:
     properties:
       authorId:
@@ -411,6 +395,22 @@ definitions:
         type: string
       userId:
         type: integer
+    type: object
+  web.UpdatePriorityRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - name
+    - sort
     type: object
   web.UpdateStatusRequest:
     properties:
@@ -868,7 +868,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.ListDictEntitiesResponse'
+            $ref: '#/definitions/web.ListPrioritiesResponse'
         "401":
           description: Unauthorized
           schema:
@@ -890,14 +890,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/web.CreateDictEntityRequest'
+          $ref: '#/definitions/web.CreatePriorityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.DictEntity'
+            $ref: '#/definitions/web.Priority'
         "400":
           description: Bad Request
           schema:
@@ -960,7 +960,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.DictEntity'
+            $ref: '#/definitions/web.Priority'
         "400":
           description: Bad Request
           schema:
@@ -991,14 +991,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/web.UpdateDictEntityRequest'
+          $ref: '#/definitions/web.UpdatePriorityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.DictEntity'
+            $ref: '#/definitions/web.Priority'
         "400":
           description: Bad Request
           schema:

@@ -15,23 +15,23 @@
 
 import * as runtime from '../runtime';
 import type {
-  WebCreateDictEntityRequest,
-  WebDictEntity,
+  WebCreatePriorityRequest,
   WebErrorResponse,
-  WebListDictEntitiesResponse,
-  WebUpdateDictEntityRequest,
+  WebListPrioritiesResponse,
+  WebPriority,
+  WebUpdatePriorityRequest,
 } from '../models/index';
 import {
-    WebCreateDictEntityRequestFromJSON,
-    WebCreateDictEntityRequestToJSON,
-    WebDictEntityFromJSON,
-    WebDictEntityToJSON,
+    WebCreatePriorityRequestFromJSON,
+    WebCreatePriorityRequestToJSON,
     WebErrorResponseFromJSON,
     WebErrorResponseToJSON,
-    WebListDictEntitiesResponseFromJSON,
-    WebListDictEntitiesResponseToJSON,
-    WebUpdateDictEntityRequestFromJSON,
-    WebUpdateDictEntityRequestToJSON,
+    WebListPrioritiesResponseFromJSON,
+    WebListPrioritiesResponseToJSON,
+    WebPriorityFromJSON,
+    WebPriorityToJSON,
+    WebUpdatePriorityRequestFromJSON,
+    WebUpdatePriorityRequestToJSON,
 } from '../models/index';
 
 export interface PrioritiesIdDeleteRequest {
@@ -44,11 +44,11 @@ export interface PrioritiesIdGetRequest {
 
 export interface PrioritiesIdPutRequest {
     id: number;
-    request: WebUpdateDictEntityRequest;
+    request: WebUpdatePriorityRequest;
 }
 
 export interface PrioritiesPostRequest {
-    request: WebCreateDictEntityRequest;
+    request: WebCreatePriorityRequest;
 }
 
 /**
@@ -79,18 +79,18 @@ export class PrioritiesApi extends runtime.BaseAPI {
      * Get all priorities in dictionary
      * List priorities
      */
-    async prioritiesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebListDictEntitiesResponse>> {
+    async prioritiesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebListPrioritiesResponse>> {
         const requestOptions = await this.prioritiesGetRequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebListDictEntitiesResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebListPrioritiesResponseFromJSON(jsonValue));
     }
 
     /**
      * Get all priorities in dictionary
      * List priorities
      */
-    async prioritiesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebListDictEntitiesResponse> {
+    async prioritiesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebListPrioritiesResponse> {
         const response = await this.prioritiesGetRaw(initOverrides);
         return await response.value();
     }
@@ -172,18 +172,18 @@ export class PrioritiesApi extends runtime.BaseAPI {
      * Get status dictionary entry by ID
      * Get status by ID
      */
-    async prioritiesIdGetRaw(requestParameters: PrioritiesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebDictEntity>> {
+    async prioritiesIdGetRaw(requestParameters: PrioritiesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebPriority>> {
         const requestOptions = await this.prioritiesIdGetRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebDictEntityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebPriorityFromJSON(jsonValue));
     }
 
     /**
      * Get status dictionary entry by ID
      * Get status by ID
      */
-    async prioritiesIdGet(requestParameters: PrioritiesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebDictEntity> {
+    async prioritiesIdGet(requestParameters: PrioritiesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebPriority> {
         const response = await this.prioritiesIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -221,7 +221,7 @@ export class PrioritiesApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: WebUpdateDictEntityRequestToJSON(requestParameters['request']),
+            body: WebUpdatePriorityRequestToJSON(requestParameters['request']),
         };
     }
 
@@ -229,18 +229,18 @@ export class PrioritiesApi extends runtime.BaseAPI {
      * Update status dictionary entry by ID
      * Update status
      */
-    async prioritiesIdPutRaw(requestParameters: PrioritiesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebDictEntity>> {
+    async prioritiesIdPutRaw(requestParameters: PrioritiesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebPriority>> {
         const requestOptions = await this.prioritiesIdPutRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebDictEntityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebPriorityFromJSON(jsonValue));
     }
 
     /**
      * Update status dictionary entry by ID
      * Update status
      */
-    async prioritiesIdPut(requestParameters: PrioritiesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebDictEntity> {
+    async prioritiesIdPut(requestParameters: PrioritiesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebPriority> {
         const response = await this.prioritiesIdPutRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -270,7 +270,7 @@ export class PrioritiesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: WebCreateDictEntityRequestToJSON(requestParameters['request']),
+            body: WebCreatePriorityRequestToJSON(requestParameters['request']),
         };
     }
 
@@ -278,18 +278,18 @@ export class PrioritiesApi extends runtime.BaseAPI {
      * Create new status dictionary entry
      * Create status
      */
-    async prioritiesPostRaw(requestParameters: PrioritiesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebDictEntity>> {
+    async prioritiesPostRaw(requestParameters: PrioritiesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebPriority>> {
         const requestOptions = await this.prioritiesPostRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebDictEntityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebPriorityFromJSON(jsonValue));
     }
 
     /**
      * Create new status dictionary entry
      * Create status
      */
-    async prioritiesPost(requestParameters: PrioritiesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebDictEntity> {
+    async prioritiesPost(requestParameters: PrioritiesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebPriority> {
         const response = await this.prioritiesPostRaw(requestParameters, initOverrides);
         return await response.value();
     }

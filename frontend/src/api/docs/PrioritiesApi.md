@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost:8080/api*
 
 ## prioritiesGet
 
-> WebListDictEntitiesResponse prioritiesGet()
+> WebListPrioritiesResponse prioritiesGet()
 
 List priorities
 
@@ -51,7 +51,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**WebListDictEntitiesResponse**](WebListDictEntitiesResponse.md)
+[**WebListPrioritiesResponse**](WebListPrioritiesResponse.md)
 
 ### Authorization
 
@@ -145,7 +145,7 @@ No authorization required
 
 ## prioritiesIdGet
 
-> WebDictEntity prioritiesIdGet(id)
+> WebPriority prioritiesIdGet(id)
 
 Get status by ID
 
@@ -190,7 +190,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**WebDictEntity**](WebDictEntity.md)
+[**WebPriority**](WebPriority.md)
 
 ### Authorization
 
@@ -215,7 +215,7 @@ No authorization required
 
 ## prioritiesIdPut
 
-> WebDictEntity prioritiesIdPut(id, request)
+> WebPriority prioritiesIdPut(id, request)
 
 Update status
 
@@ -237,7 +237,7 @@ async function example() {
   const body = {
     // number | Priority ID
     id: 56,
-    // WebUpdateDictEntityRequest | Priority data
+    // WebUpdatePriorityRequest | Priority data
     request: ...,
   } satisfies PrioritiesIdPutRequest;
 
@@ -259,11 +259,11 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | Priority ID | [Defaults to `undefined`] |
-| **request** | [WebUpdateDictEntityRequest](WebUpdateDictEntityRequest.md) | Priority data | |
+| **request** | [WebUpdatePriorityRequest](WebUpdatePriorityRequest.md) | Priority data | |
 
 ### Return type
 
-[**WebDictEntity**](WebDictEntity.md)
+[**WebPriority**](WebPriority.md)
 
 ### Authorization
 
@@ -288,7 +288,7 @@ No authorization required
 
 ## prioritiesPost
 
-> WebDictEntity prioritiesPost(request)
+> WebPriority prioritiesPost(request)
 
 Create status
 
@@ -308,7 +308,7 @@ async function example() {
   const api = new PrioritiesApi();
 
   const body = {
-    // WebCreateDictEntityRequest | Priority data
+    // WebCreatePriorityRequest | Priority data
     request: ...,
   } satisfies PrioritiesPostRequest;
 
@@ -329,11 +329,11 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **request** | [WebCreateDictEntityRequest](WebCreateDictEntityRequest.md) | Priority data | |
+| **request** | [WebCreatePriorityRequest](WebCreatePriorityRequest.md) | Priority data | |
 
 ### Return type
 
-[**WebDictEntity**](WebDictEntity.md)
+[**WebPriority**](WebPriority.md)
 
 ### Authorization
 

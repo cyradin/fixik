@@ -574,7 +574,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListPrioritiesResponse"
                         }
                     },
                     "401": {
@@ -610,7 +610,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/web.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreatePriorityRequest"
                         }
                     }
                 ],
@@ -618,7 +618,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Priority"
                         }
                     },
                     "400": {
@@ -668,7 +668,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Priority"
                         }
                     },
                     "400": {
@@ -717,7 +717,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdatePriorityRequest"
                         }
                     }
                 ],
@@ -725,7 +725,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Priority"
                         }
                     },
                     "400": {
@@ -1598,29 +1598,6 @@ const docTemplate = `{
                 }
             }
         },
-        "web.CreateDictEntityRequest": {
-            "type": "object",
-            "required": [
-                "code",
-                "description",
-                "name",
-                "sort"
-            ],
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "sort": {
-                    "type": "integer"
-                }
-            }
-        },
         "web.CreateIncidentRequest": {
             "type": "object",
             "required": [
@@ -1649,6 +1626,29 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "web.CreatePriorityRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
                     "type": "integer"
                 }
             }
@@ -1735,33 +1735,6 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
-                }
-            }
-        },
-        "web.DictEntity": {
-            "type": "object",
-            "required": [
-                "code",
-                "description",
-                "id",
-                "name",
-                "sort"
-            ],
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "sort": {
-                    "type": "integer"
                 }
             }
         },
@@ -1927,7 +1900,7 @@ const docTemplate = `{
                 }
             }
         },
-        "web.ListDictEntitiesResponse": {
+        "web.ListPrioritiesResponse": {
             "type": "object",
             "required": [
                 "items"
@@ -1936,7 +1909,7 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/web.DictEntity"
+                        "$ref": "#/definitions/web.Priority"
                     }
                 }
             }
@@ -2024,6 +1997,33 @@ const docTemplate = `{
             "properties": {
                 "code": {
                     "type": "string"
+                }
+            }
+        },
+        "web.Priority": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "id",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
                 }
             }
         },
@@ -2116,29 +2116,6 @@ const docTemplate = `{
                 }
             }
         },
-        "web.UpdateDictEntityRequest": {
-            "type": "object",
-            "required": [
-                "code",
-                "description",
-                "name",
-                "sort"
-            ],
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "sort": {
-                    "type": "integer"
-                }
-            }
-        },
         "web.UpdateIncidentRequest": {
             "type": "object",
             "properties": {
@@ -2161,6 +2138,29 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "web.UpdatePriorityRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
                     "type": "integer"
                 }
             }

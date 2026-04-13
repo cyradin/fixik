@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateDictEntity(t *testing.T) {
+func TestCreatePriority(t *testing.T) {
 	t.Parallel()
 
 	t.Run("success", func(t *testing.T) {
@@ -31,16 +31,16 @@ func TestCreateDictEntity(t *testing.T) {
 				}, nil
 			},
 		}
-		req := CreateDictEntityRequest{
+		req := CreatePriorityRequest{
 			Name:        "Test",
 			Code:        "TST",
 			Description: "desc",
 			Sort:        42,
 		}
-		rr := testRequest(t, createDictEntity(m), http.MethodPost, "/dummy", req)
+		rr := testRequest(t, createPriority(m), http.MethodPost, "/dummy", req)
 		require.Equal(t, http.StatusOK, rr.Code)
 
-		var resp DictEntity
+		var resp Priority
 
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
@@ -53,8 +53,8 @@ func TestCreateDictEntity(t *testing.T) {
 		t.Parallel()
 
 		m := &mockManager{}
-		req := CreateDictEntityRequest{Name: "", Code: ""}
-		rr := testRequest(t, createDictEntity(m), http.MethodPost, "/dummy", req)
+		req := CreatePriorityRequest{Name: "", Code: ""}
+		rr := testRequest(t, createPriority(m), http.MethodPost, "/dummy", req)
 		require.Equal(t, http.StatusBadRequest, rr.Code)
 	})
 
@@ -66,13 +66,13 @@ func TestCreateDictEntity(t *testing.T) {
 				return dict.Entity{}, errors.New("create failed")
 			},
 		}
-		req := CreateDictEntityRequest{Name: "Name", Code: "C", Sort: 123}
-		rr := testRequest(t, createDictEntity(m), http.MethodPost, "/dummy", req)
+		req := CreatePriorityRequest{Name: "Name", Code: "C", Sort: 123}
+		rr := testRequest(t, createPriority(m), http.MethodPost, "/dummy", req)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
 	})
 }
 
-func TestGetDictEntity(t *testing.T) {
+func TestGetPriority(t *testing.T) {
 	t.Parallel()
 
 	t.Run("success", func(t *testing.T) {
@@ -84,7 +84,7 @@ func TestGetDictEntity(t *testing.T) {
 			},
 		}
 		r := chi.NewRouter()
-		r.Get("/entities/{id}", getDictEntity(m))
+		r.Get("/entities/{id}", getPriority(m))
 
 		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil)
 		rr := httptest.NewRecorder()
@@ -92,7 +92,7 @@ func TestGetDictEntity(t *testing.T) {
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusOK, rr.Code)
 
-		var resp DictEntity
+		var resp Priority
 
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
@@ -105,7 +105,7 @@ func TestGetDictEntity(t *testing.T) {
 		m := &mockManager{}
 		r := chi.NewRouter()
 
-		r.Get("/entities/{id}", getDictEntity(m))
+		r.Get("/entities/{id}", getPriority(m))
 
 		req := httptest.NewRequest(http.MethodGet, "/entities/abc", nil)
 		rr := httptest.NewRecorder()
@@ -122,7 +122,7 @@ func TestGetDictEntity(t *testing.T) {
 			},
 		}
 		r := chi.NewRouter()
-		r.Get("/entities/{id}", getDictEntity(m))
+		r.Get("/entities/{id}", getPriority(m))
 
 		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil)
 		rr := httptest.NewRecorder()
@@ -131,7 +131,7 @@ func TestGetDictEntity(t *testing.T) {
 	})
 }
 
-func TestUpdateDictEntity(t *testing.T) {
+func TestUpdatePriority(t *testing.T) {
 	t.Parallel()
 
 	t.Run("success", func(t *testing.T) {
@@ -141,9 +141,9 @@ func TestUpdateDictEntity(t *testing.T) {
 			updateFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) { return e, nil },
 		}
 		r := chi.NewRouter()
-		r.Put("/entities/{id}", updateDictEntity(m))
+		r.Put("/entities/{id}", updatePriority(m))
 
-		reqBody := UpdateDictEntityRequest{Name: "Updated", Code: "UPD", Sort: 123}
+		reqBody := UpdatePriorityRequest{Name: "Updated", Code: "UPD", Sort: 123}
 		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -157,9 +157,9 @@ func TestUpdateDictEntity(t *testing.T) {
 
 		m := &mockManager{}
 		r := chi.NewRouter()
-		r.Put("/entities/{id}", updateDictEntity(m))
+		r.Put("/entities/{id}", updatePriority(m))
 
-		reqBody := UpdateDictEntityRequest{Name: "", Code: ""}
+		reqBody := UpdatePriorityRequest{Name: "", Code: ""}
 		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -173,9 +173,9 @@ func TestUpdateDictEntity(t *testing.T) {
 
 		m := &mockManager{}
 		r := chi.NewRouter()
-		r.Put("/entities/{id}", updateDictEntity(m))
+		r.Put("/entities/{id}", updatePriority(m))
 
-		reqBody := UpdateDictEntityRequest{Name: "X", Code: "X"}
+		reqBody := UpdatePriorityRequest{Name: "X", Code: "X"}
 		req := httptest.NewRequest(http.MethodPut, "/entities/abc", jsonBody(t, reqBody))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -193,9 +193,9 @@ func TestUpdateDictEntity(t *testing.T) {
 			},
 		}
 		r := chi.NewRouter()
-		r.Put("/entities/{id}", updateDictEntity(m))
+		r.Put("/entities/{id}", updatePriority(m))
 
-		reqBody := UpdateDictEntityRequest{Name: "X", Code: "X", Sort: 123}
+		reqBody := UpdatePriorityRequest{Name: "X", Code: "X", Sort: 123}
 		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -205,7 +205,7 @@ func TestUpdateDictEntity(t *testing.T) {
 	})
 }
 
-func TestDeleteDictEntity(t *testing.T) {
+func TestDeletePriority(t *testing.T) {
 	t.Parallel()
 
 	t.Run("success", func(t *testing.T) {
@@ -214,7 +214,7 @@ func TestDeleteDictEntity(t *testing.T) {
 		deleted := false
 		m := &mockManager{deleteFn: func(ctx context.Context, id int64) error { deleted = true; return nil }}
 		r := chi.NewRouter()
-		r.Delete("/entities/{id}", deleteDictEntity(m))
+		r.Delete("/entities/{id}", deletePriority(m))
 
 		req := httptest.NewRequest(http.MethodDelete, "/entities/42", nil)
 		rr := httptest.NewRecorder()
@@ -228,7 +228,7 @@ func TestDeleteDictEntity(t *testing.T) {
 
 		m := &mockManager{}
 		r := chi.NewRouter()
-		r.Delete("/entities/{id}", deleteDictEntity(m))
+		r.Delete("/entities/{id}", deletePriority(m))
 
 		req := httptest.NewRequest(http.MethodDelete, "/entities/abc", nil)
 		rr := httptest.NewRecorder()
@@ -241,7 +241,7 @@ func TestDeleteDictEntity(t *testing.T) {
 
 		m := &mockManager{deleteFn: func(ctx context.Context, id int64) error { return errors.New("fail") }}
 		r := chi.NewRouter()
-		r.Delete("/entities/{id}", deleteDictEntity(m))
+		r.Delete("/entities/{id}", deletePriority(m))
 
 		req := httptest.NewRequest(http.MethodDelete, "/entities/1", nil)
 		rr := httptest.NewRecorder()
@@ -250,7 +250,7 @@ func TestDeleteDictEntity(t *testing.T) {
 	})
 }
 
-func TestListDictEntities(t *testing.T) {
+func TestListPriorities(t *testing.T) {
 	t.Parallel()
 
 	t.Run("success", func(t *testing.T) {
@@ -264,10 +264,10 @@ func TestListDictEntities(t *testing.T) {
 				}, nil
 			},
 		}
-		rr := testRequest(t, listDictEntities(m), http.MethodGet, "/dummy", nil)
+		rr := testRequest(t, listPriorities(m), http.MethodGet, "/dummy", nil)
 		require.Equal(t, http.StatusOK, rr.Code)
 
-		var resp ListDictEntitiesResponse
+		var resp ListPrioritiesResponse
 
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
@@ -280,10 +280,10 @@ func TestListDictEntities(t *testing.T) {
 		m := &mockManager{
 			listFn: func(ctx context.Context) ([]dict.Entity, error) { return []dict.Entity{}, nil },
 		}
-		rr := testRequest(t, listDictEntities(m), http.MethodGet, "/dummy", nil)
+		rr := testRequest(t, listPriorities(m), http.MethodGet, "/dummy", nil)
 		require.Equal(t, http.StatusOK, rr.Code)
 
-		var resp ListDictEntitiesResponse
+		var resp ListPrioritiesResponse
 
 		err := json.NewDecoder(rr.Body).Decode(&resp)
 		require.NoError(t, err)
@@ -296,7 +296,7 @@ func TestListDictEntities(t *testing.T) {
 		m := &mockManager{
 			listFn: func(ctx context.Context) ([]dict.Entity, error) { return nil, errors.New("fail") },
 		}
-		rr := testRequest(t, listDictEntities(m), http.MethodGet, "/dummy", nil)
+		rr := testRequest(t, listPriorities(m), http.MethodGet, "/dummy", nil)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
 	})
 }

@@ -1,12 +1,72 @@
 package web
 
 import (
+	"context"
 	"net/http"
+	"strconv"
 
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/internal/dict"
 	"github.com/go-chi/chi/v5"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
+
+const (
+	maxNameLen = 100
+	maxCodeLen = 50
+)
+
+type priorityManager interface {
+	Create(ctx context.Context, e dict.Entity) (dict.Entity, error)
+	GetByID(ctx context.Context, id int64) (dict.Entity, error)
+	List(ctx context.Context) ([]dict.Entity, error)
+	Update(ctx context.Context, s dict.Entity) (dict.Entity, error)
+	Delete(ctx context.Context, id int64) error
+}
+
+type CreatePriorityRequest struct {
+	Name        string `json:"name" validate:"required"`
+	Code        string `json:"code" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	Sort        int    `json:"sort" validate:"required"`
+}
+
+func (r CreatePriorityRequest) Validate() error {
+	return validation.ValidateStruct(
+		&r,
+		validation.Field(&r.Name, validation.Required, validation.Length(1, maxNameLen)),
+		validation.Field(&r.Code, validation.Required, validation.Length(1, maxCodeLen)),
+		validation.Field(&r.Sort, validation.Required),
+	)
+}
+
+type UpdatePriorityRequest struct {
+	Name        string `json:"name" validate:"required"`
+	Code        string `json:"code" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	Sort        int    `json:"sort" validate:"required"`
+}
+
+func (r UpdatePriorityRequest) Validate() error {
+	return validation.ValidateStruct(
+		&r,
+		validation.Field(&r.Name, validation.Required, validation.Length(1, maxNameLen)),
+		validation.Field(&r.Code, validation.Required, validation.Length(1, maxCodeLen)),
+		validation.Field(&r.Sort, validation.Required),
+	)
+}
+
+type ListPrioritiesResponse struct {
+	Items []Priority `json:"items" validate:"required"`
+}
+
+type Priority struct {
+	ID          int64  `json:"id" validate:"required"`
+	Name        string `json:"name" validate:"required"`
+	Code        string `json:"code" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	Sort        int    `json:"sort" validate:"required"`
+}
 
 func priorityRoutes(c *container.Container) func(r chi.Router) {
 	priorityManager := c.PriorityManager()
@@ -25,14 +85,28 @@ func priorityRoutes(c *container.Container) func(r chi.Router) {
 // @Tags priorities
 // @Accept json
 // @Produce json
-// @Param request body CreateDictEntityRequest true "Priority data"
-// @Success 200 {object} DictEntity
+// @Param request body CreatePriorityRequest true "Priority data"
+// @Success 200 {object} Priority
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities [post]
-func createPriority(manager *dict.EntityManager) http.HandlerFunc {
-	return createDictEntity(manager)
+func createPriority(manager priorityManager) http.HandlerFunc {
+	return handle(func(ctx context.Context, req CreatePriorityRequest) (Priority, error) {
+		entity := dict.Entity{
+			Name:        req.Name,
+			Code:        req.Code,
+			Description: req.Description,
+			Sort:        req.Sort,
+		}
+
+		result, err := manager.Create(ctx, entity)
+		if err != nil {
+			return Priority{}, err
+		}
+
+		return toPriorityResponse(result), nil
+	})
 }
 
 // @Summary Get status by ID
@@ -41,13 +115,28 @@ func createPriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Priority ID"
-// @Success 200 {object} DictEntity
+// @Success 200 {object} Priority
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [get]
-func getPriority(manager *dict.EntityManager) http.HandlerFunc {
-	return getDictEntity(manager)
+func getPriority(manager priorityManager) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+		if err != nil {
+			handleError(r.Context(), w, ErrRequestPathEntityID)
+			return
+		}
+
+		handle(func(ctx context.Context, _ NoBody) (Priority, error) {
+			result, err := manager.GetByID(ctx, id)
+			if err != nil {
+				return Priority{}, err
+			}
+
+			return toPriorityResponse(result), nil
+		})(w, r)
+	}
 }
 
 // @Summary Update status
@@ -56,14 +145,37 @@ func getPriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Priority ID"
-// @Param request body UpdateDictEntityRequest true "Priority data"
-// @Success 200 {object} DictEntity
+// @Param request body UpdatePriorityRequest true "Priority data"
+// @Success 200 {object} Priority
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [put]
-func updatePriority(manager *dict.EntityManager) http.HandlerFunc {
-	return updateDictEntity(manager)
+func updatePriority(manager priorityManager) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+		if err != nil {
+			handleError(r.Context(), w, ErrRequestPathEntityID)
+			return
+		}
+
+		handle(func(ctx context.Context, req UpdatePriorityRequest) (Priority, error) {
+			entity := dict.Entity{
+				ID:          id,
+				Name:        req.Name,
+				Code:        req.Code,
+				Description: req.Description,
+				Sort:        req.Sort,
+			}
+
+			result, err := manager.Update(ctx, entity)
+			if err != nil {
+				return Priority{}, err
+			}
+
+			return toPriorityResponse(result), nil
+		})(w, r)
+	}
 }
 
 // deletePriority godoc
@@ -78,8 +190,22 @@ func updatePriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [delete]
-func deletePriority(manager *dict.EntityManager) http.HandlerFunc {
-	return deleteDictEntity(manager)
+func deletePriority(manager priorityManager) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+		if err != nil {
+			handleError(r.Context(), w, ErrRequestPathEntityID)
+			return
+		}
+
+		handle(func(ctx context.Context, _ NoBody) (NoBody, error) {
+			if err := manager.Delete(ctx, id); err != nil {
+				return NoBody{}, err
+			}
+
+			return NoBody{}, nil
+		})(w, r)
+	}
 }
 
 // listPriorities godoc
@@ -88,10 +214,32 @@ func deletePriority(manager *dict.EntityManager) http.HandlerFunc {
 // @Tags priorities
 // @Accept json
 // @Produce json
-// @Success 200 {object} ListDictEntitiesResponse
+// @Success 200 {object} ListPrioritiesResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities [get]
-func listPriorities(manager *dict.EntityManager) http.HandlerFunc {
-	return listDictEntities(manager)
+func listPriorities(manager priorityManager) http.HandlerFunc {
+	return handle(func(ctx context.Context, _ NoBody) (ListPrioritiesResponse, error) {
+		items, err := manager.List(ctx)
+		if err != nil {
+			return ListPrioritiesResponse{}, err
+		}
+
+		resp := make([]Priority, 0, len(items))
+		for _, item := range items {
+			resp = append(resp, toPriorityResponse(item))
+		}
+
+		return ListPrioritiesResponse{Items: resp}, nil
+	})
+}
+
+func toPriorityResponse(item dict.Entity) Priority {
+	return Priority{
+		ID:          item.ID,
+		Name:        item.Name,
+		Code:        item.Code,
+		Description: item.Description,
+		Sort:        item.Sort,
+	}
 }
