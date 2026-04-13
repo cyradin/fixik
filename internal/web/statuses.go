@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/cyradin/fixik/internal/container"
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/cyradin/fixik/internal/status"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -87,10 +88,15 @@ func statusRoutes(c *container.Container) func(r chi.Router) {
 // @Success 200 {object} Status
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses [post]
 func createStatus(manager statusManager) http.HandlerFunc {
 	return handle(func(ctx context.Context, req CreateStatusRequest) (Status, error) {
+		if !checkPermissions(ctx, role.StatusCreate) {
+			return Status{}, ErrForbidden
+		}
+
 		entity := status.Status{
 			Name:        req.Name,
 			Code:        req.Code,
@@ -117,6 +123,7 @@ func createStatus(manager statusManager) http.HandlerFunc {
 // @Success 200 {object} Status
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [get]
 func getStatus(manager statusManager) http.HandlerFunc {
@@ -128,6 +135,10 @@ func getStatus(manager statusManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (Status, error) {
+			if !checkPermissions(ctx, role.StatusGet) {
+				return Status{}, ErrForbidden
+			}
+
 			result, err := manager.GetByID(ctx, id)
 			if err != nil {
 				return Status{}, err
@@ -148,6 +159,7 @@ func getStatus(manager statusManager) http.HandlerFunc {
 // @Success 200 {object} Status
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [put]
 func updateStatus(manager statusManager) http.HandlerFunc {
@@ -159,6 +171,10 @@ func updateStatus(manager statusManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, req UpdateStatusRequest) (Status, error) {
+			if !checkPermissions(ctx, role.StatusUpdate) {
+				return Status{}, ErrForbidden
+			}
+
 			entity := status.Status{
 				ID:          id,
 				Name:        req.Name,
@@ -188,6 +204,7 @@ func updateStatus(manager statusManager) http.HandlerFunc {
 // @Success 200
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [delete]
 func deleteStatus(manager statusManager) http.HandlerFunc {
@@ -199,6 +216,10 @@ func deleteStatus(manager statusManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (NoBody, error) {
+			if !checkPermissions(ctx, role.StatusDelete) {
+				return NoBody{}, ErrForbidden
+			}
+
 			if err := manager.Delete(ctx, id); err != nil {
 				return NoBody{}, err
 			}
@@ -216,10 +237,15 @@ func deleteStatus(manager statusManager) http.HandlerFunc {
 // @Produce json
 // @Success 200 {object} ListStatusesResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses [get]
 func listStatuses(manager statusManager) http.HandlerFunc {
 	return handle(func(ctx context.Context, _ NoBody) (ListStatusesResponse, error) {
+		if !checkPermissions(ctx, role.StatusGet) {
+			return ListStatusesResponse{}, ErrForbidden
+		}
+
 		items, err := manager.List(ctx)
 		if err != nil {
 			return ListStatusesResponse{}, err

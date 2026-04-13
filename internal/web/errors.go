@@ -6,6 +6,8 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/cyradin/fixik/internal/role"
+	"github.com/cyradin/fixik/internal/user"
 	"github.com/cyradin/fixik/pkg/logger"
 )
 
@@ -47,6 +49,12 @@ var (
 			Status: http.StatusBadRequest,
 			Msg:    msg,
 		}
+	}
+
+	ErrForbidden = &UserMessageError{
+		Err:    errors.New(http.StatusText(http.StatusForbidden)),
+		Status: http.StatusForbidden,
+		Msg:    "Доступ запрещен",
 	}
 )
 
@@ -107,4 +115,13 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.WriteHeader(status)
 
 	_ = json.NewEncoder(w).Encode(v)
+}
+
+func checkPermissions(ctx context.Context, perms role.Permission) bool {
+	u, ok := user.FromContext(ctx)
+	if !ok {
+		return false
+	}
+
+	return role.Can(u.Role, perms)
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/internal/incident"
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
@@ -154,10 +155,15 @@ func incidentRoutes(c *container.Container) func(r chi.Router) {
 // @Success 200 {object} IncidentResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents [post]
 func createIncident(manager incidentManager) http.HandlerFunc {
 	return handle(func(ctx context.Context, req CreateIncidentRequest) (IncidentResponse, error) {
+		if !checkPermissions(ctx, role.IncidentCreate) {
+			return IncidentResponse{}, ErrForbidden
+		}
+
 		if err := req.Validate(); err != nil {
 			return IncidentResponse{}, err
 		}
@@ -188,6 +194,7 @@ func createIncident(manager incidentManager) http.HandlerFunc {
 // @Success 200 {object} IncidentResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents/{id} [get]
 func getIncident(manager incidentManager) http.HandlerFunc {
@@ -199,6 +206,10 @@ func getIncident(manager incidentManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (IncidentResponse, error) {
+			if !checkPermissions(ctx, role.IncidentGet) {
+				return IncidentResponse{}, ErrForbidden
+			}
+
 			i, err := manager.GetByID(ctx, id)
 			if err != nil {
 				return IncidentResponse{}, err
@@ -219,6 +230,7 @@ func getIncident(manager incidentManager) http.HandlerFunc {
 // @Success 200 {object} IncidentResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents/{id} [patch]
 func updateIncident(manager incidentManager) http.HandlerFunc {
@@ -230,6 +242,10 @@ func updateIncident(manager incidentManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, req UpdateIncidentRequest) (IncidentResponse, error) {
+			if !checkPermissions(ctx, role.IncidentUpdate) {
+				return IncidentResponse{}, ErrForbidden
+			}
+
 			if err := req.Validate(); err != nil {
 				return IncidentResponse{}, err
 			}
@@ -262,6 +278,7 @@ func updateIncident(manager incidentManager) http.HandlerFunc {
 // @Success 200
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents/{id} [delete]
 func deleteIncident(manager incidentManager) http.HandlerFunc {
@@ -273,6 +290,10 @@ func deleteIncident(manager incidentManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (NoBody, error) {
+			if !checkPermissions(ctx, role.IncidentDelete) {
+				return NoBody{}, ErrForbidden
+			}
+
 			return NoBody{}, manager.Delete(ctx, id)
 		})(w, r)
 	}
@@ -288,6 +309,7 @@ func deleteIncident(manager incidentManager) http.HandlerFunc {
 // @Success 200 {object} IncidentListResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents [get]
 func listIncidents(manager incidentManager) http.HandlerFunc {
@@ -299,6 +321,10 @@ func listIncidents(manager incidentManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (IncidentListResponse, error) {
+			if !checkPermissions(ctx, role.IncidentGet) {
+				return IncidentListResponse{}, ErrForbidden
+			}
+
 			listResult, err := manager.List(ctx, limit, offset)
 			if err != nil {
 				return IncidentListResponse{}, err
@@ -380,6 +406,7 @@ func toIncidentResponse(i incident.Incident) IncidentResponse {
 // @Success 200 {object} IncidentComment
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents/{id}/comments [post]
 func createIncidentComment(manager commentCreater) http.HandlerFunc {
@@ -391,6 +418,10 @@ func createIncidentComment(manager commentCreater) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, req IncidentCommentCreateRequest) (IncidentComment, error) {
+			if !checkPermissions(ctx, role.CommentCreate) {
+				return IncidentComment{}, ErrForbidden
+			}
+
 			if err := req.Validate(); err != nil {
 				return IncidentComment{}, err
 			}
@@ -416,6 +447,7 @@ func createIncidentComment(manager commentCreater) http.HandlerFunc {
 // @Success 200 {object} IncidentCommentListResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /incidents/{id}/comments [get]
 func getIncidentComments(manager commentByIncidentLister) http.HandlerFunc {
@@ -433,6 +465,10 @@ func getIncidentComments(manager commentByIncidentLister) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (IncidentCommentListResponse, error) {
+			if !checkPermissions(ctx, role.CommentGet) {
+				return IncidentCommentListResponse{}, ErrForbidden
+			}
+
 			result, err := manager.ListByIncident(ctx, incidentID, limit, offset)
 			if err != nil {
 				return IncidentCommentListResponse{}, err

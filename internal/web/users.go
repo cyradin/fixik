@@ -132,10 +132,15 @@ func userRoutes(c *container.Container) func(r chi.Router) {
 // @Success 200 {object} UserResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users [post]
 func createUser(manager userCreater) http.HandlerFunc {
 	return handle(func(ctx context.Context, req CreateUserRequest) (UserResponse, error) {
+		if !checkPermissions(ctx, role.UserCreate) {
+			return UserResponse{}, ErrForbidden
+		}
+
 		if err := req.Validate(); err != nil {
 			return UserResponse{}, err
 		}
@@ -164,6 +169,7 @@ func createUser(manager userCreater) http.HandlerFunc {
 // @Success 200 {object} UserResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users/{id} [get]
 func getUser(manager userGetter) http.HandlerFunc {
@@ -175,6 +181,10 @@ func getUser(manager userGetter) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (UserResponse, error) {
+			if !checkPermissions(ctx, role.UserGet) {
+				return UserResponse{}, ErrForbidden
+			}
+
 			u, err := manager.GetByID(ctx, id)
 			if err != nil {
 				return UserResponse{}, err
@@ -195,6 +205,7 @@ func getUser(manager userGetter) http.HandlerFunc {
 // @Success 200 {object} UserResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users/{id} [patch]
 func updateUser(manager userUpdater) http.HandlerFunc {
@@ -206,6 +217,10 @@ func updateUser(manager userUpdater) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, req UpdateUserRequest) (UserResponse, error) {
+			if !checkPermissions(ctx, role.UserUpdate) {
+				return UserResponse{}, ErrForbidden
+			}
+
 			u, err := manager.Update(ctx, user.UpdateUser{
 				ID:       id,
 				Username: req.Username,
@@ -232,6 +247,7 @@ func updateUser(manager userUpdater) http.HandlerFunc {
 // @Success 200
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users/{id} [delete]
 func deleteUser(manager userDeleter) http.HandlerFunc {
@@ -243,6 +259,10 @@ func deleteUser(manager userDeleter) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (NoBody, error) {
+			if !checkPermissions(ctx, role.UserDelete) {
+				return NoBody{}, ErrForbidden
+			}
+
 			return NoBody{}, manager.Delete(ctx, id)
 		})(w, r)
 	}
@@ -258,6 +278,7 @@ func deleteUser(manager userDeleter) http.HandlerFunc {
 // @Success 200 {object} ListUsersResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /users [get]
 func listUsers(manager userLister) http.HandlerFunc {
@@ -269,6 +290,10 @@ func listUsers(manager userLister) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (ListUsersResponse, error) {
+			if !checkPermissions(ctx, role.UserGet) {
+				return ListUsersResponse{}, ErrForbidden
+			}
+
 			users, err := manager.List(ctx, limit, offset)
 			if err != nil {
 				return ListUsersResponse{}, err

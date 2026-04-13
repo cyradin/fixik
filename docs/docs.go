@@ -644,7 +644,7 @@ const docTemplate = `{
         },
         "/priorities/{id}": {
             "get": {
-                "description": "Get status dictionary entry by ID",
+                "description": "Get priority dictionary entry by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -654,7 +654,7 @@ const docTemplate = `{
                 "tags": [
                     "priorities"
                 ],
-                "summary": "Get status by ID",
+                "summary": "Get priority by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -692,7 +692,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Update status dictionary entry by ID",
+                "description": "Update priority dictionary entry by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -702,7 +702,7 @@ const docTemplate = `{
                 "tags": [
                     "priorities"
                 ],
-                "summary": "Update status",
+                "summary": "Update priority",
                 "parameters": [
                     {
                         "type": "integer",
@@ -749,7 +749,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete status dictionary entry by ID",
+                "description": "Delete priority dictionary entry by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -759,7 +759,7 @@ const docTemplate = `{
                 "tags": [
                     "priorities"
                 ],
-                "summary": "Delete status",
+                "summary": "Delete priority",
                 "parameters": [
                     {
                         "type": "integer",

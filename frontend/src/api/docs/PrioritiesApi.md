@@ -5,9 +5,9 @@ All URIs are relative to *http://localhost:8080/api*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**prioritiesGet**](PrioritiesApi.md#prioritiesget) | **GET** /priorities | List priorities |
-| [**prioritiesIdDelete**](PrioritiesApi.md#prioritiesiddelete) | **DELETE** /priorities/{id} | Delete status |
-| [**prioritiesIdGet**](PrioritiesApi.md#prioritiesidget) | **GET** /priorities/{id} | Get status by ID |
-| [**prioritiesIdPut**](PrioritiesApi.md#prioritiesidput) | **PUT** /priorities/{id} | Update status |
+| [**prioritiesIdDelete**](PrioritiesApi.md#prioritiesiddelete) | **DELETE** /priorities/{id} | Delete priority |
+| [**prioritiesIdGet**](PrioritiesApi.md#prioritiesidget) | **GET** /priorities/{id} | Get priority by ID |
+| [**prioritiesIdPut**](PrioritiesApi.md#prioritiesidput) | **PUT** /priorities/{id} | Update priority |
 | [**prioritiesPost**](PrioritiesApi.md#prioritiespost) | **POST** /priorities | Create status |
 
 
@@ -77,9 +77,9 @@ No authorization required
 
 > prioritiesIdDelete(id)
 
-Delete status
+Delete priority
 
-Delete status dictionary entry by ID
+Delete priority dictionary entry by ID
 
 ### Example
 
@@ -147,9 +147,9 @@ No authorization required
 
 > WebPriority prioritiesIdGet(id)
 
-Get status by ID
+Get priority by ID
 
-Get status dictionary entry by ID
+Get priority dictionary entry by ID
 
 ### Example
 
@@ -217,9 +217,9 @@ No authorization required
 
 > WebPriority prioritiesIdPut(id, request)
 
-Update status
+Update priority
 
-Update status dictionary entry by ID
+Update priority dictionary entry by ID
 
 ### Example
 

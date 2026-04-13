@@ -7,6 +7,7 @@ import (
 
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
@@ -89,10 +90,15 @@ func priorityRoutes(c *container.Container) func(r chi.Router) {
 // @Success 200 {object} Priority
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities [post]
 func createPriority(manager priorityManager) http.HandlerFunc {
 	return handle(func(ctx context.Context, req CreatePriorityRequest) (Priority, error) {
+		if !checkPermissions(ctx, role.PriorityCreate) {
+			return Priority{}, ErrForbidden
+		}
+
 		entity := dict.Entity{
 			Name:        req.Name,
 			Code:        req.Code,
@@ -109,8 +115,8 @@ func createPriority(manager priorityManager) http.HandlerFunc {
 	})
 }
 
-// @Summary Get status by ID
-// @Description Get status dictionary entry by ID
+// @Summary Get priority by ID
+// @Description Get priority dictionary entry by ID
 // @Tags priorities
 // @Accept json
 // @Produce json
@@ -118,6 +124,7 @@ func createPriority(manager priorityManager) http.HandlerFunc {
 // @Success 200 {object} Priority
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [get]
 func getPriority(manager priorityManager) http.HandlerFunc {
@@ -129,6 +136,10 @@ func getPriority(manager priorityManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (Priority, error) {
+			if !checkPermissions(ctx, role.PriorityGet) {
+				return Priority{}, ErrForbidden
+			}
+
 			result, err := manager.GetByID(ctx, id)
 			if err != nil {
 				return Priority{}, err
@@ -139,8 +150,8 @@ func getPriority(manager priorityManager) http.HandlerFunc {
 	}
 }
 
-// @Summary Update status
-// @Description Update status dictionary entry by ID
+// @Summary Update priority
+// @Description Update priority dictionary entry by ID
 // @Tags priorities
 // @Accept json
 // @Produce json
@@ -149,6 +160,7 @@ func getPriority(manager priorityManager) http.HandlerFunc {
 // @Success 200 {object} Priority
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [put]
 func updatePriority(manager priorityManager) http.HandlerFunc {
@@ -160,6 +172,10 @@ func updatePriority(manager priorityManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, req UpdatePriorityRequest) (Priority, error) {
+			if !checkPermissions(ctx, role.PriorityUpdate) {
+				return Priority{}, ErrForbidden
+			}
+
 			entity := dict.Entity{
 				ID:          id,
 				Name:        req.Name,
@@ -179,8 +195,8 @@ func updatePriority(manager priorityManager) http.HandlerFunc {
 }
 
 // deletePriority godoc
-// @Summary Delete status
-// @Description Delete status dictionary entry by ID
+// @Summary Delete priority
+// @Description Delete priority dictionary entry by ID
 // @Tags priorities
 // @Accept json
 // @Produce json
@@ -188,6 +204,7 @@ func updatePriority(manager priorityManager) http.HandlerFunc {
 // @Success 200
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities/{id} [delete]
 func deletePriority(manager priorityManager) http.HandlerFunc {
@@ -199,6 +216,10 @@ func deletePriority(manager priorityManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (NoBody, error) {
+			if !checkPermissions(ctx, role.PriorityDelete) {
+				return NoBody{}, ErrForbidden
+			}
+
 			if err := manager.Delete(ctx, id); err != nil {
 				return NoBody{}, err
 			}
@@ -216,10 +237,15 @@ func deletePriority(manager priorityManager) http.HandlerFunc {
 // @Produce json
 // @Success 200 {object} ListPrioritiesResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /priorities [get]
 func listPriorities(manager priorityManager) http.HandlerFunc {
 	return handle(func(ctx context.Context, _ NoBody) (ListPrioritiesResponse, error) {
+		if !checkPermissions(ctx, role.PriorityGet) {
+			return ListPrioritiesResponse{}, ErrForbidden
+		}
+
 		items, err := manager.List(ctx)
 		if err != nil {
 			return ListPrioritiesResponse{}, err

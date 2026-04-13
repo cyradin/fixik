@@ -123,8 +123,8 @@ export class PrioritiesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete status dictionary entry by ID
-     * Delete status
+     * Delete priority dictionary entry by ID
+     * Delete priority
      */
     async prioritiesIdDeleteRaw(requestParameters: PrioritiesIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const requestOptions = await this.prioritiesIdDeleteRequestOpts(requestParameters);
@@ -134,8 +134,8 @@ export class PrioritiesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete status dictionary entry by ID
-     * Delete status
+     * Delete priority dictionary entry by ID
+     * Delete priority
      */
     async prioritiesIdDelete(requestParameters: PrioritiesIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.prioritiesIdDeleteRaw(requestParameters, initOverrides);
@@ -169,8 +169,8 @@ export class PrioritiesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get status dictionary entry by ID
-     * Get status by ID
+     * Get priority dictionary entry by ID
+     * Get priority by ID
      */
     async prioritiesIdGetRaw(requestParameters: PrioritiesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebPriority>> {
         const requestOptions = await this.prioritiesIdGetRequestOpts(requestParameters);
@@ -180,8 +180,8 @@ export class PrioritiesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get status dictionary entry by ID
-     * Get status by ID
+     * Get priority dictionary entry by ID
+     * Get priority by ID
      */
     async prioritiesIdGet(requestParameters: PrioritiesIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebPriority> {
         const response = await this.prioritiesIdGetRaw(requestParameters, initOverrides);
@@ -226,8 +226,8 @@ export class PrioritiesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update status dictionary entry by ID
-     * Update status
+     * Update priority dictionary entry by ID
+     * Update priority
      */
     async prioritiesIdPutRaw(requestParameters: PrioritiesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebPriority>> {
         const requestOptions = await this.prioritiesIdPutRequestOpts(requestParameters);
@@ -237,8 +237,8 @@ export class PrioritiesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update status dictionary entry by ID
-     * Update status
+     * Update priority dictionary entry by ID
+     * Update priority
      */
     async prioritiesIdPut(requestParameters: PrioritiesIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebPriority> {
         const response = await this.prioritiesIdPutRaw(requestParameters, initOverrides);

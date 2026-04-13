@@ -7,6 +7,7 @@ import (
 
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
@@ -84,10 +85,15 @@ func teamRoutes(c *container.Container) func(r chi.Router) {
 // @Success 200 {object} Team
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams [post]
 func createTeam(manager teamManager) http.HandlerFunc {
 	return handle(func(ctx context.Context, req CreateTeamRequest) (Team, error) {
+		if !checkPermissions(ctx, role.TeamCreate) {
+			return Team{}, ErrForbidden
+		}
+
 		entity := dict.Entity{
 			Name:        req.Name,
 			Code:        req.Code,
@@ -113,6 +119,7 @@ func createTeam(manager teamManager) http.HandlerFunc {
 // @Success 200 {object} Team
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams/{id} [get]
 func getTeam(manager teamManager) http.HandlerFunc {
@@ -124,6 +131,10 @@ func getTeam(manager teamManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (Team, error) {
+			if !checkPermissions(ctx, role.TeamGet) {
+				return Team{}, ErrForbidden
+			}
+
 			result, err := manager.GetByID(ctx, id)
 			if err != nil {
 				return Team{}, err
@@ -144,6 +155,7 @@ func getTeam(manager teamManager) http.HandlerFunc {
 // @Success 200 {object} Team
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams/{id} [put]
 func updateTeam(manager teamManager) http.HandlerFunc {
@@ -155,6 +167,10 @@ func updateTeam(manager teamManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, req UpdateTeamRequest) (Team, error) {
+			if !checkPermissions(ctx, role.TeamUpdate) {
+				return Team{}, ErrForbidden
+			}
+
 			entity := dict.Entity{
 				ID:          id,
 				Name:        req.Name,
@@ -183,6 +199,7 @@ func updateTeam(manager teamManager) http.HandlerFunc {
 // @Success 200
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams/{id} [delete]
 func deleteTeam(manager teamManager) http.HandlerFunc {
@@ -194,6 +211,10 @@ func deleteTeam(manager teamManager) http.HandlerFunc {
 		}
 
 		handle(func(ctx context.Context, _ NoBody) (NoBody, error) {
+			if !checkPermissions(ctx, role.TeamDelete) {
+				return NoBody{}, ErrForbidden
+			}
+
 			if err := manager.Delete(ctx, id); err != nil {
 				return NoBody{}, err
 			}
@@ -211,10 +232,15 @@ func deleteTeam(manager teamManager) http.HandlerFunc {
 // @Produce json
 // @Success 200 {object} ListTeamsResponse
 // @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /teams [get]
 func listTeams(manager teamManager) http.HandlerFunc {
 	return handle(func(ctx context.Context, _ NoBody) (ListTeamsResponse, error) {
+		if !checkPermissions(ctx, role.TeamGet) {
+			return ListTeamsResponse{}, ErrForbidden
+		}
+
 		items, err := manager.List(ctx)
 		if err != nil {
 			return ListTeamsResponse{}, err

@@ -917,7 +917,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Delete status dictionary entry by ID
+      description: Delete priority dictionary entry by ID
       parameters:
       - description: Priority ID
         in: path
@@ -941,13 +941,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/web.ErrorResponse'
-      summary: Delete status
+      summary: Delete priority
       tags:
       - priorities
     get:
       consumes:
       - application/json
-      description: Get status dictionary entry by ID
+      description: Get priority dictionary entry by ID
       parameters:
       - description: Priority ID
         in: path
@@ -973,13 +973,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/web.ErrorResponse'
-      summary: Get status by ID
+      summary: Get priority by ID
       tags:
       - priorities
     put:
       consumes:
       - application/json
-      description: Update status dictionary entry by ID
+      description: Update priority dictionary entry by ID
       parameters:
       - description: Priority ID
         in: path
@@ -1011,7 +1011,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/web.ErrorResponse'
-      summary: Update status
+      summary: Update priority
       tags:
       - priorities
   /roles:
