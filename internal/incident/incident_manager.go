@@ -188,6 +188,7 @@ func (m *IncidentManager) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
+// nolint:gocognit
 func (m *IncidentManager) List(ctx context.Context, limit, offset int) (IncidentList, error) {
 	listResult, err := m.repo.List(ctx, limit, offset)
 	if err != nil {

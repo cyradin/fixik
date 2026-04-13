@@ -115,7 +115,7 @@ func getStatus(manager *status.StatusManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -146,7 +146,7 @@ func updateStatus(manager *status.StatusManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -186,7 +186,7 @@ func deleteStatus(manager *status.StatusManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 

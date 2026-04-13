@@ -169,7 +169,7 @@ func getUser(manager userGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -200,7 +200,7 @@ func updateUser(manager userUpdater) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -237,7 +237,7 @@ func deleteUser(manager userDeleter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -263,7 +263,7 @@ func listUsers(manager userLister) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		limit, offset, err := decodePagination(r, 1, 100) //nolint:mnd
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 

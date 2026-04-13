@@ -7,6 +7,7 @@
 Name | Type
 ------------ | -------------
 `error` | string
+`userMessage` | string
 
 ## Example
 
@@ -16,6 +17,7 @@ import type { WebErrorResponse } from ''
 // TODO: Update the object below with actual values
 const example = {
   "error": null,
+  "userMessage": null,
 } satisfies WebErrorResponse
 
 console.log(example)

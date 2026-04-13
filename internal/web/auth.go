@@ -81,7 +81,7 @@ func authLogin(srv userLoginer, accessTTL, refreshTTL time.Duration, secureCooki
 			result, err := srv.Login(ctx, req.Username, req.Password)
 			if err != nil {
 				if errors.Is(err, user.ErrUserNotFound) {
-					return UserResponse{}, UnauthorizedError{Err: err}
+					return UserResponse{}, ErrInvalidLoginPassword
 				}
 
 				return UserResponse{}, err
@@ -126,12 +126,12 @@ func authRefresh(srv tokenRefresher, accessTTL, refreshTTL time.Duration, secure
 		handle(func(ctx context.Context, req NoBody) (UserResponse, error) {
 			rtCookie, err := r.Cookie(refreshTokenCookie)
 			if err != nil {
-				return UserResponse{}, UnauthorizedError{Err: fmt.Errorf("refresh token missing")}
+				return UserResponse{}, &UserMessageError{Err: fmt.Errorf("refresh token missing"), Status: http.StatusUnauthorized}
 			}
 
 			result, err := srv.Refresh(ctx, rtCookie.Value)
 			if err != nil {
-				return UserResponse{}, UnauthorizedError{Err: err}
+				return UserResponse{}, &UserMessageError{Err: err, Status: http.StatusUnauthorized}
 			}
 
 			setAccessToken(w, result.AccessToken, accessTTL, secureCookies)
@@ -158,7 +158,7 @@ func changePassword(passwordChanger passwordChanger) http.HandlerFunc {
 		handle(func(ctx context.Context, req ChangePasswordRequest) (NoBody, error) {
 			u, ok := user.FromContext(r.Context())
 			if !ok {
-				return NoBody{}, UnauthorizedError{Err: fmt.Errorf("no user in context")}
+				return NoBody{}, ErrUnauthorized
 			}
 
 			if err := req.Validate(); err != nil {
@@ -167,7 +167,7 @@ func changePassword(passwordChanger passwordChanger) http.HandlerFunc {
 
 			if err := passwordChanger.ChangePassword(ctx, u.ID, req.CurrentPassword, req.NewPassword); err != nil {
 				if errors.Is(err, user.ErrUserNotFound) || errors.Is(err, user.ErrUserInvalidPassword) {
-					return NoBody{}, UnauthorizedError{Err: err}
+					return NoBody{}, ErrInvalidPassword
 				}
 
 				return NoBody{}, err

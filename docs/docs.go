@@ -1763,8 +1763,17 @@ const docTemplate = `{
         },
         "web.ErrorResponse": {
             "type": "object",
+            "required": [
+                "error",
+                "userMessage"
+            ],
             "properties": {
                 "error": {
+                    "description": "причина ошибки",
+                    "type": "string"
+                },
+                "userMessage": {
+                    "description": "сообщение, которое нужно показать пользователю",
                     "type": "string"
                 }
             }

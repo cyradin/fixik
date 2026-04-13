@@ -20,17 +20,25 @@ import { mapValues } from '../runtime';
  */
 export interface WebErrorResponse {
     /**
-     * 
+     * причина ошибки
      * @type {string}
      * @memberof WebErrorResponse
      */
-    error?: string;
+    error: string;
+    /**
+     * сообщение, которое нужно показать пользователю
+     * @type {string}
+     * @memberof WebErrorResponse
+     */
+    userMessage: string;
 }
 
 /**
  * Check if a given object implements the WebErrorResponse interface.
  */
 export function instanceOfWebErrorResponse(value: object): value is WebErrorResponse {
+    if (!('error' in value) || value['error'] === undefined) return false;
+    if (!('userMessage' in value) || value['userMessage'] === undefined) return false;
     return true;
 }
 
@@ -44,7 +52,8 @@ export function WebErrorResponseFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'error': json['error'] == null ? undefined : json['error'],
+        'error': json['error'],
+        'userMessage': json['userMessage'],
     };
 }
 
@@ -60,6 +69,7 @@ export function WebErrorResponseToJSONTyped(value?: WebErrorResponse | null, ign
     return {
         
         'error': value['error'],
+        'userMessage': value['userMessage'],
     };
 }
 

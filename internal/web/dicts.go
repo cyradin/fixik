@@ -89,7 +89,7 @@ func getDictEntity(manager entityManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -108,7 +108,7 @@ func updateDictEntity(manager entityManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -135,7 +135,7 @@ func deleteDictEntity(manager entityManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 

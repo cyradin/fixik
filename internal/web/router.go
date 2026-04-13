@@ -3,35 +3,16 @@ package web
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
 	"strconv"
 
 	"github.com/cyradin/fixik/internal/container"
-	"github.com/cyradin/fixik/internal/user"
-	"github.com/cyradin/fixik/pkg/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
-
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-type UnauthorizedError struct {
-	Err error
-}
-
-func (e UnauthorizedError) Error() string {
-	return "unauthorized"
-}
-
-func (e UnauthorizedError) Unwrap() error {
-	return e.Err
-}
 
 func NewRouter(c *container.Container, allowedOriginsCORS []string) *chi.Mux {
 	r := chi.NewRouter()
@@ -78,26 +59,13 @@ func decodeJSON(r *http.Request, v any) error {
 	return dec.Decode(v)
 }
 
-func writeError(w http.ResponseWriter, status int, err error) {
-	writeJSON(w, status, ErrorResponse{
-		Error: err.Error(),
-	})
-}
-
-func writeJSON(w http.ResponseWriter, status int, v any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-
-	_ = json.NewEncoder(w).Encode(v)
-}
-
 func handle[Req any, Resp any](fn func(ctx context.Context, req Req) (Resp, error)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req Req
 
 		if _, ok := any(req).(NoBody); !ok {
 			if err := decodeJSON(r, &req); err != nil {
-				writeError(w, http.StatusBadRequest, err)
+				handleError(r.Context(), w, ErrRequestDecode(err.Error()))
 				return
 			}
 		}
@@ -105,7 +73,7 @@ func handle[Req any, Resp any](fn func(ctx context.Context, req Req) (Resp, erro
 		// optional validation
 		if v, ok := any(req).(Validatable); ok {
 			if err := v.Validate(); err != nil {
-				writeError(w, http.StatusBadRequest, err)
+				handleError(r.Context(), w, ErrValidation(err.Error()))
 				return
 			}
 		}
@@ -124,28 +92,6 @@ func handle[Req any, Resp any](fn func(ctx context.Context, req Req) (Resp, erro
 			w.WriteHeader(http.StatusOK)
 		}
 	}
-}
-
-func handleError(ctx context.Context, w http.ResponseWriter, err error) {
-	var (
-		unauthErr UnauthorizedError
-	)
-
-	// nolint:gocritic
-	switch true {
-	case errors.As(err, &unauthErr):
-		if errors.Is(unauthErr.Err, user.ErrUserNotFound) {
-			writeError(w, http.StatusUnauthorized, fmt.Errorf("user not found"))
-			return
-		}
-
-		writeError(w, http.StatusUnauthorized, fmt.Errorf("unauthorized"))
-
-		return
-	}
-
-	logger.FromContext(ctx).Error("request error", logger.Error(err))
-	writeError(w, http.StatusInternalServerError, err)
 }
 
 type Validatable interface {

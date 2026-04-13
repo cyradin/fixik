@@ -194,7 +194,7 @@ func getIncident(manager incidentManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -225,7 +225,7 @@ func updateIncident(manager incidentManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -268,7 +268,7 @@ func deleteIncident(manager incidentManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -294,7 +294,7 @@ func listIncidents(manager incidentManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		limit, offset, err := decodePagination(r, 1, 100) //nolint:mnd
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrValidation(err.Error()))
 			return
 		}
 
@@ -386,7 +386,7 @@ func createIncidentComment(manager commentCreater) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		incidentID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
@@ -422,13 +422,13 @@ func getIncidentComments(manager commentByIncidentLister) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		incidentID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrRequestPathEntityID)
 			return
 		}
 
 		limit, offset, err := decodePagination(r, 1, 100) //nolint:mnd
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
+			handleError(r.Context(), w, ErrValidation(err.Error()))
 			return
 		}
 

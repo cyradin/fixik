@@ -139,7 +139,14 @@ definitions:
   web.ErrorResponse:
     properties:
       error:
+        description: причина ошибки
         type: string
+      userMessage:
+        description: сообщение, которое нужно показать пользователю
+        type: string
+    required:
+    - error
+    - userMessage
     type: object
   web.IncidentComment:
     properties:
