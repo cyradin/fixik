@@ -86,9 +86,10 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   function can(permission: string): boolean
-  function can(permission: string[]): boolean
-  function can(permission: string | string[]): boolean {
+  function can(permission: readonly string[]): boolean
+  function can(permission: string | readonly string[]): boolean {
     const perms = Array.isArray(permission) ? permission : [permission]
+
     return perms.every((p) => userPermissions.value.has(p))
   }
 

@@ -13,7 +13,7 @@ import AdminUsers from '@/views/admin/Users.vue'
 
 import UserProfile from '@/views/user/Profile.vue'
 import UserInfo from '@/views/user/Info.vue'
-import { PERMISSIONS } from '@/constants/permissions'
+import { PERMISSION_GROUPS } from '@/constants/permissions'
 import Forbidden from '@/views/Forbidden.vue'
 
 const routes = [
@@ -43,11 +43,7 @@ const routes = [
     component: AdminStatuses,
     meta: {
       requiresAuth: true,
-      permissions: [
-        PERMISSIONS.STATUS_CREATE,
-        PERMISSIONS.STATUS_UPDATE,
-        PERMISSIONS.STATUS_DELETE,
-      ],
+      permissions: PERMISSION_GROUPS.STATUS_ADMIN,
     },
   },
   {
@@ -55,11 +51,7 @@ const routes = [
     component: AdminPriorities,
     meta: {
       requiresAuth: true,
-      permissions: [
-        PERMISSIONS.PRIORITY_CREATE,
-        PERMISSIONS.PRIORITY_UPDATE,
-        PERMISSIONS.PRIORITY_DELETE,
-      ],
+      permissions: PERMISSION_GROUPS.PRIORITY_ADMIN,
     },
   },
   {
@@ -67,7 +59,7 @@ const routes = [
     component: AdminTeams,
     meta: {
       requiresAuth: true,
-      permissions: [PERMISSIONS.TEAM_CREATE, PERMISSIONS.TEAM_UPDATE, PERMISSIONS.TEAM_DELETE],
+      permissions: PERMISSION_GROUPS.TEAM_ADMIN,
     },
   },
   {
@@ -75,7 +67,7 @@ const routes = [
     component: AdminUsers,
     meta: {
       requiresAuth: true,
-      permissions: [PERMISSIONS.USER_CREATE, PERMISSIONS.USER_UPDATE, PERMISSIONS.USER_DELETE],
+      permissions: PERMISSION_GROUPS.USER_ADMIN,
     },
   },
   {

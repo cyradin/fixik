@@ -6,10 +6,18 @@
 
     <el-menu v-if="authStore.isAuth" mode="horizontal" :ellipsis="false" router>
       <el-menu-item index="/">Инциденты</el-menu-item>
-      <el-menu-item index="/admin/statuses">Статусы</el-menu-item>
-      <el-menu-item index="/admin/priorities">Приоритеты</el-menu-item>
-      <el-menu-item index="/admin/teams">Команды</el-menu-item>
-      <el-menu-item index="/admin/users">Пользователи</el-menu-item>
+      <el-menu-item index="/admin/statuses" v-if="can(PERMISSION_GROUPS.STATUS_ADMIN)"
+        >Статусы</el-menu-item
+      >
+      <el-menu-item index="/admin/priorities" v-if="can(PERMISSION_GROUPS.PRIORITY_ADMIN)"
+        >Приоритеты</el-menu-item
+      >
+      <el-menu-item index="/admin/teams" v-if="can(PERMISSION_GROUPS.TEAM_ADMIN)"
+        >Команды</el-menu-item
+      >
+      <el-menu-item index="/admin/users" v-if="can(PERMISSION_GROUPS.USER_ADMIN)"
+        >Пользователи</el-menu-item
+      >
     </el-menu>
 
     <el-dropdown v-if="authStore.isAuth">
@@ -34,9 +42,12 @@ import { useRouter } from 'vue-router'
 import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElButton, ElNotification } from 'element-plus'
 import { User } from '@element-plus/icons-vue'
 import { notifyError } from '@/utils/notify'
+import { PERMISSION_GROUPS } from '@/constants/permissions'
 
 const authStore = useAuthStore()
 const router = useRouter()
+
+const can = authStore.can
 
 const userName = computed(() => authStore.user?.name || authStore.user?.username || 'Пользователь')
 

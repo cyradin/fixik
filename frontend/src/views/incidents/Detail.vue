@@ -5,7 +5,7 @@
     <el-space style="width: 100%" alignment="center" justify="space-between">
       <h2 style="margin: 0">#{{ incident.id }} {{ incident.title }}</h2>
 
-      <IncidentDeleteButton :id="Number(id)" />
+      <IncidentDeleteButton :id="Number(id)" v-if="can(PERMISSIONS.INCIDENT_DELETE)" />
     </el-space>
 
     <p v-if="incident.author">
@@ -41,10 +41,15 @@ import IncidentEditForm from '@/components/incidents/IncidentEditForm.vue'
 import { useIncidentsStore } from '@/stores/incidentsStore'
 import { formatDateTime } from '@/utils/date'
 import UserLink from '@/components/users/UserLink.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { PERMISSIONS } from '@/constants/permissions'
 
 const router = useRouter()
 
 const incidentsStore = useIncidentsStore()
+const authStore = useAuthStore()
+
+const can = authStore.can
 
 const props = defineProps<{
   id: string
