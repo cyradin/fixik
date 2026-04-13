@@ -29,6 +29,9 @@ var allRoles = []Role{
 		Permissions: IncidentGet |
 			IncidentCreate |
 			IncidentUpdate |
+			CommentGet |
+			CommentCreate |
+			CommentUpdate |
 			UserGet |
 			TeamGet |
 			PriorityGet |
@@ -42,6 +45,10 @@ var allRoles = []Role{
 			IncidentCreate |
 			IncidentUpdate |
 			IncidentDelete |
+			CommentGet |
+			CommentCreate |
+			CommentUpdate |
+			CommentDelete |
 			UserGet |
 			TeamGet |
 			PriorityGet |
@@ -61,6 +68,10 @@ var allRoles = []Role{
 			IncidentCreate |
 			IncidentUpdate |
 			IncidentDelete |
+			CommentGet |
+			CommentCreate |
+			CommentUpdate |
+			CommentDelete |
 			UserGet |
 			UserCreate |
 			UserUpdate |
@@ -111,6 +122,12 @@ const (
 	IncidentUpdate
 	IncidentDelete
 
+	// Comment
+	CommentGet
+	CommentCreate
+	CommentUpdate
+	CommentDelete
+
 	// User
 	UserGet
 	UserCreate
@@ -141,6 +158,10 @@ var permissionCodes = map[Permission]string{
 	IncidentCreate: "INCIDENT_CREATE",
 	IncidentUpdate: "INCIDENT_UPDATE",
 	IncidentDelete: "INCIDENT_DELETE",
+	CommentGet:     "COMMENT_GET",
+	CommentCreate:  "COMMENT_CREATE",
+	CommentUpdate:  "COMMENT_UPDATE",
+	CommentDelete:  "COMMENT_DELETE",
 	UserGet:        "USER_GET",
 	UserCreate:     "USER_CREATE",
 	UserUpdate:     "USER_UPDATE",
