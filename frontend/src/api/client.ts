@@ -31,7 +31,6 @@ function withAuthRefresh<T extends (...args: any[]) => Promise<any>>(fn: T): T {
 
         return fn(...args)
       }
-      notifyError('Ошибка запроса к серверу')
       throw e
     }
   }) as T

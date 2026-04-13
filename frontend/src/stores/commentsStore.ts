@@ -72,7 +72,6 @@ export const useCommentsStore = defineStore('comments', {
 
         return comment
       } catch (e) {
-        notifyError('Не удалось добавить комментарий')
         throw e
       }
     },

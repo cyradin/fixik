@@ -36,21 +36,22 @@ const rules = {
 }
 
 const submit = async () => {
-  try {
-    await formRef.value.validate()
-    loading.value = true
+  loading.value = true
 
-    await authStore.changePassword(form.currentPassword, form.newPassword)
+  await formRef.value?.validate(async (valid: boolean) => {
+    if (!valid) return
 
-    notifySuccess('Пароль изменён')
+    try {
+      await authStore.changePassword(form.currentPassword, form.newPassword)
+      notifySuccess('Пароль изменён')
 
-    form.currentPassword = ''
-    form.newPassword = ''
-  } catch (e: any) {
-    notifyError(e.message || 'Не удалось изменить пароль')
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
+      form.currentPassword = ''
+      form.newPassword = ''
+    } catch (e: any) {
+      notifyError(e.message || 'Не удалось изменить пароль')
+    }
+  })
+
+  loading.value = false
 }
 </script>

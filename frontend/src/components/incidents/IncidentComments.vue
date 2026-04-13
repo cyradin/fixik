@@ -60,6 +60,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useCommentsStore } from '@/stores/commentsStore'
 import { formatDateTime } from '@/utils/date'
+import { notifyError } from '@/utils/notify'
 
 const props = defineProps<{
   incidentId: number
@@ -99,6 +100,8 @@ const submit = async () => {
 
     store.setPage(props.incidentId, 1)
     store.fetch(props.incidentId, 1, limit)
+  } catch (e) {
+    notifyError('Не удалось добавить комментарий')
   } finally {
     loadingCreate.value = false
   }

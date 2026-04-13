@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { authApi, usersApi } from '@/api/client'
+import { extractUserMessage } from '@/utils/errors'
+import { notifyError } from '@/utils/notify'
 
 export interface CurrentUser {
   id: number
@@ -13,7 +15,6 @@ export interface CurrentUser {
 export const useAuthStore = defineStore('auth', () => {
   const isAuth = ref(false)
   const loading = ref(false)
-  const error = ref('')
   const initialized = ref(false)
   const user = ref<CurrentUser | null>(null)
 
@@ -23,17 +24,13 @@ export const useAuthStore = defineStore('auth', () => {
       const data = await authApi.authLoginPost({ request: { username, password } })
       isAuth.value = true
       user.value = data
-      error.value = ''
     } catch (e: any) {
-      if (e.response?.status === 401) {
-        error.value = 'Неверный логин или пароль'
-      } else {
-        error.value = 'Что-то пошло не так. Попробуйте позже'
-      }
-
       isAuth.value = false
       user.value = null
-      throw e
+
+      console.log('login error: ', e)
+
+      throw new Error(await extractUserMessage(e))
     } finally {
       loading.value = false
     }
@@ -74,28 +71,20 @@ export const useAuthStore = defineStore('auth', () => {
         },
       })
     } catch (e: any) {
-      if (e?.response?.status === 401) {
-        throw new Error('Неверный текущий пароль')
-      }
+      console.log('login error: ', e)
 
-      throw e
+      throw new Error(await extractUserMessage(e))
     }
-  }
-
-  const clearError = () => {
-    error.value = ''
   }
 
   return {
     isAuth,
     loading,
-    error,
     initialized,
     user,
     login,
     logout,
     refresh,
-    clearError,
     changePassword,
   }
 })
