@@ -11,6 +11,14 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
+type statusManager interface {
+	Create(ctx context.Context, s status.Status) (status.Status, error)
+	GetByID(ctx context.Context, id int64) (status.Status, error)
+	List(ctx context.Context) ([]status.Status, error)
+	Update(ctx context.Context, s status.Status) (status.Status, error)
+	Delete(ctx context.Context, id int64) error
+}
+
 type CreateStatusRequest struct {
 	Name        string `json:"name" validate:"required"`
 	Code        string `json:"code" validate:"required"`
@@ -81,7 +89,7 @@ func statusRoutes(c *container.Container) func(r chi.Router) {
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses [post]
-func createStatus(manager *status.StatusManager) http.HandlerFunc {
+func createStatus(manager statusManager) http.HandlerFunc {
 	return handle(func(ctx context.Context, req CreateStatusRequest) (Status, error) {
 		entity := status.Status{
 			Name:        req.Name,
@@ -111,7 +119,7 @@ func createStatus(manager *status.StatusManager) http.HandlerFunc {
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [get]
-func getStatus(manager *status.StatusManager) http.HandlerFunc {
+func getStatus(manager statusManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -142,7 +150,7 @@ func getStatus(manager *status.StatusManager) http.HandlerFunc {
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [put]
-func updateStatus(manager *status.StatusManager) http.HandlerFunc {
+func updateStatus(manager statusManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -182,7 +190,7 @@ func updateStatus(manager *status.StatusManager) http.HandlerFunc {
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses/{id} [delete]
-func deleteStatus(manager *status.StatusManager) http.HandlerFunc {
+func deleteStatus(manager statusManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -210,7 +218,7 @@ func deleteStatus(manager *status.StatusManager) http.HandlerFunc {
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /statuses [get]
-func listStatuses(manager *status.StatusManager) http.HandlerFunc {
+func listStatuses(manager statusManager) http.HandlerFunc {
 	return handle(func(ctx context.Context, _ NoBody) (ListStatusesResponse, error) {
 		items, err := manager.List(ctx)
 		if err != nil {
