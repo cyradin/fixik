@@ -15,23 +15,23 @@
 
 import * as runtime from '../runtime';
 import type {
-  WebCreateDictEntityRequest,
-  WebDictEntity,
+  WebCreateTeamRequest,
   WebErrorResponse,
-  WebListDictEntitiesResponse,
-  WebUpdateDictEntityRequest,
+  WebListTeamsResponse,
+  WebTeam,
+  WebUpdateTeamRequest,
 } from '../models/index';
 import {
-    WebCreateDictEntityRequestFromJSON,
-    WebCreateDictEntityRequestToJSON,
-    WebDictEntityFromJSON,
-    WebDictEntityToJSON,
+    WebCreateTeamRequestFromJSON,
+    WebCreateTeamRequestToJSON,
     WebErrorResponseFromJSON,
     WebErrorResponseToJSON,
-    WebListDictEntitiesResponseFromJSON,
-    WebListDictEntitiesResponseToJSON,
-    WebUpdateDictEntityRequestFromJSON,
-    WebUpdateDictEntityRequestToJSON,
+    WebListTeamsResponseFromJSON,
+    WebListTeamsResponseToJSON,
+    WebTeamFromJSON,
+    WebTeamToJSON,
+    WebUpdateTeamRequestFromJSON,
+    WebUpdateTeamRequestToJSON,
 } from '../models/index';
 
 export interface TeamsIdDeleteRequest {
@@ -44,11 +44,11 @@ export interface TeamsIdGetRequest {
 
 export interface TeamsIdPutRequest {
     id: number;
-    request: WebUpdateDictEntityRequest;
+    request: WebUpdateTeamRequest;
 }
 
 export interface TeamsPostRequest {
-    request: WebCreateDictEntityRequest;
+    request: WebCreateTeamRequest;
 }
 
 /**
@@ -79,18 +79,18 @@ export class TeamsApi extends runtime.BaseAPI {
      * Get all teams in dictionary
      * List teams
      */
-    async teamsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebListDictEntitiesResponse>> {
+    async teamsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebListTeamsResponse>> {
         const requestOptions = await this.teamsGetRequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebListDictEntitiesResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebListTeamsResponseFromJSON(jsonValue));
     }
 
     /**
      * Get all teams in dictionary
      * List teams
      */
-    async teamsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebListDictEntitiesResponse> {
+    async teamsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebListTeamsResponse> {
         const response = await this.teamsGetRaw(initOverrides);
         return await response.value();
     }
@@ -172,18 +172,18 @@ export class TeamsApi extends runtime.BaseAPI {
      * Get team dictionary entry by ID
      * Get team by ID
      */
-    async teamsIdGetRaw(requestParameters: TeamsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebDictEntity>> {
+    async teamsIdGetRaw(requestParameters: TeamsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebTeam>> {
         const requestOptions = await this.teamsIdGetRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebDictEntityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebTeamFromJSON(jsonValue));
     }
 
     /**
      * Get team dictionary entry by ID
      * Get team by ID
      */
-    async teamsIdGet(requestParameters: TeamsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebDictEntity> {
+    async teamsIdGet(requestParameters: TeamsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebTeam> {
         const response = await this.teamsIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -221,7 +221,7 @@ export class TeamsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: WebUpdateDictEntityRequestToJSON(requestParameters['request']),
+            body: WebUpdateTeamRequestToJSON(requestParameters['request']),
         };
     }
 
@@ -229,18 +229,18 @@ export class TeamsApi extends runtime.BaseAPI {
      * Update team dictionary entry by ID
      * Update team
      */
-    async teamsIdPutRaw(requestParameters: TeamsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebDictEntity>> {
+    async teamsIdPutRaw(requestParameters: TeamsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebTeam>> {
         const requestOptions = await this.teamsIdPutRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebDictEntityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebTeamFromJSON(jsonValue));
     }
 
     /**
      * Update team dictionary entry by ID
      * Update team
      */
-    async teamsIdPut(requestParameters: TeamsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebDictEntity> {
+    async teamsIdPut(requestParameters: TeamsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebTeam> {
         const response = await this.teamsIdPutRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -270,7 +270,7 @@ export class TeamsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: WebCreateDictEntityRequestToJSON(requestParameters['request']),
+            body: WebCreateTeamRequestToJSON(requestParameters['request']),
         };
     }
 
@@ -278,18 +278,18 @@ export class TeamsApi extends runtime.BaseAPI {
      * Create new team dictionary entry
      * Create team
      */
-    async teamsPostRaw(requestParameters: TeamsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebDictEntity>> {
+    async teamsPostRaw(requestParameters: TeamsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WebTeam>> {
         const requestOptions = await this.teamsPostRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WebDictEntityFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WebTeamFromJSON(jsonValue));
     }
 
     /**
      * Create new team dictionary entry
      * Create team
      */
-    async teamsPost(requestParameters: TeamsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebDictEntity> {
+    async teamsPost(requestParameters: TeamsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WebTeam> {
         const response = await this.teamsPostRaw(requestParameters, initOverrides);
         return await response.value();
     }

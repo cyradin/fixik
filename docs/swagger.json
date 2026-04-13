@@ -1080,7 +1080,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListTeamsResponse"
                         }
                     },
                     "401": {
@@ -1116,7 +1116,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/web.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateTeamRequest"
                         }
                     }
                 ],
@@ -1124,7 +1124,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Team"
                         }
                     },
                     "400": {
@@ -1174,7 +1174,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Team"
                         }
                     },
                     "400": {
@@ -1223,7 +1223,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateTeamRequest"
                         }
                     }
                 ],
@@ -1231,7 +1231,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Team"
                         }
                     },
                     "400": {
@@ -1677,6 +1677,29 @@
                 }
             }
         },
+        "web.CreateTeamRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
         "web.CreateUserRequest": {
             "type": "object",
             "required": [
@@ -1943,6 +1966,20 @@
                 }
             }
         },
+        "web.ListTeamsResponse": {
+            "type": "object",
+            "required": [
+                "items"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.Team"
+                    }
+                }
+            }
+        },
         "web.ListUsersResponse": {
             "type": "object",
             "required": [
@@ -2049,6 +2086,33 @@
                 }
             }
         },
+        "web.Team": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "id",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
         "web.UpdateDictEntityRequest": {
             "type": "object",
             "required": [
@@ -2116,6 +2180,29 @@
                 },
                 "isFinal": {
                     "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
+        "web.UpdateTeamRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"

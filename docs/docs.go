@@ -1083,7 +1083,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.ListDictEntitiesResponse"
+                            "$ref": "#/definitions/web.ListTeamsResponse"
                         }
                     },
                     "401": {
@@ -1119,7 +1119,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/web.CreateDictEntityRequest"
+                            "$ref": "#/definitions/web.CreateTeamRequest"
                         }
                     }
                 ],
@@ -1127,7 +1127,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Team"
                         }
                     },
                     "400": {
@@ -1177,7 +1177,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Team"
                         }
                     },
                     "400": {
@@ -1226,7 +1226,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/web.UpdateDictEntityRequest"
+                            "$ref": "#/definitions/web.UpdateTeamRequest"
                         }
                     }
                 ],
@@ -1234,7 +1234,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.DictEntity"
+                            "$ref": "#/definitions/web.Team"
                         }
                     },
                     "400": {
@@ -1680,6 +1680,29 @@ const docTemplate = `{
                 }
             }
         },
+        "web.CreateTeamRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
         "web.CreateUserRequest": {
             "type": "object",
             "required": [
@@ -1946,6 +1969,20 @@ const docTemplate = `{
                 }
             }
         },
+        "web.ListTeamsResponse": {
+            "type": "object",
+            "required": [
+                "items"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.Team"
+                    }
+                }
+            }
+        },
         "web.ListUsersResponse": {
             "type": "object",
             "required": [
@@ -2052,6 +2089,33 @@ const docTemplate = `{
                 }
             }
         },
+        "web.Team": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "id",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
         "web.UpdateDictEntityRequest": {
             "type": "object",
             "required": [
@@ -2119,6 +2183,29 @@ const docTemplate = `{
                 },
                 "isFinal": {
                     "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
+        "web.UpdateTeamRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "description",
+                "name",
+                "sort"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"

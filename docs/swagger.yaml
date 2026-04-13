@@ -79,6 +79,22 @@ definitions:
     - name
     - sort
     type: object
+  web.CreateTeamRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - name
+    - sort
+    type: object
   web.CreateUserRequest:
     properties:
       email:
@@ -262,6 +278,15 @@ definitions:
     required:
     - items
     type: object
+  web.ListTeamsResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/web.Team'
+        type: array
+    required:
+    - items
+    type: object
   web.ListUsersResponse:
     properties:
       items:
@@ -335,6 +360,25 @@ definitions:
     - name
     - sort
     type: object
+  web.Team:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
+    - id
+    - name
+    - sort
+    type: object
   web.UpdateDictEntityRequest:
     properties:
       code:
@@ -384,6 +428,22 @@ definitions:
     - code
     - description
     - isFinal
+    - name
+    - sort
+    type: object
+  web.UpdateTeamRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      sort:
+        type: integer
+    required:
+    - code
+    - description
     - name
     - sort
     type: object
@@ -1145,7 +1205,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.ListDictEntitiesResponse'
+            $ref: '#/definitions/web.ListTeamsResponse'
         "401":
           description: Unauthorized
           schema:
@@ -1167,14 +1227,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/web.CreateDictEntityRequest'
+          $ref: '#/definitions/web.CreateTeamRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.DictEntity'
+            $ref: '#/definitions/web.Team'
         "400":
           description: Bad Request
           schema:
@@ -1237,7 +1297,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.DictEntity'
+            $ref: '#/definitions/web.Team'
         "400":
           description: Bad Request
           schema:
@@ -1268,14 +1328,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/web.UpdateDictEntityRequest'
+          $ref: '#/definitions/web.UpdateTeamRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.DictEntity'
+            $ref: '#/definitions/web.Team'
         "400":
           description: Bad Request
           schema:

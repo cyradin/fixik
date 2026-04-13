@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost:8080/api*
 
 ## teamsGet
 
-> WebListDictEntitiesResponse teamsGet()
+> WebListTeamsResponse teamsGet()
 
 List teams
 
@@ -51,7 +51,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**WebListDictEntitiesResponse**](WebListDictEntitiesResponse.md)
+[**WebListTeamsResponse**](WebListTeamsResponse.md)
 
 ### Authorization
 
@@ -145,7 +145,7 @@ No authorization required
 
 ## teamsIdGet
 
-> WebDictEntity teamsIdGet(id)
+> WebTeam teamsIdGet(id)
 
 Get team by ID
 
@@ -190,7 +190,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**WebDictEntity**](WebDictEntity.md)
+[**WebTeam**](WebTeam.md)
 
 ### Authorization
 
@@ -215,7 +215,7 @@ No authorization required
 
 ## teamsIdPut
 
-> WebDictEntity teamsIdPut(id, request)
+> WebTeam teamsIdPut(id, request)
 
 Update team
 
@@ -237,7 +237,7 @@ async function example() {
   const body = {
     // number | Team ID
     id: 56,
-    // WebUpdateDictEntityRequest | Team data
+    // WebUpdateTeamRequest | Team data
     request: ...,
   } satisfies TeamsIdPutRequest;
 
@@ -259,11 +259,11 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | Team ID | [Defaults to `undefined`] |
-| **request** | [WebUpdateDictEntityRequest](WebUpdateDictEntityRequest.md) | Team data | |
+| **request** | [WebUpdateTeamRequest](WebUpdateTeamRequest.md) | Team data | |
 
 ### Return type
 
-[**WebDictEntity**](WebDictEntity.md)
+[**WebTeam**](WebTeam.md)
 
 ### Authorization
 
@@ -288,7 +288,7 @@ No authorization required
 
 ## teamsPost
 
-> WebDictEntity teamsPost(request)
+> WebTeam teamsPost(request)
 
 Create team
 
@@ -308,7 +308,7 @@ async function example() {
   const api = new TeamsApi();
 
   const body = {
-    // WebCreateDictEntityRequest | Team data
+    // WebCreateTeamRequest | Team data
     request: ...,
   } satisfies TeamsPostRequest;
 
@@ -329,11 +329,11 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **request** | [WebCreateDictEntityRequest](WebCreateDictEntityRequest.md) | Team data | |
+| **request** | [WebCreateTeamRequest](WebCreateTeamRequest.md) | Team data | |
 
 ### Return type
 
-[**WebDictEntity**](WebDictEntity.md)
+[**WebTeam**](WebTeam.md)
 
 ### Authorization
 
