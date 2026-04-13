@@ -71,8 +71,8 @@ const create = async (data: any) => {
 
     notifySuccess('Статус создан')
     return res
-  } catch (e) {
-    notifyError('Ошибка создания статуса')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }
@@ -82,8 +82,8 @@ const update = async (id: number, data: any) => {
     await store.update(id, data)
 
     notifySuccess('Статус обновлен')
-  } catch (e) {
-    notifyError('Ошибка обновления статуса')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }
@@ -92,8 +92,8 @@ const remove = async (id: number) => {
   try {
     await store.remove(id)
     notifySuccess('Статус удален')
-  } catch (e) {
-    notifyError('Ошибка удаления статуса')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }

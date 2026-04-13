@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { incidentsApi } from '@/api/client'
 import type { WebIncidentComment } from '@/api/models'
 import { notifyError } from '@/utils/notify'
+import { extractUserMessage } from '@/utils/errors'
 
 interface CommentsState {
   itemsByIncident: Record<number, WebIncidentComment[]>
@@ -72,7 +73,7 @@ export const useCommentsStore = defineStore('comments', {
 
         return comment
       } catch (e) {
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { teamsApi } from '@/api/client'
 import { notifyError } from '@/utils/notify'
+import { extractUserMessage } from '@/utils/errors'
 
 export interface Team {
   id: number
@@ -55,7 +56,7 @@ export const useTeamsStore = defineStore('teams', {
         return res
       } catch (e) {
         console.error('team create error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -70,7 +71,7 @@ export const useTeamsStore = defineStore('teams', {
         if (item) Object.assign(item, data)
       } catch (e) {
         console.error('team update error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -81,7 +82,7 @@ export const useTeamsStore = defineStore('teams', {
         this.items = this.items.filter((i) => i.id !== id)
       } catch (e) {
         console.error('team delete error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
   },

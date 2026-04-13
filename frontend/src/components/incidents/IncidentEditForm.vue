@@ -135,8 +135,8 @@ const updateDescription = async (value: string) => {
     await incidentsStore.updateDescription(incident.value.id, value)
     incident.value.description = value
     notifySuccess('Описание обновлено')
-  } catch (e) {
-    notifyError('Ошибка обновления описания')
+  } catch (e: any) {
+    notifyError(e.message)
   } finally {
     loading.description = false
   }
@@ -152,8 +152,8 @@ const updateStatus = async (value: number) => {
     const status = statusesStore.items.find((s) => s.id === value)
     if (status) incident.value.status = { ...status }
     notifySuccess('Статус обновлен')
-  } catch (e) {
-    notifyError('Ошибка обновления статуса')
+  } catch (e: any) {
+    notifyError(e.message)
   } finally {
     loading.status = false
   }
@@ -169,8 +169,8 @@ const updatePriority = async (value: number) => {
     const priority = prioritiesStore.items.find((p) => p.id === value)
     if (priority) incident.value.priority = { ...priority }
     notifySuccess('Приоритет обновлен')
-  } catch (e) {
-    notifyError('Ошибка обновления приоритета')
+  } catch (e: any) {
+    notifyError(e.message)
   } finally {
     loading.priority = false
   }
@@ -186,8 +186,8 @@ const updateTeam = async (value: number | null) => {
     const team = teamsStore.items.find((t) => t.id === value)
     incident.value.team = team ? { ...team } : null
     notifySuccess('Команда обновлена')
-  } catch (e) {
-    notifyError('Ошибка обновления команды')
+  } catch (e: any) {
+    notifyError(e.message)
   } finally {
     loading.team = false
   }
@@ -203,8 +203,8 @@ const updateUser = async (value: number | null) => {
     const user = usersStore.items.find((u) => u.id === value)
     incident.value.user = user ? { ...user } : null
     notifySuccess('Исполнитель обновлен')
-  } catch (e) {
-    notifyError('Ошибка обновления исполнителя')
+  } catch (e: any) {
+    notifyError(e.message)
   } finally {
     loading.user = false
   }

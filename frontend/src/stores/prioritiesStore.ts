@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { prioritiesApi } from '@/api/client'
 import { notifyError } from '@/utils/notify'
+import { extractUserMessage } from '@/utils/errors'
 
 export interface Priority {
   id: number
@@ -55,7 +56,7 @@ export const usePrioritiesStore = defineStore('priorities', {
         return res
       } catch (e) {
         console.error('priority create error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -70,7 +71,7 @@ export const usePrioritiesStore = defineStore('priorities', {
         if (item) Object.assign(item, data)
       } catch (e) {
         console.error('priority update error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -80,7 +81,7 @@ export const usePrioritiesStore = defineStore('priorities', {
         this.items = this.items.filter((i) => i.id !== id)
       } catch (e) {
         console.error('priority delete error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
   },

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { statusesApi } from '@/api/client'
 import { notifyError } from '@/utils/notify'
+import { extractUserMessage } from '@/utils/errors'
 
 export interface Status {
   id: number
@@ -57,7 +58,7 @@ export const useStatusesStore = defineStore('statuses', {
         return res
       } catch (e) {
         console.error('status create error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -72,7 +73,7 @@ export const useStatusesStore = defineStore('statuses', {
         if (item) Object.assign(item, data)
       } catch (e) {
         console.error('status update error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -83,7 +84,7 @@ export const useStatusesStore = defineStore('statuses', {
         this.items = this.items.filter((i) => i.id !== id)
       } catch (e) {
         console.error('status delete error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
   },

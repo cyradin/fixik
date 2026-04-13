@@ -111,8 +111,8 @@ const onDrop = async (statusCode: string, dropResult: any) => {
 
   try {
     await incidentsStore.updateStatus(movedItem.id, status.id)
-  } catch (err) {
-    notifyError(`Не удалось обновить статус инцидента #${movedItem.id}`)
+  } catch (e: any) {
+    notifyError(e.message)
   }
 }
 </script>

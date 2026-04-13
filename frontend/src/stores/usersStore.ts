@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { usersApi } from '@/api/client'
 import { notifyError } from '@/utils/notify'
 import { WebUpdateUserRequestRoleEnum, WebUserResponse } from '@/api'
+import { extractUserMessage } from '@/utils/errors'
 
 export interface User {
   id: number
@@ -86,7 +87,7 @@ export const useUsersStore = defineStore('users', {
         return user
       } catch (e) {
         console.error('user create error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -103,7 +104,7 @@ export const useUsersStore = defineStore('users', {
         }
       } catch (e) {
         console.error('user update error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -113,7 +114,7 @@ export const useUsersStore = defineStore('users', {
         this.items = this.items.filter((u) => u.id !== id)
       } catch (e) {
         console.error('user delete error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 

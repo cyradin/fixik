@@ -65,8 +65,8 @@ const create = async (data: any) => {
     const res = await store.create(data)
     notifySuccess('Команда создана')
     return res
-  } catch (e) {
-    notifyError('Ошибка создания команды')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }
@@ -75,8 +75,8 @@ const update = async (id: number, data: any) => {
   try {
     await store.update(id, data)
     notifySuccess('Команда обновлена')
-  } catch (e) {
-    notifyError('Ошибка обновления команды')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }
@@ -85,8 +85,8 @@ const remove = async (id: number) => {
   try {
     await store.remove(id)
     notifySuccess('Команда удалена')
-  } catch (e) {
-    notifyError('Ошибка удаления команды')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }

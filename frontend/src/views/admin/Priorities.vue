@@ -65,8 +65,8 @@ const create = async (data: any) => {
     const res = await store.create(data)
     notifySuccess('Приоритет создан')
     return res
-  } catch (e) {
-    notifyError('Ошибка создания приоритета')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }
@@ -75,8 +75,8 @@ const update = async (id: number, data: any) => {
   try {
     await store.update(id, data)
     notifySuccess('Приоритет обновлён')
-  } catch (e) {
-    notifyError('Ошибка обновления приоритета')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }
@@ -85,8 +85,8 @@ const remove = async (id: number) => {
   try {
     await store.remove(id)
     notifySuccess('Приоритет удален')
-  } catch (e) {
-    notifyError('Ошибка удаления приоритета')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }

@@ -118,8 +118,8 @@ const submit = async () => {
     notifySuccess(`Инцидент #${newIncident.id} создан`)
 
     router.push(`/incident/${newIncident.id}`)
-  } catch (e) {
-    notifyError('Не удалось создать инцидент')
+  } catch (e: any) {
+    notifyError(e.message)
   } finally {
     loading.value = false
   }

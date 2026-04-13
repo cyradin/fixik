@@ -105,8 +105,8 @@ const create = async (data: any) => {
     const res = await store.create(data)
     notifySuccess('Пользователь создан')
     return res
-  } catch (e) {
-    notifyError('Ошибка создания пользователя')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }
@@ -115,8 +115,8 @@ const update = async (id: number, data: any) => {
   try {
     await store.update(id, data)
     notifySuccess('Пользователь обновлён')
-  } catch (e) {
-    notifyError('Ошибка обновления пользователя')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }
@@ -125,8 +125,8 @@ const remove = async (id: number) => {
   try {
     await store.remove(id)
     notifySuccess('Пользователь удален')
-  } catch (e) {
-    notifyError('Ошибка удаления пользователя')
+  } catch (e: any) {
+    notifyError(e.message)
     throw e
   }
 }

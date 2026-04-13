@@ -5,6 +5,7 @@ import { usePrioritiesStore } from '@/stores/prioritiesStore'
 import { useTeamsStore } from '@/stores/teamsStore'
 import { useUsersStore } from '@/stores/usersStore'
 import { notifyError } from '@/utils/notify'
+import { extractUserMessage } from '@/utils/errors'
 
 export interface IncidentStatus {
   id: number
@@ -183,7 +184,7 @@ export const useIncidentsStore = defineStore('incidents', {
         }
       } catch (e) {
         console.error('update status error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -200,7 +201,7 @@ export const useIncidentsStore = defineStore('incidents', {
         }
       } catch (e) {
         console.error('update priority error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -211,7 +212,7 @@ export const useIncidentsStore = defineStore('incidents', {
         if (item) item.description = description
       } catch (e) {
         console.error('update description error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -230,7 +231,7 @@ export const useIncidentsStore = defineStore('incidents', {
           teamId && teamId > 0 ? (teamsStore.items.find((t) => t.id === teamId) ?? null) : null
       } catch (e) {
         console.error('update team error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -249,7 +250,7 @@ export const useIncidentsStore = defineStore('incidents', {
           userId && userId > 0 ? (usersStore.items.find((u) => u.id === userId) ?? null) : null
       } catch (e) {
         console.error('update user error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -263,7 +264,7 @@ export const useIncidentsStore = defineStore('incidents', {
         return incident
       } catch (e) {
         console.error('incident create error:', e)
-        throw e
+        throw new Error(await extractUserMessage(e))
       }
     },
 
@@ -285,7 +286,7 @@ export const useIncidentsStore = defineStore('incidents', {
           await incidentsApi.incidentsIdDelete({ id })
         } catch (e) {
           console.error('incident delete error:', e)
-          notifyError('Ошибка удаления, восстановлено')
+          notifyError(await extractUserMessage(e), 'Ошибка удаления инцидента')
           this.addLocal(backup)
         } finally {
           this.pendingDeletes.delete(id)
