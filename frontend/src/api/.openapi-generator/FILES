@@ -32,6 +32,7 @@ docs/WebListRolesResponse.md
 docs/WebListStatusesResponse.md
 docs/WebListUsersResponse.md
 docs/WebPagination.md
+docs/WebPermission.md
 docs/WebRole.md
 docs/WebStatus.md
 docs/WebUpdateDictEntityRequest.md
@@ -59,6 +60,7 @@ models/WebListRolesResponse.ts
 models/WebListStatusesResponse.ts
 models/WebListUsersResponse.ts
 models/WebPagination.ts
+models/WebPermission.ts
 models/WebRole.ts
 models/WebStatus.ts
 models/WebUpdateDictEntityRequest.ts

@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { WebPermission } from './WebPermission';
+import {
+    WebPermissionFromJSON,
+    WebPermissionFromJSONTyped,
+    WebPermissionToJSON,
+    WebPermissionToJSONTyped,
+} from './WebPermission';
+
 /**
  * 
  * @export
@@ -37,6 +45,12 @@ export interface WebRole {
      * @memberof WebRole
      */
     name: string;
+    /**
+     * 
+     * @type {Array<WebPermission>}
+     * @memberof WebRole
+     */
+    permissions: Array<WebPermission>;
 }
 
 
@@ -58,6 +72,7 @@ export function instanceOfWebRole(value: object): value is WebRole {
     if (!('code' in value) || value['code'] === undefined) return false;
     if (!('description' in value) || value['description'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('permissions' in value) || value['permissions'] === undefined) return false;
     return true;
 }
 
@@ -74,6 +89,7 @@ export function WebRoleFromJSONTyped(json: any, ignoreDiscriminator: boolean): W
         'code': json['code'],
         'description': json['description'],
         'name': json['name'],
+        'permissions': ((json['permissions'] as Array<any>).map(WebPermissionFromJSON)),
     };
 }
 
@@ -91,6 +107,7 @@ export function WebRoleToJSONTyped(value?: WebRole | null, ignoreDiscriminator: 
         'code': value['code'],
         'description': value['description'],
         'name': value['name'],
+        'permissions': ((value['permissions'] as Array<any>).map(WebPermissionToJSON)),
     };
 }
 

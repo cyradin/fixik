@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/cyradin/fixik/internal/container"
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/cyradin/fixik/internal/user"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -59,7 +60,7 @@ func (r CreateUserRequest) Validate() error {
 		validation.Field(&r.Email, validation.Required, validation.Length(1, maxEmailLen)),
 		validation.Field(&r.Password, validation.Required, validation.Length(minPasswordLen, maxPasswordLen)),
 		validation.Field(&r.TeamID, validation.Min(1)),
-		validation.Field(&r.Role, validation.Required, validation.In(toAnySlice(user.RoleTypes())...)),
+		validation.Field(&r.Role, validation.Required, validation.In(toAnySlice(role.Types())...)),
 	)
 }
 
@@ -80,7 +81,7 @@ func (r UpdateUserRequest) Validate() error {
 		validation.Field(&r.Email, validation.Length(1, maxEmailLen)),
 		validation.Field(&r.Password, validation.Length(minPasswordLen, maxPasswordLen)),
 		validation.Field(&r.TeamID, validation.Min(1)),
-		validation.Field(&r.Role, validation.In(toAnySlice(user.RoleTypes())...)),
+		validation.Field(&r.Role, validation.In(toAnySlice(role.Types())...)),
 	)
 }
 

@@ -1979,12 +1979,24 @@ const docTemplate = `{
                 }
             }
         },
+        "web.Permission": {
+            "type": "object",
+            "required": [
+                "code"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                }
+            }
+        },
         "web.Role": {
             "type": "object",
             "required": [
                 "code",
                 "description",
-                "name"
+                "name",
+                "permissions"
             ],
             "properties": {
                 "code": {
@@ -2000,6 +2012,12 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.Permission"
+                    }
                 }
             }
         },

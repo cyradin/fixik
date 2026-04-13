@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/cyradin/fixik/internal/container"
-	"github.com/cyradin/fixik/internal/user"
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -14,9 +14,14 @@ type ListRolesResponse struct {
 }
 
 type Role struct {
-	Name        string `json:"name" validate:"required"`
-	Code        string `json:"code" enums:"admin,manager,user" validate:"required"`
-	Description string `json:"description" validate:"required"`
+	Name        string       `json:"name" validate:"required"`
+	Code        string       `json:"code" enums:"admin,manager,user" validate:"required"`
+	Description string       `json:"description" validate:"required"`
+	Permissions []Permission `json:"permissions" validate:"required"`
+}
+
+type Permission struct {
+	Code string `json:"code" validate:"required"`
 }
 
 func roleRoutes(_ *container.Container) func(r chi.Router) {
@@ -37,7 +42,7 @@ func roleRoutes(_ *container.Container) func(r chi.Router) {
 // @Router /roles [get]
 func listRoles() http.HandlerFunc {
 	return handle(func(ctx context.Context, _ NoBody) (ListRolesResponse, error) {
-		roles := user.Roles()
+		roles := role.List()
 
 		items := make([]Role, 0, len(roles))
 		for _, role := range roles {
@@ -45,9 +50,23 @@ func listRoles() http.HandlerFunc {
 				Name:        role.Name,
 				Code:        role.Code,
 				Description: role.Description,
+				Permissions: toPermissionsResponse(role.Permissions),
 			})
 		}
 
 		return ListRolesResponse{Items: items}, nil
 	})
+}
+
+func toPermissionsResponse(permissions role.Permission) []Permission {
+	codes := permissions.Codes()
+	result := make([]Permission, 0, len(codes))
+
+	for _, code := range codes {
+		result = append(result, Permission{
+			Code: code,
+		})
+	}
+
+	return result
 }

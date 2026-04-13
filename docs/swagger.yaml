@@ -284,6 +284,13 @@ definitions:
     - offset
     - total
     type: object
+  web.Permission:
+    properties:
+      code:
+        type: string
+    required:
+    - code
+    type: object
   web.Role:
     properties:
       code:
@@ -296,10 +303,15 @@ definitions:
         type: string
       name:
         type: string
+      permissions:
+        items:
+          $ref: '#/definitions/web.Permission'
+        type: array
     required:
     - code
     - description
     - name
+    - permissions
     type: object
   web.Status:
     properties:

@@ -1,5 +1,5 @@
 
-# WebRole
+# WebPermission
 
 
 ## Properties
@@ -7,22 +7,16 @@
 Name | Type
 ------------ | -------------
 `code` | string
-`description` | string
-`name` | string
-`permissions` | [Array&lt;WebPermission&gt;](WebPermission.md)
 
 ## Example
 
 ```typescript
-import type { WebRole } from ''
+import type { WebPermission } from ''
 
 // TODO: Update the object below with actual values
 const example = {
   "code": null,
-  "description": null,
-  "name": null,
-  "permissions": null,
-} satisfies WebRole
+} satisfies WebPermission
 
 console.log(example)
 
@@ -31,7 +25,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as WebRole
+const exampleParsed = JSON.parse(exampleJSON) as WebPermission
 console.log(exampleParsed)
 ```
 

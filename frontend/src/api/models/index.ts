@@ -19,6 +19,7 @@ export * from './WebListRolesResponse';
 export * from './WebListStatusesResponse';
 export * from './WebListUsersResponse';
 export * from './WebPagination';
+export * from './WebPermission';
 export * from './WebRole';
 export * from './WebStatus';
 export * from './WebUpdateDictEntityRequest';

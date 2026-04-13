@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/cyradin/fixik/internal/db"
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,7 +27,7 @@ func TestUserManager_Create(t *testing.T) {
 				Email:    "alice@example.com",
 				Password: "pass",
 				TeamID:   new(int64(1)),
-				Role:     RoleUser,
+				Role:     role.User,
 			},
 			mock: func(m *userRepoMock) {
 				m.createFn = func(ctx context.Context, u *db.User) error {
@@ -41,7 +42,7 @@ func TestUserManager_Create(t *testing.T) {
 						Email:    "alice@example.com",
 						Password: "hashed",
 						TeamID:   new(int64(1)),
-						Role:     RoleUser,
+						Role:     role.User,
 					}, nil
 				}
 			},
@@ -96,7 +97,7 @@ func TestUserManager_GetByUsername(t *testing.T) {
 		Email:    "alice@example.com",
 		Password: "hashed",
 		TeamID:   new(int64(1)),
-		Role:     RoleAdmin,
+		Role:     role.Admin,
 	}
 
 	tests := []struct {
@@ -145,7 +146,7 @@ func TestUserManager_GetByUsername(t *testing.T) {
 				Username: "alice",
 				Email:    "alice@example.com",
 				TeamID:   new(int64(1)),
-				Role:     RoleAdmin,
+				Role:     role.Admin,
 			}, u)
 		})
 	}
@@ -161,7 +162,7 @@ func TestUserManager_GetByID(t *testing.T) {
 		Email:    "alice@example.com",
 		Password: "hashed",
 		TeamID:   new(int64(1)),
-		Role:     RoleAdmin,
+		Role:     role.Admin,
 	}
 
 	tests := []struct {
@@ -210,7 +211,7 @@ func TestUserManager_GetByID(t *testing.T) {
 				Username: "alice",
 				Email:    "alice@example.com",
 				TeamID:   new(int64(1)),
-				Role:     RoleAdmin,
+				Role:     role.Admin,
 			}, u)
 		})
 	}
@@ -220,9 +221,9 @@ func TestUserManager_GetByIDMany(t *testing.T) {
 	t.Parallel()
 
 	dbUsers := []db.User{
-		{ID: 1, Name: "Алиса", Username: "alice", Role: RoleAdmin, TeamID: new(int64(1))},
-		{ID: 2, Name: "Боб", Username: "bob", Role: RoleUser, TeamID: new(int64(2))},
-		{ID: 3, Name: "Каролина", Username: "carol", Role: RoleManager, TeamID: new(int64(3))},
+		{ID: 1, Name: "Алиса", Username: "alice", Role: role.Admin, TeamID: new(int64(1))},
+		{ID: 2, Name: "Боб", Username: "bob", Role: role.User, TeamID: new(int64(2))},
+		{ID: 3, Name: "Каролина", Username: "carol", Role: role.Manager, TeamID: new(int64(3))},
 	}
 
 	tests := []struct {
@@ -241,9 +242,9 @@ func TestUserManager_GetByIDMany(t *testing.T) {
 				}
 			},
 			want: []User{
-				{ID: 1, Name: "Алиса", Username: "alice", Role: RoleAdmin, TeamID: new(int64(1))},
-				{ID: 2, Name: "Боб", Username: "bob", Role: RoleUser, TeamID: new(int64(2))},
-				{ID: 3, Name: "Каролина", Username: "carol", Role: RoleManager, TeamID: new(int64(3))},
+				{ID: 1, Name: "Алиса", Username: "alice", Role: role.Admin, TeamID: new(int64(1))},
+				{ID: 2, Name: "Боб", Username: "bob", Role: role.User, TeamID: new(int64(2))},
+				{ID: 3, Name: "Каролина", Username: "carol", Role: role.Manager, TeamID: new(int64(3))},
 			},
 		},
 		{
@@ -316,11 +317,11 @@ func TestUserManager_Update(t *testing.T) {
 				Email:    new(string),
 				Password: new(string),
 				TeamID:   new(int64),
-				Role:     new(RoleManager),
+				Role:     new(role.Manager),
 			},
 			mock: func(m *userRepoMock) {
 				m.getByIDFn = func(ctx context.Context, id int64) (db.User, error) {
-					return db.User{ID: id, Name: "Боб", Role: RoleManager}, nil
+					return db.User{ID: id, Name: "Боб", Role: role.Manager}, nil
 				}
 				m.updateFn = func(ctx context.Context, u *db.User) error {
 					return nil
@@ -417,13 +418,13 @@ func TestUserManager_List(t *testing.T) {
 			ID:       1,
 			Name:     "Алиса",
 			Username: "alice",
-			Role:     RoleAdmin,
+			Role:     role.Admin,
 		},
 		{
 			ID:       2,
 			Name:     "Боб",
 			Username: "bob",
-			Role:     RoleUser,
+			Role:     role.User,
 		},
 	}
 
