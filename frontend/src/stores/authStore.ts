@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { authApi, usersApi } from '@/api/client'
 import { extractUserMessage } from '@/utils/errors'
 import { notifyError } from '@/utils/notify'
+import { useRolesStore } from './rolesStore'
 
 export interface CurrentUser {
   id: number
@@ -77,6 +78,20 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const userPermissions = computed<Set<string>>(() => {
+    const rolesStore = useRolesStore()
+    const role = rolesStore.byCode(user.value?.role)
+
+    return new Set(role?.permissions?.map((p) => p.code) ?? [])
+  })
+
+  function can(permission: string): boolean
+  function can(permission: string[]): boolean
+  function can(permission: string | string[]): boolean {
+    const perms = Array.isArray(permission) ? permission : [permission]
+    return perms.every((p) => userPermissions.value.has(p))
+  }
+
   return {
     isAuth,
     loading,
@@ -86,5 +101,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     refresh,
     changePassword,
+    can,
   }
 })

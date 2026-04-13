@@ -1,13 +1,18 @@
 import { defineStore } from 'pinia'
 import { rolesApi } from '@/api/client'
 import { notifyError } from '@/utils/notify'
+import type { PermissionCode } from '@/constants/permissions'
 
 export interface Role {
   code: string
   description: string
   name: string
+  permissions: Permission[]
 }
 
+export interface Permission {
+  code: PermissionCode
+}
 interface RolesState {
   items: Role[]
   pollingId: ReturnType<typeof setInterval> | null
@@ -33,7 +38,10 @@ export const useRolesStore = defineStore('roles', {
     async fetchAll(): Promise<void> {
       try {
         const resp = await rolesApi.rolesGet({})
-        this.items = resp.items
+        this.items = resp.items.map((role) => ({
+          ...role,
+          permissions: role.permissions as { code: PermissionCode }[],
+        }))
       } catch (e) {
         notifyError('Не удалось обновить список ролей пользователей')
         console.error('roles fetch error:', e)
