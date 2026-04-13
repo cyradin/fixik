@@ -33,8 +33,43 @@ func TestCodes(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			result := tt.src.Codes()
 			require.ElementsMatch(t, tt.expected, result)
+		})
+	}
+}
+
+func TestCan(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name     string
+		role     Type
+		perms    Permission
+		expected bool
+	}{
+		{
+			name:     "user can edit incidents",
+			role:     User,
+			perms:    IncidentCreate | IncidentUpdate,
+			expected: true,
+		},
+		{
+			name:     "user cannot edit teams",
+			role:     User,
+			perms:    TeamCreate | TeamUpdate,
+			expected: false,
+		},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			result := Can(tt.role, tt.perms)
+			require.Equal(t, tt.expected, result)
 		})
 	}
 }

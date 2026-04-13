@@ -1,6 +1,8 @@
 package role
 
 import (
+	"slices"
+
 	"github.com/cyradin/fixik/internal/db"
 )
 
@@ -19,65 +21,77 @@ const (
 	Admin   = db.RoleAdmin
 )
 
-func List() []Role {
-	return []Role{
-		{
-			Name:        "Пользователь",
-			Code:        User,
-			Description: "Может работать с инцидентами (всё, кроме удаления)",
-			Permissions: IncidentGet |
-				IncidentCreate |
-				IncidentUpdate |
-				UserGet |
-				TeamGet |
-				PriorityGet |
-				StatusGet,
-		},
-		{
-			Name:        "Менеджер",
-			Code:        Manager,
-			Description: "Может выполнять все операции, кроме изменения пользователей и команд",
-			Permissions: IncidentGet |
-				IncidentCreate |
-				IncidentUpdate |
-				IncidentDelete |
-				UserGet |
-				TeamGet |
-				PriorityGet |
-				PriorityCreate |
-				PriorityUpdate |
-				PriorityDelete |
-				StatusGet |
-				StatusCreate |
-				StatusUpdate |
-				StatusDelete,
-		},
-		{
-			Name:        "Администратор",
-			Code:        Admin,
-			Description: "Может выполнять все операции",
-			Permissions: IncidentGet |
-				IncidentCreate |
-				IncidentUpdate |
-				IncidentDelete |
-				UserGet |
-				UserCreate |
-				UserUpdate |
-				UserDelete |
-				TeamGet |
-				TeamCreate |
-				TeamUpdate |
-				TeamDelete |
-				PriorityGet |
-				PriorityCreate |
-				PriorityUpdate |
-				PriorityDelete |
-				StatusGet |
-				StatusCreate |
-				StatusUpdate |
-				StatusDelete,
-		},
+var allRoles = []Role{
+	{
+		Name:        "Пользователь",
+		Code:        User,
+		Description: "Может работать с инцидентами (всё, кроме удаления)",
+		Permissions: IncidentGet |
+			IncidentCreate |
+			IncidentUpdate |
+			UserGet |
+			TeamGet |
+			PriorityGet |
+			StatusGet,
+	},
+	{
+		Name:        "Менеджер",
+		Code:        Manager,
+		Description: "Может выполнять все операции, кроме изменения пользователей и команд",
+		Permissions: IncidentGet |
+			IncidentCreate |
+			IncidentUpdate |
+			IncidentDelete |
+			UserGet |
+			TeamGet |
+			PriorityGet |
+			PriorityCreate |
+			PriorityUpdate |
+			PriorityDelete |
+			StatusGet |
+			StatusCreate |
+			StatusUpdate |
+			StatusDelete,
+	},
+	{
+		Name:        "Администратор",
+		Code:        Admin,
+		Description: "Может выполнять все операции",
+		Permissions: IncidentGet |
+			IncidentCreate |
+			IncidentUpdate |
+			IncidentDelete |
+			UserGet |
+			UserCreate |
+			UserUpdate |
+			UserDelete |
+			TeamGet |
+			TeamCreate |
+			TeamUpdate |
+			TeamDelete |
+			PriorityGet |
+			PriorityCreate |
+			PriorityUpdate |
+			PriorityDelete |
+			StatusGet |
+			StatusCreate |
+			StatusUpdate |
+			StatusDelete,
+	},
+}
+
+func Can(code Type, permissions Permission) bool {
+	for _, r := range allRoles {
+		if r.Code == code {
+			return r.Permissions&permissions > 0
+		}
 	}
+
+	return false
+}
+
+func List() []Role {
+	return slices.Clone(allRoles)
 }
 
 func Types() []Type {
