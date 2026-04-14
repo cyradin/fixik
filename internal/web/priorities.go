@@ -223,7 +223,7 @@ func deletePriority(manager priorityManager) http.HandlerFunc {
 
 			if err := manager.Delete(ctx, id); err != nil {
 				if errors.Is(err, priority.ErrHasDependantEntities) {
-					return NoBody{}, ErrUnableToDelete("")
+					return NoBody{}, ErrUnableToDelete("есть инциденты с таким приоритетом")
 				}
 
 				return NoBody{}, err

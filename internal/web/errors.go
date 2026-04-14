@@ -59,7 +59,9 @@ var (
 
 	ErrUnableToDelete = func(msg string) *UserMessageError {
 		if msg == "" {
-			msg = "Невозможно удалить: есть инциденты, использующие данную сущность"
+			msg = "Невозможно удалить"
+		} else {
+			msg = "Невозможно удалить: " + msg
 		}
 
 		return &UserMessageError{

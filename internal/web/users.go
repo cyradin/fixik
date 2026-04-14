@@ -266,7 +266,7 @@ func deleteUser(manager userDeleter) http.HandlerFunc {
 
 			if err := manager.Delete(ctx, id); err != nil {
 				if errors.Is(err, user.ErrHasDependantEntities) {
-					return NoBody{}, ErrUnableToDelete("")
+					return NoBody{}, ErrUnableToDelete("есть инциденты, привязанные к этому пользователю")
 				}
 
 				return NoBody{}, err

@@ -218,9 +218,9 @@ func deleteTeam(manager teamManager) http.HandlerFunc {
 
 			if err := manager.Delete(ctx, id); err != nil {
 				if errors.Is(err, team.ErrHasDependantIncidents) {
-					return NoBody{}, ErrUnableToDelete("")
+					return NoBody{}, ErrUnableToDelete("есть инциденты, назначенные на эту команду")
 				} else if errors.Is(err, team.ErrHasDependantUsers) {
-					return NoBody{}, ErrUnableToDelete("Невозможно удалить: есть пользователи, использующие данную сущность")
+					return NoBody{}, ErrUnableToDelete("есть пользователи, привязанные к этой команде")
 				}
 
 				return NoBody{}, err
