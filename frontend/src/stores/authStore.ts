@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { authApi, usersApi } from '@/api/client'
 import { extractUserMessage } from '@/utils/errors'
-import { notifyError } from '@/utils/notify'
 import { useRolesStore } from './rolesStore'
 
 export interface CurrentUser {
@@ -18,6 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
   const initialized = ref(false)
   const user = ref<CurrentUser | null>(null)
+  const rolesStore = useRolesStore()
 
   const login = async (username: string, password: string) => {
     loading.value = true
@@ -78,19 +78,14 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const userPermissions = computed<Set<string>>(() => {
-    const rolesStore = useRolesStore()
-    const role = rolesStore.byCode(user.value?.role)
-
-    return new Set(role?.permissions?.map((p) => p.code) ?? [])
-  })
-
   function can(permission: string): boolean
   function can(permission: readonly string[]): boolean
   function can(permission: string | readonly string[]): boolean {
+    const role = rolesStore.byCode(user.value?.role)
+    const userPermissions = new Set(role?.permissions?.map((p) => p.code) ?? [])
     const perms = Array.isArray(permission) ? permission : [permission]
 
-    return perms.every((p) => userPermissions.value.has(p))
+    return perms.every((p) => userPermissions.has(p))
   }
 
   return {

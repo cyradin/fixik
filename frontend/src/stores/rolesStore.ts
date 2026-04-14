@@ -14,6 +14,7 @@ export interface Permission {
   code: PermissionCode
 }
 interface RolesState {
+  initialized: boolean
   items: Role[]
   pollingId: ReturnType<typeof setInterval> | null
 }
@@ -22,6 +23,7 @@ export const useRolesStore = defineStore('roles', {
   state: (): RolesState => ({
     items: [],
     pollingId: null,
+    initialized: false,
   }),
 
   getters: {
@@ -42,6 +44,7 @@ export const useRolesStore = defineStore('roles', {
           ...role,
           permissions: role.permissions as { code: PermissionCode }[],
         }))
+        this.initialized = true
       } catch (e) {
         notifyError('Не удалось обновить список ролей пользователей')
         console.error('roles fetch error:', e)

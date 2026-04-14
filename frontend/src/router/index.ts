@@ -15,6 +15,7 @@ import UserProfile from '@/views/user/Profile.vue'
 import UserInfo from '@/views/user/Info.vue'
 import { PERMISSION_GROUPS } from '@/constants/permissions'
 import Forbidden from '@/views/Forbidden.vue'
+import { useRolesStore } from '@/stores/rolesStore'
 
 const routes = [
   {
@@ -92,9 +93,14 @@ export const router = createRouter({
 
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
+  const rolesStore = useRolesStore()
 
   if (!authStore.initialized) {
     await authStore.refresh()
+  }
+
+  if (!rolesStore.initialized) {
+    await rolesStore.fetchAll()
   }
 
   if (to.meta.requiresAuth && !authStore.isAuth) {
