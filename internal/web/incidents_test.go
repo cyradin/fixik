@@ -12,6 +12,7 @@ import (
 
 	"github.com/cyradin/fixik/internal/incident"
 	"github.com/cyradin/fixik/internal/priority"
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/cyradin/fixik/internal/status"
 	"github.com/cyradin/fixik/internal/user"
 	"github.com/go-chi/chi/v5"
@@ -96,7 +97,10 @@ func TestGetIncident(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/incidents/{id}", getIncident(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/incidents/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/incidents/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -137,7 +141,10 @@ func TestGetIncident(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/incidents/{id}", getIncident(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/incidents/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/incidents/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -170,7 +177,10 @@ func TestUpdateIncident(t *testing.T) {
 			http.MethodPatch,
 			"/incidents/1",
 			jsonBody(t, UpdateIncidentRequest{Title: &title}),
-		)
+		).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -219,7 +229,10 @@ func TestUpdateIncident(t *testing.T) {
 			http.MethodPatch,
 			"/incidents/1",
 			jsonBody(t, UpdateIncidentRequest{Title: &title}),
-		)
+		).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -247,7 +260,10 @@ func TestDeleteIncident(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/incidents/{id}", deleteIncident(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/incidents/1", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/incidents/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -283,7 +299,10 @@ func TestDeleteIncident(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/incidents/{id}", deleteIncident(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/incidents/1", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/incidents/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -370,7 +389,10 @@ func TestCreateIncidentComment(t *testing.T) {
 		buf := new(bytes.Buffer)
 		require.NoError(t, json.NewEncoder(buf).Encode(reqBody))
 
-		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf)
+		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 
 		req.Header.Set("Content-Type", "application/json")
 
@@ -423,7 +445,10 @@ func TestCreateIncidentComment(t *testing.T) {
 		buf := new(bytes.Buffer)
 		require.NoError(t, json.NewEncoder(buf).Encode(reqBody))
 
-		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf)
+		req := httptest.NewRequest(http.MethodPost, "/incidents/1/comments", buf).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -468,7 +493,10 @@ func TestGetIncidentComments(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/incidents/{id}/comments", getIncidentComments(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/incidents/1/comments?limit=10&offset=0", nil)
+		req := httptest.NewRequest(http.MethodGet, "/incidents/1/comments?limit=10&offset=0", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 

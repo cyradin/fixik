@@ -10,6 +10,8 @@ import (
 	"testing"
 
 	"github.com/cyradin/fixik/internal/priority"
+	"github.com/cyradin/fixik/internal/role"
+	"github.com/cyradin/fixik/internal/user"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -86,7 +88,10 @@ func TestGetPriority(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/entities/{id}", getPriority(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -107,7 +112,10 @@ func TestGetPriority(t *testing.T) {
 
 		r.Get("/entities/{id}", getPriority(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/entities/abc", nil)
+		req := httptest.NewRequest(http.MethodGet, "/entities/abc", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusBadRequest, rr.Code)
@@ -124,7 +132,10 @@ func TestGetPriority(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/entities/{id}", getPriority(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
@@ -144,7 +155,10 @@ func TestUpdatePriority(t *testing.T) {
 		r.Put("/entities/{id}", updatePriority(m))
 
 		reqBody := UpdatePriorityRequest{Name: "Updated", Code: "UPD", Sort: 123}
-		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -160,7 +174,10 @@ func TestUpdatePriority(t *testing.T) {
 		r.Put("/entities/{id}", updatePriority(m))
 
 		reqBody := UpdatePriorityRequest{Name: "", Code: ""}
-		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -196,7 +213,10 @@ func TestUpdatePriority(t *testing.T) {
 		r.Put("/entities/{id}", updatePriority(m))
 
 		reqBody := UpdatePriorityRequest{Name: "X", Code: "X", Sort: 123}
-		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -216,7 +236,10 @@ func TestDeletePriority(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deletePriority(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/entities/42", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/entities/42", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusOK, rr.Code)
@@ -230,7 +253,10 @@ func TestDeletePriority(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deletePriority(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/entities/abc", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/entities/abc", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusBadRequest, rr.Code)
@@ -243,7 +269,10 @@ func TestDeletePriority(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deletePriority(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/entities/1", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/entities/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
@@ -346,7 +375,10 @@ func testRequest(t *testing.T, handler http.HandlerFunc, method, url string, bod
 		buf = bytes.NewBuffer(nil)
 	}
 
-	req := httptest.NewRequest(method, url, buf)
+	req := httptest.NewRequest(method, url, buf).
+		WithContext(user.WithContext(t.Context(), user.User{
+			Role: role.Admin,
+		}))
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}

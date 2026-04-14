@@ -8,7 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/cyradin/fixik/internal/status"
+	"github.com/cyradin/fixik/internal/user"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -80,11 +82,33 @@ func TestGetStatus(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/statuses/{id}", getStatus(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/statuses/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/statuses/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("403", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockStatusManager{
+			getFn: func(ctx context.Context, id int64) (status.Status, error) {
+				return status.Status{ID: id, Name: "A"}, nil
+			},
+		}
+
+		r := chi.NewRouter()
+		r.Get("/statuses/{id}", getStatus(m))
+
+		req := httptest.NewRequest(http.MethodGet, "/statuses/1", nil)
+		rr := httptest.NewRecorder()
+
+		r.ServeHTTP(rr, req)
+		require.Equal(t, http.StatusForbidden, rr.Code)
 	})
 
 	t.Run("invalid id", func(t *testing.T) {
@@ -94,7 +118,10 @@ func TestGetStatus(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/statuses/{id}", getStatus(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/statuses/abc", nil)
+		req := httptest.NewRequest(http.MethodGet, "/statuses/abc", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -113,7 +140,10 @@ func TestGetStatus(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/statuses/{id}", getStatus(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/statuses/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/statuses/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -137,7 +167,10 @@ func TestUpdateStatus(t *testing.T) {
 		r.Put("/statuses/{id}", updateStatus(m))
 
 		reqBody := UpdateStatusRequest{Name: "A", Code: "A", Sort: 1, IsFinal: true}
-		req := httptest.NewRequest(http.MethodPut, "/statuses/1", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPut, "/statuses/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -153,7 +186,10 @@ func TestUpdateStatus(t *testing.T) {
 		r := chi.NewRouter()
 		r.Put("/statuses/{id}", updateStatus(m))
 
-		req := httptest.NewRequest(http.MethodPut, "/statuses/1", jsonBody(t, UpdateStatusRequest{}))
+		req := httptest.NewRequest(http.MethodPut, "/statuses/1", jsonBody(t, UpdateStatusRequest{})).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -169,7 +205,10 @@ func TestUpdateStatus(t *testing.T) {
 		r := chi.NewRouter()
 		r.Put("/statuses/{id}", updateStatus(m))
 
-		req := httptest.NewRequest(http.MethodPut, "/statuses/abc", jsonBody(t, UpdateStatusRequest{}))
+		req := httptest.NewRequest(http.MethodPut, "/statuses/abc", jsonBody(t, UpdateStatusRequest{})).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -192,7 +231,10 @@ func TestUpdateStatus(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPut, "/statuses/1", jsonBody(t, UpdateStatusRequest{
 			Name: "A", Code: "A", Sort: 1,
-		}))
+		})).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -219,7 +261,10 @@ func TestDeleteStatus(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/statuses/{id}", deleteStatus(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/statuses/1", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/statuses/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -235,7 +280,10 @@ func TestDeleteStatus(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/statuses/{id}", deleteStatus(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/statuses/abc", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/statuses/abc", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -254,7 +302,10 @@ func TestDeleteStatus(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/statuses/{id}", deleteStatus(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/statuses/1", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/statuses/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)

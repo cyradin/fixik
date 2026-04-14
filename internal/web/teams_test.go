@@ -8,7 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/cyradin/fixik/internal/team"
+	"github.com/cyradin/fixik/internal/user"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -85,7 +87,10 @@ func TestGetTeam(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/entities/{id}", getTeam(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 
 		r.ServeHTTP(rr, req)
@@ -106,7 +111,10 @@ func TestGetTeam(t *testing.T) {
 
 		r.Get("/entities/{id}", getTeam(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/entities/abc", nil)
+		req := httptest.NewRequest(http.MethodGet, "/entities/abc", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusBadRequest, rr.Code)
@@ -123,7 +131,10 @@ func TestGetTeam(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/entities/{id}", getTeam(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/entities/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
@@ -143,7 +154,10 @@ func TestUpdateTeam(t *testing.T) {
 		r.Put("/entities/{id}", updateTeam(m))
 
 		reqBody := UpdateTeamRequest{Name: "Updated", Code: "UPD", Sort: 123}
-		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -159,7 +173,10 @@ func TestUpdateTeam(t *testing.T) {
 		r.Put("/entities/{id}", updateTeam(m))
 
 		reqBody := UpdateTeamRequest{Name: "", Code: ""}
-		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -175,7 +192,10 @@ func TestUpdateTeam(t *testing.T) {
 		r.Put("/entities/{id}", updateTeam(m))
 
 		reqBody := UpdateTeamRequest{Name: "X", Code: "X"}
-		req := httptest.NewRequest(http.MethodPut, "/entities/abc", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPut, "/entities/abc", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -195,7 +215,10 @@ func TestUpdateTeam(t *testing.T) {
 		r.Put("/entities/{id}", updateTeam(m))
 
 		reqBody := UpdateTeamRequest{Name: "X", Code: "X", Sort: 123}
-		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -215,7 +238,10 @@ func TestDeleteTeam(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deleteTeam(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/entities/42", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/entities/42", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusOK, rr.Code)
@@ -229,7 +255,10 @@ func TestDeleteTeam(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deleteTeam(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/entities/abc", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/entities/abc", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusBadRequest, rr.Code)
@@ -242,7 +271,10 @@ func TestDeleteTeam(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deleteTeam(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/entities/1", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/entities/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)

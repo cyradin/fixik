@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/cyradin/fixik/internal/role"
 	"github.com/cyradin/fixik/internal/user"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
@@ -72,7 +73,10 @@ func TestGetUser(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/users/{id}", getUser(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/users/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/users/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusOK, rr.Code)
@@ -108,7 +112,10 @@ func TestGetUser(t *testing.T) {
 		r := chi.NewRouter()
 		r.Get("/users/{id}", getUser(m))
 
-		req := httptest.NewRequest(http.MethodGet, "/users/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/users/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
@@ -131,7 +138,10 @@ func TestUpdateUser(t *testing.T) {
 
 		username := "updated"
 		reqBody := UpdateUserRequest{Username: &username}
-		req := httptest.NewRequest(http.MethodPatch, "/users/1", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPatch, "/users/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -148,7 +158,10 @@ func TestUpdateUser(t *testing.T) {
 
 		username := "updated"
 		reqBody := UpdateUserRequest{Username: &username}
-		req := httptest.NewRequest(http.MethodPatch, "/users/abc", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPatch, "/users/abc", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -169,7 +182,10 @@ func TestUpdateUser(t *testing.T) {
 
 		username := "updated"
 		reqBody := UpdateUserRequest{Username: &username}
-		req := httptest.NewRequest(http.MethodPatch, "/users/1", jsonBody(t, reqBody))
+		req := httptest.NewRequest(http.MethodPatch, "/users/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		req.Header.Set("Content-Type", "application/json")
 
 		rr := httptest.NewRecorder()
@@ -194,7 +210,10 @@ func TestDeleteUser(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/users/{id}", deleteUser(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/users/42", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/users/42", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusOK, rr.Code)
@@ -223,7 +242,10 @@ func TestDeleteUser(t *testing.T) {
 		r := chi.NewRouter()
 		r.Delete("/users/{id}", deleteUser(m))
 
-		req := httptest.NewRequest(http.MethodDelete, "/users/1", nil)
+		req := httptest.NewRequest(http.MethodDelete, "/users/1", nil).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
 		rr := httptest.NewRecorder()
 		r.ServeHTTP(rr, req)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
