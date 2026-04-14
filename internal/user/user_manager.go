@@ -8,7 +8,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var ErrNotFound = db.ErrNotFound
+var (
+	ErrNotFound             = db.ErrNotFound
+	ErrHasDependantEntities = fmt.Errorf("has dependant entities")
+)
 
 type userRepo interface {
 	Create(ctx context.Context, u *db.User) error
@@ -20,13 +23,29 @@ type userRepo interface {
 	List(ctx context.Context, limit, offset int) ([]db.User, error)
 }
 
-type UserManager struct {
-	repo userRepo
+type incidentsByUserCounter interface {
+	CountByUser(ctx context.Context, userID int64) (int, error)
 }
 
-func NewUserManager(repo userRepo) *UserManager {
+type txExecutor interface {
+	Exec(ctx context.Context, fn func(ctx context.Context) error) error
+}
+
+type UserManager struct {
+	repo             userRepo
+	incidentsCounter incidentsByUserCounter
+	txExecutor       txExecutor
+}
+
+func NewUserManager(
+	repo userRepo,
+	incidentsCounter incidentsByUserCounter,
+	txExecutor txExecutor,
+) *UserManager {
 	return &UserManager{
-		repo: repo,
+		repo:             repo,
+		incidentsCounter: incidentsCounter,
+		txExecutor:       txExecutor,
 	}
 }
 
@@ -99,7 +118,22 @@ func (m *UserManager) Update(ctx context.Context, u UpdateUser) (User, error) {
 }
 
 func (m *UserManager) Delete(ctx context.Context, id int64) error {
-	return m.repo.Delete(ctx, id)
+	return m.txExecutor.Exec(ctx, func(ctx context.Context) error {
+		cnt, err := m.incidentsCounter.CountByUser(ctx, id)
+		if err != nil {
+			return fmt.Errorf("count incidents: %w", err)
+		}
+
+		if cnt > 0 {
+			return ErrHasDependantEntities
+		}
+
+		if err := m.repo.Delete(ctx, id); err != nil {
+			return fmt.Errorf("repository delete: %w", err)
+		}
+
+		return nil
+	})
 }
 
 func (m *UserManager) GetByID(ctx context.Context, id int64) (User, error) {

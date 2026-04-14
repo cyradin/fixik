@@ -5,19 +5,22 @@ import (
 
 	"github.com/cyradin/fixik/internal/config"
 	"github.com/cyradin/fixik/internal/db"
-	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/incident"
+	"github.com/cyradin/fixik/internal/priority"
 	"github.com/cyradin/fixik/internal/status"
+	"github.com/cyradin/fixik/internal/team"
 	"github.com/cyradin/fixik/internal/user"
 	"github.com/cyradin/fixik/pkg/logger"
+	"github.com/cyradin/fixik/pkg/transaction"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Container struct {
-	version string
-	cfg     *config.Config
-	logger  *slog.Logger
-	pgPool  *pgxpool.Pool
+	version    string
+	cfg        *config.Config
+	logger     *slog.Logger
+	pgPool     *pgxpool.Pool
+	txExecutor *transaction.Executor
 
 	statusRepo   *db.StatusRepository
 	priorityRepo *db.DictRepository
@@ -28,8 +31,8 @@ type Container struct {
 
 	statusManager *status.StatusManager
 
-	priorityManager *dict.EntityManager
-	teamManager     *dict.EntityManager
+	priorityManager *priority.PriorityManager
+	teamManager     *team.TeamManager
 
 	incidentManager *incident.IncidentManager
 	commentManager  *incident.CommentManager

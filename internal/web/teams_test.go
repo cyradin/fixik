@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/team"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -19,9 +19,9 @@ func TestCreateTeam(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			createFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) {
-				return dict.Entity{
+		m := &mockTeamManager{
+			createFn: func(ctx context.Context, e team.Team) (team.Team, error) {
+				return team.Team{
 					ID:          1,
 					Name:        e.Name,
 					Code:        e.Code,
@@ -51,7 +51,7 @@ func TestCreateTeam(t *testing.T) {
 	t.Run("validation error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockTeamManager{}
 		req := CreateTeamRequest{Name: "", Code: ""}
 		rr := testRequest(t, createTeam(m), http.MethodPost, "/dummy", req)
 		require.Equal(t, http.StatusBadRequest, rr.Code)
@@ -60,9 +60,9 @@ func TestCreateTeam(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			createFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) {
-				return dict.Entity{}, errors.New("create failed")
+		m := &mockTeamManager{
+			createFn: func(ctx context.Context, e team.Team) (team.Team, error) {
+				return team.Team{}, errors.New("create failed")
 			},
 		}
 		req := CreateTeamRequest{Name: "Name", Code: "C", Sort: 123}
@@ -77,9 +77,9 @@ func TestGetTeam(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			getFn: func(ctx context.Context, id int64) (dict.Entity, error) {
-				return dict.Entity{ID: id, Name: "A"}, nil
+		m := &mockTeamManager{
+			getFn: func(ctx context.Context, id int64) (team.Team, error) {
+				return team.Team{ID: id, Name: "A"}, nil
 			},
 		}
 		r := chi.NewRouter()
@@ -101,7 +101,7 @@ func TestGetTeam(t *testing.T) {
 	t.Run("invalid id", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockTeamManager{}
 		r := chi.NewRouter()
 
 		r.Get("/entities/{id}", getTeam(m))
@@ -115,9 +115,9 @@ func TestGetTeam(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			getFn: func(ctx context.Context, id int64) (dict.Entity, error) {
-				return dict.Entity{}, errors.New("not found")
+		m := &mockTeamManager{
+			getFn: func(ctx context.Context, id int64) (team.Team, error) {
+				return team.Team{}, errors.New("not found")
 			},
 		}
 		r := chi.NewRouter()
@@ -136,8 +136,8 @@ func TestUpdateTeam(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			updateFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) { return e, nil },
+		m := &mockTeamManager{
+			updateFn: func(ctx context.Context, e team.Team) (team.Team, error) { return e, nil },
 		}
 		r := chi.NewRouter()
 		r.Put("/entities/{id}", updateTeam(m))
@@ -154,7 +154,7 @@ func TestUpdateTeam(t *testing.T) {
 	t.Run("validation error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockTeamManager{}
 		r := chi.NewRouter()
 		r.Put("/entities/{id}", updateTeam(m))
 
@@ -170,7 +170,7 @@ func TestUpdateTeam(t *testing.T) {
 	t.Run("invalid id", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockTeamManager{}
 		r := chi.NewRouter()
 		r.Put("/entities/{id}", updateTeam(m))
 
@@ -186,9 +186,9 @@ func TestUpdateTeam(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			updateFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) {
-				return dict.Entity{}, errors.New("fail")
+		m := &mockTeamManager{
+			updateFn: func(ctx context.Context, e team.Team) (team.Team, error) {
+				return team.Team{}, errors.New("fail")
 			},
 		}
 		r := chi.NewRouter()
@@ -211,7 +211,7 @@ func TestDeleteTeam(t *testing.T) {
 		t.Parallel()
 
 		deleted := false
-		m := &mockManager{deleteFn: func(ctx context.Context, id int64) error { deleted = true; return nil }}
+		m := &mockTeamManager{deleteFn: func(ctx context.Context, id int64) error { deleted = true; return nil }}
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deleteTeam(m))
 
@@ -225,7 +225,7 @@ func TestDeleteTeam(t *testing.T) {
 	t.Run("invalid id", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockTeamManager{}
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deleteTeam(m))
 
@@ -238,7 +238,7 @@ func TestDeleteTeam(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{deleteFn: func(ctx context.Context, id int64) error { return errors.New("fail") }}
+		m := &mockTeamManager{deleteFn: func(ctx context.Context, id int64) error { return errors.New("fail") }}
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deleteTeam(m))
 
@@ -255,9 +255,9 @@ func TestListTeams(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			listFn: func(ctx context.Context) ([]dict.Entity, error) {
-				return []dict.Entity{
+		m := &mockTeamManager{
+			listFn: func(ctx context.Context) ([]team.Team, error) {
+				return []team.Team{
 					{ID: 1, Name: "A", Code: "A", Sort: 1},
 					{ID: 2, Name: "B", Code: "B", Sort: 2},
 				}, nil
@@ -276,8 +276,8 @@ func TestListTeams(t *testing.T) {
 	t.Run("empty list", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			listFn: func(ctx context.Context) ([]dict.Entity, error) { return []dict.Entity{}, nil },
+		m := &mockTeamManager{
+			listFn: func(ctx context.Context) ([]team.Team, error) { return []team.Team{}, nil },
 		}
 		rr := testRequest(t, listTeams(m), http.MethodGet, "/dummy", nil)
 		require.Equal(t, http.StatusOK, rr.Code)
@@ -292,10 +292,36 @@ func TestListTeams(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			listFn: func(ctx context.Context) ([]dict.Entity, error) { return nil, errors.New("fail") },
+		m := &mockTeamManager{
+			listFn: func(ctx context.Context) ([]team.Team, error) { return nil, errors.New("fail") },
 		}
 		rr := testRequest(t, listTeams(m), http.MethodGet, "/dummy", nil)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
 	})
 }
+
+type mockTeamManager struct {
+	createFn func(ctx context.Context, e team.Team) (team.Team, error)
+	getFn    func(ctx context.Context, id int64) (team.Team, error)
+	listFn   func(ctx context.Context) ([]team.Team, error)
+	updateFn func(ctx context.Context, e team.Team) (team.Team, error)
+	deleteFn func(ctx context.Context, id int64) error
+}
+
+func (m *mockTeamManager) Create(ctx context.Context, e team.Team) (team.Team, error) {
+	return m.createFn(ctx, e)
+}
+
+func (m *mockTeamManager) GetByID(ctx context.Context, id int64) (team.Team, error) {
+	return m.getFn(ctx, id)
+}
+
+func (m *mockTeamManager) List(ctx context.Context) ([]team.Team, error) {
+	return m.listFn(ctx)
+}
+
+func (m *mockTeamManager) Update(ctx context.Context, e team.Team) (team.Team, error) {
+	return m.updateFn(ctx, e)
+}
+
+func (m *mockTeamManager) Delete(ctx context.Context, id int64) error { return m.deleteFn(ctx, id) }

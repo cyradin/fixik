@@ -7,6 +7,8 @@ import (
 	"github.com/cyradin/fixik/internal/db"
 )
 
+var ErrHasDependantEntities = fmt.Errorf("has dependant entities")
+
 type statusRepo interface {
 	Create(ctx context.Context, s *db.Status) error
 	GetByID(ctx context.Context, id int64) (db.Status, error)
@@ -15,12 +17,30 @@ type statusRepo interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-type StatusManager struct {
-	repo statusRepo
+type incidentsByStatusCounter interface {
+	CountByStatus(ctx context.Context, statusID int64) (int, error)
 }
 
-func NewStatusManager(repo statusRepo) *StatusManager {
-	return &StatusManager{repo: repo}
+type txExecutor interface {
+	Exec(ctx context.Context, callback func(ctx context.Context) error) error
+}
+
+type StatusManager struct {
+	repo             statusRepo
+	incidentsCounter incidentsByStatusCounter
+	txExecutor       txExecutor
+}
+
+func NewStatusManager(
+	repo statusRepo,
+	incidentsCounter incidentsByStatusCounter,
+	txExecutor txExecutor,
+) *StatusManager {
+	return &StatusManager{
+		repo:             repo,
+		incidentsCounter: incidentsCounter,
+		txExecutor:       txExecutor,
+	}
 }
 
 func (m *StatusManager) Create(ctx context.Context, e Status) (Status, error) {
@@ -35,7 +55,7 @@ func (m *StatusManager) Create(ctx context.Context, e Status) (Status, error) {
 	return result, nil
 }
 
-func (m *StatusManager) GetByID(ctx context.Context, id StatusID) (Status, error) {
+func (m *StatusManager) GetByID(ctx context.Context, id ID) (Status, error) {
 	result, err := m.repo.GetByID(ctx, id)
 	if err != nil {
 		return Status{}, fmt.Errorf("repository get by id: %w", err)
@@ -70,12 +90,23 @@ func (m *StatusManager) Update(ctx context.Context, e Status) (Status, error) {
 	return result, nil
 }
 
-func (m *StatusManager) Delete(ctx context.Context, id StatusID) error {
-	if err := m.repo.Delete(ctx, id); err != nil {
-		return fmt.Errorf("repository delete: %w", err)
-	}
+func (m *StatusManager) Delete(ctx context.Context, id ID) error {
+	return m.txExecutor.Exec(ctx, func(ctx context.Context) error {
+		cnt, err := m.incidentsCounter.CountByStatus(ctx, id)
+		if err != nil {
+			return fmt.Errorf("count incidents: %w", err)
+		}
 
-	return nil
+		if cnt > 0 {
+			return ErrHasDependantEntities
+		}
+
+		if err := m.repo.Delete(ctx, id); err != nil {
+			return fmt.Errorf("repository delete: %w", err)
+		}
+
+		return nil
+	})
 }
 
 func (m *StatusManager) toDB(status Status) db.Status {

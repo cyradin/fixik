@@ -2,21 +2,22 @@ package web
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/cyradin/fixik/internal/container"
-	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/role"
+	"github.com/cyradin/fixik/internal/team"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type teamManager interface {
-	Create(ctx context.Context, e dict.Entity) (dict.Entity, error)
-	GetByID(ctx context.Context, id int64) (dict.Entity, error)
-	List(ctx context.Context) ([]dict.Entity, error)
-	Update(ctx context.Context, s dict.Entity) (dict.Entity, error)
+	Create(ctx context.Context, e team.Team) (team.Team, error)
+	GetByID(ctx context.Context, id int64) (team.Team, error)
+	List(ctx context.Context) ([]team.Team, error)
+	Update(ctx context.Context, s team.Team) (team.Team, error)
 	Delete(ctx context.Context, id int64) error
 }
 
@@ -94,7 +95,7 @@ func createTeam(manager teamManager) http.HandlerFunc {
 			return Team{}, ErrForbidden
 		}
 
-		entity := dict.Entity{
+		entity := team.Team{
 			Name:        req.Name,
 			Code:        req.Code,
 			Description: req.Description,
@@ -171,7 +172,7 @@ func updateTeam(manager teamManager) http.HandlerFunc {
 				return Team{}, ErrForbidden
 			}
 
-			entity := dict.Entity{
+			entity := team.Team{
 				ID:          id,
 				Name:        req.Name,
 				Code:        req.Code,
@@ -216,6 +217,12 @@ func deleteTeam(manager teamManager) http.HandlerFunc {
 			}
 
 			if err := manager.Delete(ctx, id); err != nil {
+				if errors.Is(err, team.ErrHasDependantIncidents) {
+					return NoBody{}, ErrUnableToDelete("")
+				} else if errors.Is(err, team.ErrHasDependantUsers) {
+					return NoBody{}, ErrUnableToDelete("Невозможно удалить: есть пользователи, использующие данную сущность")
+				}
+
 				return NoBody{}, err
 			}
 
@@ -255,7 +262,7 @@ func listTeams(manager teamManager) http.HandlerFunc {
 	})
 }
 
-func toTeamResponse(item dict.Entity) Team {
+func toTeamResponse(item team.Team) Team {
 	return Team{
 		ID:          item.ID,
 		Name:        item.Name,

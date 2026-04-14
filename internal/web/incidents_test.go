@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/incident"
+	"github.com/cyradin/fixik/internal/priority"
 	"github.com/cyradin/fixik/internal/status"
 	"github.com/cyradin/fixik/internal/user"
 	"github.com/go-chi/chi/v5"
@@ -545,7 +545,7 @@ func testIncident(title, desc string) incident.Incident {
 			Code: "open",
 			Name: "Open",
 		},
-		Priority: dict.Entity{
+		Priority: priority.Priority{
 			ID:   1,
 			Code: "critical",
 			Name: "Critical",

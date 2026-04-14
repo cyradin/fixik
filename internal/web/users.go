@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -263,7 +264,15 @@ func deleteUser(manager userDeleter) http.HandlerFunc {
 				return NoBody{}, ErrForbidden
 			}
 
-			return NoBody{}, manager.Delete(ctx, id)
+			if err := manager.Delete(ctx, id); err != nil {
+				if errors.Is(err, user.ErrHasDependantEntities) {
+					return NoBody{}, ErrUnableToDelete("")
+				}
+
+				return NoBody{}, err
+			}
+
+			return NoBody{}, nil
 		})(w, r)
 	}
 }

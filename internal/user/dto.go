@@ -7,7 +7,8 @@ import (
 	"github.com/cyradin/fixik/internal/role"
 )
 
-// CreateUser
+type ID = int64
+
 type CreateUser struct {
 	Name     string
 	Username string
@@ -29,7 +30,7 @@ type UpdateUser struct {
 }
 
 type User struct {
-	ID        int64
+	ID        ID
 	Name      string
 	Username  string
 	Email     string

@@ -10,9 +10,10 @@ import (
 	"github.com/cyradin/fixik/internal/config"
 	"github.com/cyradin/fixik/internal/container"
 	"github.com/cyradin/fixik/internal/db"
-	"github.com/cyradin/fixik/internal/dict"
 	"github.com/cyradin/fixik/internal/incident"
+	"github.com/cyradin/fixik/internal/priority"
 	"github.com/cyradin/fixik/internal/status"
+	"github.com/cyradin/fixik/internal/team"
 	"github.com/cyradin/fixik/internal/user"
 	"github.com/cyradin/fixik/pkg/logger"
 )
@@ -136,7 +137,7 @@ func createStatuses(ctx context.Context, c *container.Container) (map[string]int
 }
 
 func createPriorities(ctx context.Context, c *container.Container) (map[string]int64, error) {
-	data := []dict.Entity{
+	data := []priority.Priority{
 		{
 			Name:        "P1",
 			Code:        "p1",
@@ -178,7 +179,7 @@ func createPriorities(ctx context.Context, c *container.Container) (map[string]i
 }
 
 func createTeams(ctx context.Context, c *container.Container) (map[string]int64, error) {
-	data := []dict.Entity{
+	data := []team.Team{
 		{
 			Name:        teamFrontend,
 			Code:        teamFrontend,

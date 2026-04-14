@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/cyradin/fixik/internal/db"
@@ -69,7 +70,7 @@ func TestUserManager_Create(t *testing.T) {
 			repo := &userRepoMock{}
 			tt.mock(repo)
 
-			manager := NewUserManager(repo)
+			manager := NewUserManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 
 			u, err := manager.Create(t.Context(), tt.user)
 			if tt.err {
@@ -131,7 +132,7 @@ func TestUserManager_GetByUsername(t *testing.T) {
 			repo := &userRepoMock{}
 			tt.mock(repo)
 
-			manager := NewUserManager(repo)
+			manager := NewUserManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 			u, err := manager.GetByUsername(t.Context(), "alice")
 
 			if tt.err {
@@ -196,7 +197,7 @@ func TestUserManager_GetByID(t *testing.T) {
 			repo := &userRepoMock{}
 			tt.mock(repo)
 
-			manager := NewUserManager(repo)
+			manager := NewUserManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 			u, err := manager.GetByID(t.Context(), 1)
 
 			if tt.err {
@@ -276,7 +277,7 @@ func TestUserManager_GetByIDMany(t *testing.T) {
 			repo := &userRepoMock{}
 			tt.mock(repo)
 
-			manager := NewUserManager(repo)
+			manager := NewUserManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 			users, err := manager.GetByIDMany(t.Context(), tt.ids)
 
 			if tt.err {
@@ -347,7 +348,7 @@ func TestUserManager_Update(t *testing.T) {
 			repo := &userRepoMock{}
 			tt.mock(repo)
 
-			manager := NewUserManager(repo)
+			manager := NewUserManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 
 			_, err := manager.Update(t.Context(), tt.cmd)
 			if tt.err {
@@ -363,30 +364,78 @@ func TestUserManager_Update(t *testing.T) {
 func TestUserManager_Delete(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
+
 	tests := []struct {
 		name string
 		id   int64
-		mock func(*userRepoMock)
-		err  bool
+		mock func(*userRepoMock, *incidentsCounterMock, *txExecutorMock)
+		err  error
 	}{
 		{
 			name: "success",
 			id:   1,
-			mock: func(m *userRepoMock) {
-				m.deleteFn = func(ctx context.Context, id int64) error {
+			mock: func(r *userRepoMock, c *incidentsCounterMock, tx *txExecutorMock) {
+				tx.execFn = func(ctx context.Context, fn func(ctx context.Context) error) error {
+					return fn(ctx)
+				}
+
+				c.countFn = func(ctx context.Context, id int64) (int, error) {
+					require.Equal(t, int64(1), id)
+					return 0, nil
+				}
+
+				r.deleteFn = func(ctx context.Context, id int64) error {
+					require.Equal(t, int64(1), id)
 					return nil
 				}
 			},
 		},
 		{
+			name: "has dependencies",
+			id:   1,
+			mock: func(r *userRepoMock, c *incidentsCounterMock, tx *txExecutorMock) {
+				tx.execFn = func(ctx context.Context, fn func(ctx context.Context) error) error {
+					return fn(ctx)
+				}
+
+				c.countFn = func(ctx context.Context, id int64) (int, error) {
+					return 2, nil
+				}
+			},
+			err: ErrHasDependantEntities,
+		},
+		{
+			name: "count error",
+			id:   1,
+			mock: func(r *userRepoMock, c *incidentsCounterMock, tx *txExecutorMock) {
+				tx.execFn = func(ctx context.Context, fn func(ctx context.Context) error) error {
+					return fn(ctx)
+				}
+
+				c.countFn = func(ctx context.Context, id int64) (int, error) {
+					return 0, errors.New("db error")
+				}
+			},
+			err: fmt.Errorf("count incidents"),
+		},
+		{
 			name: "repo error",
 			id:   1,
-			mock: func(m *userRepoMock) {
-				m.deleteFn = func(ctx context.Context, id int64) error {
+			mock: func(r *userRepoMock, c *incidentsCounterMock, tx *txExecutorMock) {
+				tx.execFn = func(ctx context.Context, fn func(ctx context.Context) error) error {
+					return fn(ctx)
+				}
+
+				c.countFn = func(ctx context.Context, id int64) (int, error) {
+					return 0, nil
+				}
+
+				r.deleteFn = func(ctx context.Context, id int64) error {
 					return errors.New("db error")
 				}
 			},
-			err: true,
+			err: fmt.Errorf("repository delete"),
 		},
 	}
 
@@ -395,13 +444,22 @@ func TestUserManager_Delete(t *testing.T) {
 			t.Parallel()
 
 			repo := &userRepoMock{}
-			tt.mock(repo)
+			counter := &incidentsCounterMock{}
+			tx := &txExecutorMock{}
 
-			manager := NewUserManager(repo)
-			err := manager.Delete(t.Context(), tt.id)
+			tt.mock(repo, counter, tx)
 
-			if tt.err {
+			manager := NewUserManager(repo, counter, tx)
+
+			err := manager.Delete(ctx, tt.id)
+
+			if tt.err != nil {
 				require.Error(t, err)
+
+				if errors.Is(tt.err, ErrHasDependantEntities) {
+					require.ErrorIs(t, err, ErrHasDependantEntities)
+				}
+
 				return
 			}
 
@@ -460,7 +518,7 @@ func TestUserManager_List(t *testing.T) {
 
 			tt.mock(repo)
 
-			manager := NewUserManager(repo)
+			manager := NewUserManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 
 			users, err := manager.List(t.Context(), 10, 0)
 
@@ -516,4 +574,20 @@ func (m *userRepoMock) Delete(ctx context.Context, id int64) error {
 
 func (m *userRepoMock) GetByIDMany(ctx context.Context, ids []int64) ([]db.User, error) {
 	return m.getByIDManyFn(ctx, ids)
+}
+
+type incidentsCounterMock struct {
+	countFn func(ctx context.Context, id int64) (int, error)
+}
+
+func (m *incidentsCounterMock) CountByUser(ctx context.Context, id int64) (int, error) {
+	return m.countFn(ctx, id)
+}
+
+type txExecutorMock struct {
+	execFn func(ctx context.Context, fn func(ctx context.Context) error) error
+}
+
+func (m *txExecutorMock) Exec(ctx context.Context, fn func(ctx context.Context) error) error {
+	return m.execFn(ctx, fn)
 }

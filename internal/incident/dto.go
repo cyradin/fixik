@@ -3,22 +3,23 @@ package incident
 import (
 	"time"
 
-	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/priority"
 	"github.com/cyradin/fixik/internal/status"
+	"github.com/cyradin/fixik/internal/team"
 	"github.com/cyradin/fixik/internal/user"
 )
 
-type IncidentID = int64
+type ID = int64
 
 type Incident struct {
-	ID          IncidentID
+	ID          ID
 	Title       string
 	Description string
 
 	Status   status.Status
-	Priority dict.Entity
+	Priority priority.Priority
 
-	Team   *dict.Entity
+	Team   *team.Team
 	User   *user.User
 	Author *user.User
 
@@ -37,33 +38,33 @@ type CreateIncident struct {
 	Title       string
 	Description string
 
-	PriorityID dict.EntityID
-	StatusID   dict.EntityID
+	PriorityID priority.ID
+	StatusID   status.ID
 
-	TeamID   *int64
-	UserID   *int64
-	AuthorID *int64
+	TeamID   *team.ID
+	UserID   *user.ID
+	AuthorID *user.ID
 }
 
 type UpdateIncident struct {
-	ID IncidentID
+	ID ID
 
 	Title       *string
 	Description *string
 
-	TeamID   *int64
-	UserID   *int64
-	AuthorID *int64
+	PriorityID *priority.ID
+	StatusID   *status.ID
 
-	PriorityID *dict.EntityID
-	StatusID   *dict.EntityID
+	TeamID   *team.ID
+	UserID   *user.ID
+	AuthorID *user.ID
 }
 
 type CommentID = int64
 
 type Comment struct {
 	ID         CommentID
-	IncidentID IncidentID
+	IncidentID ID
 	Author     user.User
 	Text       string
 	CreatedAt  time.Time

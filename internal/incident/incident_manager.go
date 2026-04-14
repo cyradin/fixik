@@ -5,8 +5,9 @@ import (
 	"fmt"
 
 	"github.com/cyradin/fixik/internal/db"
-	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/priority"
 	"github.com/cyradin/fixik/internal/status"
+	"github.com/cyradin/fixik/internal/team"
 	"github.com/cyradin/fixik/internal/user"
 )
 
@@ -19,13 +20,18 @@ type incidentRepo interface {
 }
 
 type statusProvider interface {
-	GetByID(ctx context.Context, id status.StatusID) (status.Status, error)
+	GetByID(ctx context.Context, id status.ID) (status.Status, error)
 	List(ctx context.Context) ([]status.Status, error)
 }
 
-type entityProvider interface {
-	GetByID(ctx context.Context, id dict.EntityID) (dict.Entity, error)
-	List(ctx context.Context) ([]dict.Entity, error)
+type priorityProvider interface {
+	GetByID(ctx context.Context, id priority.ID) (priority.Priority, error)
+	List(ctx context.Context) ([]priority.Priority, error)
+}
+
+type teamProvider interface {
+	GetByID(ctx context.Context, id team.ID) (team.Team, error)
+	List(ctx context.Context) ([]team.Team, error)
 }
 
 type userProvider interface {
@@ -36,16 +42,16 @@ type userProvider interface {
 type IncidentManager struct {
 	repo             incidentRepo
 	statusProvider   statusProvider
-	priorityProvider entityProvider
-	teamProvider     entityProvider
+	priorityProvider priorityProvider
+	teamProvider     teamProvider
 	userProvider     userProvider
 }
 
 func NewIncidentManager(
 	repo incidentRepo,
 	statusProvider statusProvider,
-	priorityProvider entityProvider,
-	teamProvider entityProvider,
+	priorityProvider priorityProvider,
+	teamProvider teamProvider,
 	userProvider userProvider,
 ) *IncidentManager {
 	return &IncidentManager{
@@ -91,7 +97,7 @@ func (m *IncidentManager) GetByID(ctx context.Context, id int64) (Incident, erro
 		return Incident{}, fmt.Errorf("get priority: %w", err)
 	}
 
-	var team *dict.Entity
+	var team *team.Team
 
 	if result.TeamID != nil {
 		t, err := m.teamProvider.GetByID(ctx, *result.TeamID)
@@ -281,13 +287,13 @@ func (m *IncidentManager) loadStatuses(ctx context.Context) (map[int64]status.St
 	return result, nil
 }
 
-func (m *IncidentManager) loadPriorities(ctx context.Context) (map[int64]dict.Entity, error) {
+func (m *IncidentManager) loadPriorities(ctx context.Context) (map[int64]priority.Priority, error) {
 	items, err := m.priorityProvider.List(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("list priorities: %w", err)
 	}
 
-	result := make(map[int64]dict.Entity, len(items))
+	result := make(map[int64]priority.Priority, len(items))
 	for _, e := range items {
 		result[e.ID] = e
 	}
@@ -295,13 +301,13 @@ func (m *IncidentManager) loadPriorities(ctx context.Context) (map[int64]dict.En
 	return result, nil
 }
 
-func (m *IncidentManager) loadTeams(ctx context.Context) (map[int64]dict.Entity, error) {
+func (m *IncidentManager) loadTeams(ctx context.Context) (map[int64]team.Team, error) {
 	items, err := m.teamProvider.List(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("list teams: %w", err)
 	}
 
-	result := make(map[int64]dict.Entity, len(items))
+	result := make(map[int64]team.Team, len(items))
 	for _, e := range items {
 		result[e.ID] = e
 	}
@@ -312,8 +318,8 @@ func (m *IncidentManager) loadTeams(ctx context.Context) (map[int64]dict.Entity,
 func (m *IncidentManager) transformFromDB(
 	r db.Incident,
 	statusMap map[int64]status.Status,
-	priorityMap map[int64]dict.Entity,
-	teamMap map[int64]dict.Entity,
+	priorityMap map[int64]priority.Priority,
+	teamMap map[int64]team.Team,
 	userMap map[int64]user.User,
 ) (Incident, error) {
 	status, ok := statusMap[r.StatusID]
@@ -326,7 +332,7 @@ func (m *IncidentManager) transformFromDB(
 		return Incident{}, fmt.Errorf("priority %d not found", r.PriorityID)
 	}
 
-	var team *dict.Entity
+	var team *team.Team
 
 	if r.TeamID != nil {
 		t, ok := teamMap[*r.TeamID]
@@ -364,7 +370,7 @@ func (m *IncidentManager) transformFromDB(
 	return m.fromDB(r, status, priority, team, usr, author), nil
 }
 
-func (m *IncidentManager) fromDB(incident db.Incident, status status.Status, priority dict.Entity, team *dict.Entity, user *user.User, author *user.User) Incident {
+func (m *IncidentManager) fromDB(incident db.Incident, status status.Status, priority priority.Priority, team *team.Team, user *user.User, author *user.User) Incident {
 	return Incident{
 		ID:            incident.ID,
 		Title:         incident.Title,

@@ -320,3 +320,128 @@ func (s *IncidentRepositorySuite) createUser(name, username, email string, teamI
 
 	return user
 }
+
+func (s *IncidentRepositorySuite) TestCountByStatus() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("p1", "P1")
+	status1 := s.createStatus("open", "Open")
+	status2 := s.createStatus("closed", "Closed")
+
+	incidents := s.loadIncidents([]Incident{
+		{Title: "i1", Description: "d1", PriorityID: priority.ID, StatusID: status1.ID},
+		{Title: "i2", Description: "d2", PriorityID: priority.ID, StatusID: status1.ID},
+		{Title: "i3", Description: "d3", PriorityID: priority.ID, StatusID: status2.ID},
+	})
+
+	s.Run("count correct", func() {
+		count, err := s.repo.CountByStatus(ctx, status1.ID)
+		s.Require().NoError(err)
+		s.Equal(2, count)
+	})
+
+	s.Run("deleted not counted", func() {
+		err := s.repo.Delete(ctx, incidents[0].ID)
+		s.Require().NoError(err)
+
+		count, err := s.repo.CountByStatus(ctx, status1.ID)
+		s.Require().NoError(err)
+		s.Equal(1, count)
+	})
+
+	s.Run("zero", func() {
+		count, err := s.repo.CountByStatus(ctx, 999999)
+		s.Require().NoError(err)
+		s.Equal(0, count)
+	})
+}
+
+func (s *IncidentRepositorySuite) TestCountByPriority() {
+	ctx := s.T().Context()
+
+	priority1 := s.createPriority("p1", "P1")
+	priority2 := s.createPriority("p2", "P2")
+	status := s.createStatus("open", "Open")
+
+	s.loadIncidents([]Incident{
+		{Title: "i1", Description: "d1", PriorityID: priority1.ID, StatusID: status.ID},
+		{Title: "i2", Description: "d2", PriorityID: priority1.ID, StatusID: status.ID},
+		{Title: "i3", Description: "d3", PriorityID: priority2.ID, StatusID: status.ID},
+	})
+
+	count, err := s.repo.CountByPriority(ctx, priority1.ID)
+	s.Require().NoError(err)
+	s.Equal(2, count)
+}
+
+func (s *IncidentRepositorySuite) TestCountByTeam() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("p1", "P1")
+	status := s.createStatus("open", "Open")
+
+	team1 := s.createTeam("t1", "Team 1")
+	team2 := s.createTeam("t2", "Team 2")
+
+	user1 := s.createUser("u1", "u1", "u1@test.com", team1.ID)
+	user2 := s.createUser("u2", "u2", "u2@test.com", team2.ID)
+
+	s.loadIncidents([]Incident{
+		{Title: "i1", Description: "d1", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team1.ID, UserID: &user1.ID},
+		{Title: "i2", Description: "d2", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team1.ID, UserID: &user1.ID},
+		{Title: "i3", Description: "d3", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team2.ID, UserID: &user2.ID},
+	})
+
+	count, err := s.repo.CountByTeam(ctx, team1.ID)
+	s.Require().NoError(err)
+	s.Equal(2, count)
+}
+
+func (s *IncidentRepositorySuite) TestCountByUser() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("p1", "P1")
+	status := s.createStatus("open", "Open")
+	team := s.createTeam("t1", "Team 1")
+
+	user1 := s.createUser("u1", "u1", "u1@test.com", team.ID)
+	user2 := s.createUser("u2", "u2", "u2@test.com", team.ID)
+
+	s.loadIncidents([]Incident{
+		{
+			Title:       "i1",
+			Description: "d1",
+			PriorityID:  priority.ID,
+			StatusID:    status.ID,
+			UserID:      &user1.ID,
+		},
+		{
+			Title:       "i2",
+			Description: "d2",
+			PriorityID:  priority.ID,
+			StatusID:    status.ID,
+			UserID:      &user1.ID,
+		},
+
+		{
+			Title:       "i3",
+			Description: "d3",
+			PriorityID:  priority.ID,
+			StatusID:    status.ID,
+			UserID:      &user2.ID,
+		},
+
+		{
+			Title:       "i4",
+			Description: "d4",
+			PriorityID:  priority.ID,
+			StatusID:    status.ID,
+			AuthorID:    &user1.ID,
+		},
+	})
+
+	count, err := s.repo.CountByUser(ctx, user1.ID)
+	s.Require().NoError(err)
+
+	s.Equal(3, count)
+}

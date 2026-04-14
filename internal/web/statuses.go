@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -221,6 +222,10 @@ func deleteStatus(manager statusManager) http.HandlerFunc {
 			}
 
 			if err := manager.Delete(ctx, id); err != nil {
+				if errors.Is(err, status.ErrHasDependantEntities) {
+					return NoBody{}, ErrUnableToDelete("")
+				}
+
 				return NoBody{}, err
 			}
 

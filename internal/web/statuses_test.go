@@ -324,6 +324,7 @@ func (m *mockStatusManager) Create(ctx context.Context, s status.Status) (status
 	if m.createFn != nil {
 		return m.createFn(ctx, s)
 	}
+
 	return status.Status{}, nil
 }
 
@@ -331,6 +332,7 @@ func (m *mockStatusManager) GetByID(ctx context.Context, id int64) (status.Statu
 	if m.getFn != nil {
 		return m.getFn(ctx, id)
 	}
+
 	return status.Status{}, nil
 }
 
@@ -338,6 +340,7 @@ func (m *mockStatusManager) List(ctx context.Context) ([]status.Status, error) {
 	if m.listFn != nil {
 		return m.listFn(ctx)
 	}
+
 	return nil, nil
 }
 
@@ -345,6 +348,7 @@ func (m *mockStatusManager) Update(ctx context.Context, s status.Status) (status
 	if m.updateFn != nil {
 		return m.updateFn(ctx, s)
 	}
+
 	return status.Status{}, nil
 }
 
@@ -352,5 +356,6 @@ func (m *mockStatusManager) Delete(ctx context.Context, id int64) error {
 	if m.deleteFn != nil {
 		return m.deleteFn(ctx, id)
 	}
+
 	return nil
 }

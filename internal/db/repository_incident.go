@@ -252,3 +252,63 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) (Incid
 		Total: total,
 	}, nil
 }
+
+func (r *IncidentRepository) CountByStatus(ctx context.Context, statusID int64) (int, error) {
+	const query = `
+		SELECT COUNT(*)
+		FROM incidents
+		WHERE status_id = @id
+		  AND deleted_at IS NULL
+	`
+
+	return r.count(ctx, query, statusID, "status")
+}
+
+func (r *IncidentRepository) CountByPriority(ctx context.Context, priorityID int64) (int, error) {
+	const query = `
+		SELECT COUNT(*)
+		FROM incidents
+		WHERE priority_id = @id
+		  AND deleted_at IS NULL
+	`
+
+	return r.count(ctx, query, priorityID, "priority")
+}
+
+func (r *IncidentRepository) CountByTeam(ctx context.Context, teamID int64) (int, error) {
+	const query = `
+		SELECT COUNT(*)
+		FROM incidents
+		WHERE team_id = @id
+		  AND deleted_at IS NULL
+	`
+
+	return r.count(ctx, query, teamID, "team")
+}
+
+func (r *IncidentRepository) CountByUser(ctx context.Context, userID int64) (int, error) {
+	const query = `
+		SELECT COUNT(*)
+		FROM incidents
+		WHERE (user_id = @id OR author_id = @id)
+		  AND deleted_at IS NULL
+	`
+
+	return r.count(ctx, query, userID, "user")
+}
+
+func (r *IncidentRepository) count(ctx context.Context, query string, id int64, entity string) (int, error) {
+	args := pgx.NamedArgs{
+		"id": id,
+	}
+
+	var count int
+
+	if err := transaction.FromContext(ctx, r.db).
+		QueryRow(ctx, query, args).
+		Scan(&count); err != nil {
+		return 0, fmt.Errorf("db count by %s: %w", entity, err)
+	}
+
+	return count, nil
+}

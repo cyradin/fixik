@@ -56,6 +56,18 @@ var (
 		Status: http.StatusForbidden,
 		Msg:    "Доступ запрещен",
 	}
+
+	ErrUnableToDelete = func(msg string) *UserMessageError {
+		if msg == "" {
+			msg = "Невозможно удалить: есть инциденты, использующие данную сущность"
+		}
+
+		return &UserMessageError{
+			Err:    errors.New(http.StatusText(http.StatusConflict)),
+			Status: http.StatusConflict,
+			Msg:    msg,
+		}
+	}
 )
 
 type userMessager interface {

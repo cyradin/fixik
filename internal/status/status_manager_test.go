@@ -58,7 +58,7 @@ func TestStatusManager_Create(t *testing.T) {
 			repo := &statusRepoMock{}
 			tt.mock(repo)
 
-			m := NewStatusManager(repo)
+			m := NewStatusManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 
 			res, err := m.Create(ctx, tt.status)
 
@@ -85,7 +85,7 @@ func TestStatusManager_GetByID(t *testing.T) {
 
 	tests := []struct {
 		name string
-		id   StatusID
+		id   ID
 		mock func(*statusRepoMock)
 		want Status
 		err  bool
@@ -133,7 +133,7 @@ func TestStatusManager_GetByID(t *testing.T) {
 			repo := &statusRepoMock{}
 			tt.mock(repo)
 
-			m := NewStatusManager(repo)
+			m := NewStatusManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 
 			res, err := m.GetByID(ctx, tt.id)
 
@@ -192,7 +192,7 @@ func TestStatusManager_List(t *testing.T) {
 			repo := &statusRepoMock{}
 			tt.mock(repo)
 
-			m := NewStatusManager(repo)
+			m := NewStatusManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 
 			res, err := m.List(ctx)
 
@@ -255,7 +255,7 @@ func TestStatusManager_Update(t *testing.T) {
 			repo := &statusRepoMock{}
 			tt.mock(repo)
 
-			m := NewStatusManager(repo)
+			m := NewStatusManager(repo, &incidentsCounterMock{}, &txExecutorMock{})
 
 			res, err := m.Update(ctx, tt.status)
 
@@ -277,28 +277,82 @@ func TestStatusManager_Delete(t *testing.T) {
 
 	tests := []struct {
 		name string
-		id   StatusID
-		mock func(*statusRepoMock)
-		err  bool
+		id   ID
+		mock func(*statusRepoMock, *incidentsCounterMock, *txExecutorMock)
+		err  error
 	}{
 		{
 			name: "success",
 			id:   1,
-			mock: func(m *statusRepoMock) {
-				m.deleteFn = func(ctx context.Context, id int64) error {
+			mock: func(repo *statusRepoMock, counter *incidentsCounterMock, tx *txExecutorMock) {
+				counter.countFn = func(ctx context.Context, statusID int64) (int, error) {
+					return 0, nil
+				}
+
+				repo.deleteFn = func(ctx context.Context, id int64) error {
 					return nil
+				}
+
+				tx.execFn = func(ctx context.Context, fn func(ctx context.Context) error) error {
+					return fn(ctx)
 				}
 			},
 		},
 		{
-			name: "repo error",
+			name: "has dependent incidents",
 			id:   1,
-			mock: func(m *statusRepoMock) {
-				m.deleteFn = func(ctx context.Context, id int64) error {
-					return errors.New("db error")
+			mock: func(repo *statusRepoMock, counter *incidentsCounterMock, tx *txExecutorMock) {
+				counter.countFn = func(ctx context.Context, statusID int64) (int, error) {
+					return 2, nil
+				}
+
+				tx.execFn = func(ctx context.Context, fn func(ctx context.Context) error) error {
+					return fn(ctx)
 				}
 			},
-			err: true,
+			err: ErrHasDependantEntities,
+		},
+		{
+			name: "counter error",
+			id:   1,
+			mock: func(repo *statusRepoMock, counter *incidentsCounterMock, tx *txExecutorMock) {
+				counter.countFn = func(ctx context.Context, statusID int64) (int, error) {
+					return 0, errors.New("db error")
+				}
+
+				tx.execFn = func(ctx context.Context, fn func(ctx context.Context) error) error {
+					return fn(ctx)
+				}
+			},
+			err: errors.New("count incidents"),
+		},
+		{
+			name: "repo delete error",
+			id:   1,
+			mock: func(repo *statusRepoMock, counter *incidentsCounterMock, tx *txExecutorMock) {
+				counter.countFn = func(ctx context.Context, statusID int64) (int, error) {
+					return 0, nil
+				}
+
+				repo.deleteFn = func(ctx context.Context, id int64) error {
+					return errors.New("db error")
+				}
+
+				tx.execFn = func(ctx context.Context, fn func(ctx context.Context) error) error {
+					return fn(ctx)
+				}
+			},
+			err: errors.New("repository delete"),
+		},
+		{
+			name: "tx error",
+			id:   1,
+			mock: func(repo *statusRepoMock, counter *incidentsCounterMock, tx *txExecutorMock) {
+				tx.execFn = func(ctx context.Context, fn func(ctx context.Context) error) error {
+					return errors.New("tx error")
+				}
+			},
+			err: errors.New("tx error"),
 		},
 	}
 
@@ -307,13 +361,16 @@ func TestStatusManager_Delete(t *testing.T) {
 			t.Parallel()
 
 			repo := &statusRepoMock{}
-			tt.mock(repo)
+			counter := &incidentsCounterMock{}
+			tx := &txExecutorMock{}
 
-			m := NewStatusManager(repo)
+			tt.mock(repo, counter, tx)
+
+			m := NewStatusManager(repo, counter, tx)
 
 			err := m.Delete(ctx, tt.id)
 
-			if tt.err {
+			if tt.err != nil {
 				require.Error(t, err)
 				return
 			}
@@ -349,4 +406,20 @@ func (m *statusRepoMock) Update(ctx context.Context, s *db.Status) error {
 
 func (m *statusRepoMock) Delete(ctx context.Context, id int64) error {
 	return m.deleteFn(ctx, id)
+}
+
+type incidentsCounterMock struct {
+	countFn func(ctx context.Context, statusID int64) (int, error)
+}
+
+func (m *incidentsCounterMock) CountByStatus(ctx context.Context, statusID int64) (int, error) {
+	return m.countFn(ctx, statusID)
+}
+
+type txExecutorMock struct {
+	execFn func(ctx context.Context, fn func(ctx context.Context) error) error
+}
+
+func (m *txExecutorMock) Exec(ctx context.Context, fn func(ctx context.Context) error) error {
+	return m.execFn(ctx, fn)
 }

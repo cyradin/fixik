@@ -1,16 +1,15 @@
-package status
+package team
 
 import "time"
 
 type ID = int64
 
-type Status struct {
+type Team struct {
 	ID          ID
 	Name        string
 	Code        string
 	Description string
 	Sort        int
-	IsFinal     bool
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

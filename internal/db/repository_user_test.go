@@ -247,6 +247,44 @@ func (s *UserRepositorySuite) TestUpdate_NotFound() {
 	s.Require().ErrorIs(err, ErrNotFound)
 }
 
+func (s *UserRepositorySuite) TestCountByTeam() {
+	ctx := s.T().Context()
+
+	team1 := s.createTeam("team1", "Team One")
+	team2 := s.createTeam("team2", "Team Two")
+
+	u1 := s.createUser("A", "a1", "a1@example.com", "pass", team1.ID, RoleUser)
+	u2 := s.createUser("B", "b1", "b1@example.com", "pass", team1.ID, RoleUser)
+	_ = s.createUser("C", "c1", "c1@example.com", "pass", team2.ID, RoleUser)
+
+	s.Run("count team1", func() {
+		cnt, err := s.repo.CountByTeam(ctx, team1.ID)
+		s.Require().NoError(err)
+		s.Equal(2, cnt)
+	})
+
+	s.Run("count team2", func() {
+		cnt, err := s.repo.CountByTeam(ctx, team2.ID)
+		s.Require().NoError(err)
+		s.Equal(1, cnt)
+	})
+
+	s.Run("count empty team", func() {
+		cnt, err := s.repo.CountByTeam(ctx, 999999)
+		s.Require().NoError(err)
+		s.Equal(0, cnt)
+	})
+
+	s.Run("after delete all users", func() {
+		_ = s.repo.Delete(ctx, u1.ID)
+		_ = s.repo.Delete(ctx, u2.ID)
+
+		cnt, err := s.repo.CountByTeam(ctx, team1.ID)
+		s.Require().NoError(err)
+		s.Equal(0, cnt)
+	})
+}
+
 func (s *UserRepositorySuite) createTeam(code, name string) *Team {
 	ctx := s.T().Context()
 	team := &Team{Code: code, Name: name}

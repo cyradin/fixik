@@ -1,11 +1,11 @@
-package dict
+package priority
 
 import "time"
 
-type EntityID = int64
+type ID = int64
 
-type Entity struct {
-	ID          EntityID
+type Priority struct {
+	ID          ID
 	Name        string
 	Code        string
 	Description string

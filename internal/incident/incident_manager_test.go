@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/cyradin/fixik/internal/db"
-	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/priority"
 	"github.com/cyradin/fixik/internal/status"
+	"github.com/cyradin/fixik/internal/team"
 	"github.com/cyradin/fixik/internal/user"
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +21,7 @@ func TestIncidentManager_Create(t *testing.T) {
 	tests := []struct {
 		name string
 		cmd  CreateIncident
-		mock func(*incidentRepoMock, *statusProviderMock, *entityProviderMock, *userProviderMock)
+		mock func(*incidentRepoMock, *statusProviderMock, *priorityProviderMock, *userProviderMock)
 		err  bool
 	}{
 		{
@@ -31,11 +32,17 @@ func TestIncidentManager_Create(t *testing.T) {
 				StatusID:    1,
 				PriorityID:  2,
 			},
-			mock: func(repo *incidentRepoMock, statusProvider *statusProviderMock, priority *entityProviderMock, user *userProviderMock) {
+			mock: func(
+				repo *incidentRepoMock,
+				statusProvider *statusProviderMock,
+				priorityProvider *priorityProviderMock,
+				user *userProviderMock,
+			) {
 				repo.createFn = func(ctx context.Context, i *db.Incident) error {
 					i.ID = 10
 					return nil
 				}
+
 				repo.getByIDFn = func(ctx context.Context, id int64) (db.Incident, error) {
 					return db.Incident{
 						ID:          id,
@@ -45,11 +52,13 @@ func TestIncidentManager_Create(t *testing.T) {
 						PriorityID:  2,
 					}, nil
 				}
-				statusProvider.getByIDFn = func(ctx context.Context, id status.StatusID) (status.Status, error) {
+
+				statusProvider.getByIDFn = func(ctx context.Context, id int64) (status.Status, error) {
 					return status.Status{ID: 1}, nil
 				}
-				priority.getByIDFn = func(ctx context.Context, id dict.EntityID) (dict.Entity, error) {
-					return dict.Entity{ID: 2}, nil
+
+				priorityProvider.getByIDFn = func(ctx context.Context, id int64) (priority.Priority, error) {
+					return priority.Priority{ID: 2}, nil
 				}
 			},
 		},
@@ -58,7 +67,12 @@ func TestIncidentManager_Create(t *testing.T) {
 			cmd: CreateIncident{
 				Title: "title",
 			},
-			mock: func(repo *incidentRepoMock, status *statusProviderMock, priority *entityProviderMock, user *userProviderMock) {
+			mock: func(
+				repo *incidentRepoMock,
+				statusProvider *statusProviderMock,
+				priorityProvider *priorityProviderMock,
+				user *userProviderMock,
+			) {
 				repo.createFn = func(ctx context.Context, i *db.Incident) error {
 					return errors.New("db error")
 				}
@@ -73,7 +87,7 @@ func TestIncidentManager_Create(t *testing.T) {
 
 			repo := &incidentRepoMock{}
 			status := &statusProviderMock{}
-			priority := &entityProviderMock{}
+			priority := &priorityProviderMock{}
 			user := &userProviderMock{}
 
 			tt.mock(repo, status, priority, user)
@@ -112,7 +126,7 @@ func TestIncidentManager_GetByID(t *testing.T) {
 		mock func(
 			*incidentRepoMock,
 			*statusProviderMock,
-			*entityProviderMock,
+			*priorityProviderMock,
 			*userProviderMock,
 		)
 		erroneous bool
@@ -122,7 +136,7 @@ func TestIncidentManager_GetByID(t *testing.T) {
 			mock: func(
 				repo *incidentRepoMock,
 				status *statusProviderMock,
-				priority *entityProviderMock,
+				priorityProvider *priorityProviderMock,
 				user *userProviderMock,
 			) {
 				repo.getByIDFn = func(ctx context.Context, id int64) (db.Incident, error) {
@@ -136,14 +150,14 @@ func TestIncidentManager_GetByID(t *testing.T) {
 			mock: func(
 				repo *incidentRepoMock,
 				statusProvider *statusProviderMock,
-				priority *entityProviderMock,
+				priorityProvider *priorityProviderMock,
 				user *userProviderMock,
 			) {
 				repo.getByIDFn = func(ctx context.Context, id int64) (db.Incident, error) {
 					return dbIncident, nil
 				}
 
-				statusProvider.getByIDFn = func(ctx context.Context, id status.StatusID) (status.Status, error) {
+				statusProvider.getByIDFn = func(ctx context.Context, id int64) (status.Status, error) {
 					return status.Status{}, errors.New("status error")
 				}
 			},
@@ -154,19 +168,19 @@ func TestIncidentManager_GetByID(t *testing.T) {
 			mock: func(
 				repo *incidentRepoMock,
 				statusProvider *statusProviderMock,
-				priority *entityProviderMock,
+				priorityProvider *priorityProviderMock,
 				user *userProviderMock,
 			) {
 				repo.getByIDFn = func(ctx context.Context, id int64) (db.Incident, error) {
 					return dbIncident, nil
 				}
 
-				statusProvider.getByIDFn = func(ctx context.Context, id status.StatusID) (status.Status, error) {
+				statusProvider.getByIDFn = func(ctx context.Context, id int64) (status.Status, error) {
 					return status.Status{ID: 1}, nil
 				}
 
-				priority.getByIDFn = func(ctx context.Context, id dict.EntityID) (dict.Entity, error) {
-					return dict.Entity{}, errors.New("priority error")
+				priorityProvider.getByIDFn = func(ctx context.Context, id int64) (priority.Priority, error) {
+					return priority.Priority{}, errors.New("priority error")
 				}
 			},
 			erroneous: true,
@@ -176,19 +190,19 @@ func TestIncidentManager_GetByID(t *testing.T) {
 			mock: func(
 				repo *incidentRepoMock,
 				statusProvider *statusProviderMock,
-				priority *entityProviderMock,
+				priorityProvider *priorityProviderMock,
 				up *userProviderMock,
 			) {
 				repo.getByIDFn = func(ctx context.Context, id int64) (db.Incident, error) {
 					return dbIncident, nil
 				}
 
-				statusProvider.getByIDFn = func(ctx context.Context, id status.StatusID) (status.Status, error) {
+				statusProvider.getByIDFn = func(ctx context.Context, id int64) (status.Status, error) {
 					return status.Status{ID: 1}, nil
 				}
 
-				priority.getByIDFn = func(ctx context.Context, id dict.EntityID) (dict.Entity, error) {
-					return dict.Entity{ID: 2}, nil
+				priorityProvider.getByIDFn = func(ctx context.Context, id int64) (priority.Priority, error) {
+					return priority.Priority{ID: 2}, nil
 				}
 
 				up.getByIDFn = func(ctx context.Context, id int64) (user.User, error) {
@@ -204,8 +218,8 @@ func TestIncidentManager_GetByID(t *testing.T) {
 
 			repo := &incidentRepoMock{}
 			status := &statusProviderMock{}
-			priority := &entityProviderMock{}
-			team := &entityProviderMock{}
+			priority := &priorityProviderMock{}
+			team := &teamProviderMock{}
 			user := &userProviderMock{}
 
 			tt.mock(repo, status, priority, user)
@@ -220,9 +234,10 @@ func TestIncidentManager_GetByID(t *testing.T) {
 			}
 
 			require.NoError(t, err)
+
 			require.Equal(t, int64(1), res.ID)
-			require.Equal(t, dict.EntityID(1), res.Status.ID)
-			require.Equal(t, dict.EntityID(2), res.Priority.ID)
+			require.Equal(t, int64(1), res.Status.ID)
+			require.Equal(t, int64(2), res.Priority.ID)
 			require.Equal(t, int64(100), res.User.ID)
 			require.Equal(t, int64(100), res.Author.ID)
 		})
@@ -352,9 +367,9 @@ func TestIncidentManager_Update(t *testing.T) {
 
 			manager := NewIncidentManager(
 				repo,
-				&statusProviderMock{getByIDFn: func(context.Context, status.StatusID) (status.Status, error) { return status.Status{ID: 2}, nil }},
-				&entityProviderMock{getByIDFn: func(context.Context, dict.EntityID) (dict.Entity, error) { return dict.Entity{ID: 3}, nil }},
-				&entityProviderMock{getByIDFn: func(context.Context, dict.EntityID) (dict.Entity, error) { return dict.Entity{ID: 3}, nil }},
+				&statusProviderMock{getByIDFn: func(context.Context, status.ID) (status.Status, error) { return status.Status{ID: 2}, nil }},
+				&priorityProviderMock{getByIDFn: func(context.Context, priority.ID) (priority.Priority, error) { return priority.Priority{ID: 3}, nil }},
+				&teamProviderMock{getByIDFn: func(context.Context, team.ID) (team.Team, error) { return team.Team{ID: 3}, nil }},
 				&userProviderMock{getByIDFn: func(ctx context.Context, i int64) (user.User, error) { return user.User{ID: 1}, nil }},
 			)
 
@@ -411,9 +426,9 @@ func TestIncidentManager_Delete(t *testing.T) {
 
 			manager := NewIncidentManager(
 				repo,
-				&statusProviderMock{getByIDFn: func(context.Context, status.StatusID) (status.Status, error) { return status.Status{ID: 2}, nil }},
-				&entityProviderMock{getByIDFn: func(context.Context, dict.EntityID) (dict.Entity, error) { return dict.Entity{ID: 3}, nil }},
-				&entityProviderMock{getByIDFn: func(context.Context, dict.EntityID) (dict.Entity, error) { return dict.Entity{ID: 3}, nil }},
+				&statusProviderMock{getByIDFn: func(context.Context, status.ID) (status.Status, error) { return status.Status{ID: 2}, nil }},
+				&priorityProviderMock{getByIDFn: func(context.Context, priority.ID) (priority.Priority, error) { return priority.Priority{ID: 3}, nil }},
+				&teamProviderMock{getByIDFn: func(context.Context, team.ID) (team.Team, error) { return team.Team{ID: 3}, nil }},
 				&userProviderMock{getByIDFn: func(ctx context.Context, i int64) (user.User, error) { return user.User{ID: 1}, nil }},
 			)
 
@@ -428,7 +443,6 @@ func TestIncidentManager_Delete(t *testing.T) {
 		})
 	}
 }
-
 func TestIncidentManager_List(t *testing.T) {
 	t.Parallel()
 
@@ -458,7 +472,7 @@ func TestIncidentManager_List(t *testing.T) {
 		mock func(
 			*incidentRepoMock,
 			*statusProviderMock,
-			*entityProviderMock,
+			*priorityProviderMock,
 			*userProviderMock,
 		)
 		err bool
@@ -468,7 +482,7 @@ func TestIncidentManager_List(t *testing.T) {
 			mock: func(
 				repo *incidentRepoMock,
 				status *statusProviderMock,
-				priority *entityProviderMock,
+				priorityProvider *priorityProviderMock,
 				user *userProviderMock,
 			) {
 				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
@@ -482,7 +496,7 @@ func TestIncidentManager_List(t *testing.T) {
 			mock: func(
 				repo *incidentRepoMock,
 				statusProvider *statusProviderMock,
-				priority *entityProviderMock,
+				priorityProvider *priorityProviderMock,
 				user *userProviderMock,
 			) {
 				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
@@ -503,7 +517,7 @@ func TestIncidentManager_List(t *testing.T) {
 			mock: func(
 				repo *incidentRepoMock,
 				statusProvider *statusProviderMock,
-				priority *entityProviderMock,
+				priorityProvider *priorityProviderMock,
 				user *userProviderMock,
 			) {
 				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
@@ -517,7 +531,7 @@ func TestIncidentManager_List(t *testing.T) {
 					return []status.Status{{ID: 1}}, nil
 				}
 
-				priority.listFn = func(context.Context) ([]dict.Entity, error) {
+				priorityProvider.listFn = func(context.Context) ([]priority.Priority, error) {
 					return nil, errors.New("priority error")
 				}
 			},
@@ -528,7 +542,7 @@ func TestIncidentManager_List(t *testing.T) {
 			mock: func(
 				repo *incidentRepoMock,
 				statusProvider *statusProviderMock,
-				priority *entityProviderMock,
+				priorityProvider *priorityProviderMock,
 				up *userProviderMock,
 			) {
 				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
@@ -542,8 +556,8 @@ func TestIncidentManager_List(t *testing.T) {
 					return []status.Status{{ID: 1}}, nil
 				}
 
-				priority.listFn = func(context.Context) ([]dict.Entity, error) {
-					return []dict.Entity{{ID: 2}}, nil
+				priorityProvider.listFn = func(context.Context) ([]priority.Priority, error) {
+					return []priority.Priority{{ID: 2}}, nil
 				}
 
 				up.getByIDManyFn = func(ctx context.Context, ids []int64) ([]user.User, error) {
@@ -564,8 +578,8 @@ func TestIncidentManager_List(t *testing.T) {
 
 			repo := &incidentRepoMock{}
 			status := &statusProviderMock{}
-			priority := &entityProviderMock{}
-			team := &entityProviderMock{}
+			priority := &priorityProviderMock{}
+			team := &teamProviderMock{}
 			user := &userProviderMock{}
 
 			tt.mock(repo, status, priority, user)
@@ -582,11 +596,10 @@ func TestIncidentManager_List(t *testing.T) {
 			require.NoError(t, err)
 
 			require.Len(t, res.Items, 2)
-
 			require.Equal(t, 2, res.Total)
 
-			require.Equal(t, dict.EntityID(1), res.Items[0].Status.ID)
-			require.Equal(t, dict.EntityID(2), res.Items[0].Priority.ID)
+			require.Equal(t, int64(1), res.Items[0].Status.ID)
+			require.Equal(t, int64(2), res.Items[0].Priority.ID)
 			require.Equal(t, int64(100), res.Items[0].User.ID)
 			require.Equal(t, int64(101), res.Items[1].User.ID)
 		})
@@ -621,16 +634,50 @@ func (m *incidentRepoMock) List(ctx context.Context, limit, offset int) (db.Inci
 	return m.listFn(ctx, limit, offset)
 }
 
-type entityProviderMock struct {
-	getByIDFn func(context.Context, dict.EntityID) (dict.Entity, error)
-	listFn    func(context.Context) ([]dict.Entity, error)
+type statusProviderMock struct {
+	getByIDFn func(context.Context, status.ID) (status.Status, error)
+	listFn    func(context.Context) ([]status.Status, error)
 }
 
-func (m *entityProviderMock) GetByID(ctx context.Context, id dict.EntityID) (dict.Entity, error) {
+func (m *statusProviderMock) GetByID(ctx context.Context, id status.ID) (status.Status, error) {
 	return m.getByIDFn(ctx, id)
 }
 
-func (m *entityProviderMock) List(ctx context.Context) ([]dict.Entity, error) {
+func (m *statusProviderMock) List(ctx context.Context) ([]status.Status, error) {
+	if m.listFn != nil {
+		return m.listFn(ctx)
+	}
+
+	return nil, nil
+}
+
+type priorityProviderMock struct {
+	getByIDFn func(context.Context, priority.ID) (priority.Priority, error)
+	listFn    func(context.Context) ([]priority.Priority, error)
+}
+
+func (m *priorityProviderMock) GetByID(ctx context.Context, id priority.ID) (priority.Priority, error) {
+	return m.getByIDFn(ctx, id)
+}
+
+func (m *priorityProviderMock) List(ctx context.Context) ([]priority.Priority, error) {
+	if m.listFn != nil {
+		return m.listFn(ctx)
+	}
+
+	return nil, nil
+}
+
+type teamProviderMock struct {
+	getByIDFn func(context.Context, team.ID) (team.Team, error)
+	listFn    func(context.Context) ([]team.Team, error)
+}
+
+func (m *teamProviderMock) GetByID(ctx context.Context, id team.ID) (team.Team, error) {
+	return m.getByIDFn(ctx, id)
+}
+
+func (m *teamProviderMock) List(ctx context.Context) ([]team.Team, error) {
 	if m.listFn != nil {
 		return m.listFn(ctx)
 	}
@@ -654,23 +701,6 @@ func (m *userProviderMock) GetByID(ctx context.Context, id int64) (user.User, er
 func (m *userProviderMock) GetByIDMany(ctx context.Context, ids []int64) ([]user.User, error) {
 	if m.getByIDManyFn != nil {
 		return m.getByIDManyFn(ctx, ids)
-	}
-
-	return nil, nil
-}
-
-type statusProviderMock struct {
-	getByIDFn func(context.Context, status.StatusID) (status.Status, error)
-	listFn    func(context.Context) ([]status.Status, error)
-}
-
-func (m *statusProviderMock) GetByID(ctx context.Context, id status.StatusID) (status.Status, error) {
-	return m.getByIDFn(ctx, id)
-}
-
-func (m *statusProviderMock) List(ctx context.Context) ([]status.Status, error) {
-	if m.listFn != nil {
-		return m.listFn(ctx)
 	}
 
 	return nil, nil

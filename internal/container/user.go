@@ -8,6 +8,8 @@ func (c *Container) UserManager() *user.UserManager {
 	if c.userManager == nil {
 		c.userManager = user.NewUserManager(
 			c.UserRepository(),
+			c.IncidentRepository(),
+			c.TxExecutor(),
 		)
 	}
 

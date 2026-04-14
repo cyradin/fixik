@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/priority"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -20,9 +20,9 @@ func TestCreatePriority(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			createFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) {
-				return dict.Entity{
+		m := &mockPriorityManager{
+			createFn: func(ctx context.Context, e priority.Priority) (priority.Priority, error) {
+				return priority.Priority{
 					ID:          1,
 					Name:        e.Name,
 					Code:        e.Code,
@@ -52,7 +52,7 @@ func TestCreatePriority(t *testing.T) {
 	t.Run("validation error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockPriorityManager{}
 		req := CreatePriorityRequest{Name: "", Code: ""}
 		rr := testRequest(t, createPriority(m), http.MethodPost, "/dummy", req)
 		require.Equal(t, http.StatusBadRequest, rr.Code)
@@ -61,9 +61,9 @@ func TestCreatePriority(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			createFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) {
-				return dict.Entity{}, errors.New("create failed")
+		m := &mockPriorityManager{
+			createFn: func(ctx context.Context, e priority.Priority) (priority.Priority, error) {
+				return priority.Priority{}, errors.New("create failed")
 			},
 		}
 		req := CreatePriorityRequest{Name: "Name", Code: "C", Sort: 123}
@@ -78,9 +78,9 @@ func TestGetPriority(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			getFn: func(ctx context.Context, id int64) (dict.Entity, error) {
-				return dict.Entity{ID: id, Name: "A"}, nil
+		m := &mockPriorityManager{
+			getFn: func(ctx context.Context, id int64) (priority.Priority, error) {
+				return priority.Priority{ID: id, Name: "A"}, nil
 			},
 		}
 		r := chi.NewRouter()
@@ -102,7 +102,7 @@ func TestGetPriority(t *testing.T) {
 	t.Run("invalid id", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockPriorityManager{}
 		r := chi.NewRouter()
 
 		r.Get("/entities/{id}", getPriority(m))
@@ -116,9 +116,9 @@ func TestGetPriority(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			getFn: func(ctx context.Context, id int64) (dict.Entity, error) {
-				return dict.Entity{}, errors.New("not found")
+		m := &mockPriorityManager{
+			getFn: func(ctx context.Context, id int64) (priority.Priority, error) {
+				return priority.Priority{}, errors.New("not found")
 			},
 		}
 		r := chi.NewRouter()
@@ -137,8 +137,8 @@ func TestUpdatePriority(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			updateFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) { return e, nil },
+		m := &mockPriorityManager{
+			updateFn: func(ctx context.Context, e priority.Priority) (priority.Priority, error) { return e, nil },
 		}
 		r := chi.NewRouter()
 		r.Put("/entities/{id}", updatePriority(m))
@@ -155,7 +155,7 @@ func TestUpdatePriority(t *testing.T) {
 	t.Run("validation error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockPriorityManager{}
 		r := chi.NewRouter()
 		r.Put("/entities/{id}", updatePriority(m))
 
@@ -171,7 +171,7 @@ func TestUpdatePriority(t *testing.T) {
 	t.Run("invalid id", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockPriorityManager{}
 		r := chi.NewRouter()
 		r.Put("/entities/{id}", updatePriority(m))
 
@@ -187,9 +187,9 @@ func TestUpdatePriority(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			updateFn: func(ctx context.Context, e dict.Entity) (dict.Entity, error) {
-				return dict.Entity{}, errors.New("fail")
+		m := &mockPriorityManager{
+			updateFn: func(ctx context.Context, e priority.Priority) (priority.Priority, error) {
+				return priority.Priority{}, errors.New("fail")
 			},
 		}
 		r := chi.NewRouter()
@@ -212,7 +212,7 @@ func TestDeletePriority(t *testing.T) {
 		t.Parallel()
 
 		deleted := false
-		m := &mockManager{deleteFn: func(ctx context.Context, id int64) error { deleted = true; return nil }}
+		m := &mockPriorityManager{deleteFn: func(ctx context.Context, id int64) error { deleted = true; return nil }}
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deletePriority(m))
 
@@ -226,7 +226,7 @@ func TestDeletePriority(t *testing.T) {
 	t.Run("invalid id", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{}
+		m := &mockPriorityManager{}
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deletePriority(m))
 
@@ -239,7 +239,7 @@ func TestDeletePriority(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{deleteFn: func(ctx context.Context, id int64) error { return errors.New("fail") }}
+		m := &mockPriorityManager{deleteFn: func(ctx context.Context, id int64) error { return errors.New("fail") }}
 		r := chi.NewRouter()
 		r.Delete("/entities/{id}", deletePriority(m))
 
@@ -256,9 +256,9 @@ func TestListPriorities(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			listFn: func(ctx context.Context) ([]dict.Entity, error) {
-				return []dict.Entity{
+		m := &mockPriorityManager{
+			listFn: func(ctx context.Context) ([]priority.Priority, error) {
+				return []priority.Priority{
 					{ID: 1, Name: "A", Code: "A", Sort: 1},
 					{ID: 2, Name: "B", Code: "B", Sort: 2},
 				}, nil
@@ -277,8 +277,8 @@ func TestListPriorities(t *testing.T) {
 	t.Run("empty list", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			listFn: func(ctx context.Context) ([]dict.Entity, error) { return []dict.Entity{}, nil },
+		m := &mockPriorityManager{
+			listFn: func(ctx context.Context) ([]priority.Priority, error) { return []priority.Priority{}, nil },
 		}
 		rr := testRequest(t, listPriorities(m), http.MethodGet, "/dummy", nil)
 		require.Equal(t, http.StatusOK, rr.Code)
@@ -293,39 +293,39 @@ func TestListPriorities(t *testing.T) {
 	t.Run("manager error", func(t *testing.T) {
 		t.Parallel()
 
-		m := &mockManager{
-			listFn: func(ctx context.Context) ([]dict.Entity, error) { return nil, errors.New("fail") },
+		m := &mockPriorityManager{
+			listFn: func(ctx context.Context) ([]priority.Priority, error) { return nil, errors.New("fail") },
 		}
 		rr := testRequest(t, listPriorities(m), http.MethodGet, "/dummy", nil)
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
 	})
 }
 
-type mockManager struct {
-	createFn func(ctx context.Context, e dict.Entity) (dict.Entity, error)
-	getFn    func(ctx context.Context, id int64) (dict.Entity, error)
-	listFn   func(ctx context.Context) ([]dict.Entity, error)
-	updateFn func(ctx context.Context, e dict.Entity) (dict.Entity, error)
+type mockPriorityManager struct {
+	createFn func(ctx context.Context, e priority.Priority) (priority.Priority, error)
+	getFn    func(ctx context.Context, id int64) (priority.Priority, error)
+	listFn   func(ctx context.Context) ([]priority.Priority, error)
+	updateFn func(ctx context.Context, e priority.Priority) (priority.Priority, error)
 	deleteFn func(ctx context.Context, id int64) error
 }
 
-func (m *mockManager) Create(ctx context.Context, e dict.Entity) (dict.Entity, error) {
+func (m *mockPriorityManager) Create(ctx context.Context, e priority.Priority) (priority.Priority, error) {
 	return m.createFn(ctx, e)
 }
 
-func (m *mockManager) GetByID(ctx context.Context, id int64) (dict.Entity, error) {
+func (m *mockPriorityManager) GetByID(ctx context.Context, id int64) (priority.Priority, error) {
 	return m.getFn(ctx, id)
 }
 
-func (m *mockManager) List(ctx context.Context) ([]dict.Entity, error) {
+func (m *mockPriorityManager) List(ctx context.Context) ([]priority.Priority, error) {
 	return m.listFn(ctx)
 }
 
-func (m *mockManager) Update(ctx context.Context, e dict.Entity) (dict.Entity, error) {
+func (m *mockPriorityManager) Update(ctx context.Context, e priority.Priority) (priority.Priority, error) {
 	return m.updateFn(ctx, e)
 }
 
-func (m *mockManager) Delete(ctx context.Context, id int64) error { return m.deleteFn(ctx, id) }
+func (m *mockPriorityManager) Delete(ctx context.Context, id int64) error { return m.deleteFn(ctx, id) }
 
 func jsonBody(t *testing.T, v any) *bytes.Buffer {
 	t.Helper()

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cyradin/fixik/internal/db"
+	"github.com/cyradin/fixik/pkg/transaction"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -29,6 +30,14 @@ func (c *Container) PgPool() *pgxpool.Pool {
 	}
 
 	return c.pgPool
+}
+
+func (c *Container) TxExecutor() *transaction.Executor {
+	if c.txExecutor == nil {
+		c.txExecutor = transaction.NewExecutor(c.PgPool())
+	}
+
+	return c.txExecutor
 }
 
 func (c *Container) IncidentRepository() *db.IncidentRepository {

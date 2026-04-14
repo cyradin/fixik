@@ -2,11 +2,12 @@ package web
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/cyradin/fixik/internal/container"
-	"github.com/cyradin/fixik/internal/dict"
+	"github.com/cyradin/fixik/internal/priority"
 	"github.com/cyradin/fixik/internal/role"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -18,10 +19,10 @@ const (
 )
 
 type priorityManager interface {
-	Create(ctx context.Context, e dict.Entity) (dict.Entity, error)
-	GetByID(ctx context.Context, id int64) (dict.Entity, error)
-	List(ctx context.Context) ([]dict.Entity, error)
-	Update(ctx context.Context, s dict.Entity) (dict.Entity, error)
+	Create(ctx context.Context, e priority.Priority) (priority.Priority, error)
+	GetByID(ctx context.Context, id int64) (priority.Priority, error)
+	List(ctx context.Context) ([]priority.Priority, error)
+	Update(ctx context.Context, s priority.Priority) (priority.Priority, error)
 	Delete(ctx context.Context, id int64) error
 }
 
@@ -99,7 +100,7 @@ func createPriority(manager priorityManager) http.HandlerFunc {
 			return Priority{}, ErrForbidden
 		}
 
-		entity := dict.Entity{
+		entity := priority.Priority{
 			Name:        req.Name,
 			Code:        req.Code,
 			Description: req.Description,
@@ -176,7 +177,7 @@ func updatePriority(manager priorityManager) http.HandlerFunc {
 				return Priority{}, ErrForbidden
 			}
 
-			entity := dict.Entity{
+			entity := priority.Priority{
 				ID:          id,
 				Name:        req.Name,
 				Code:        req.Code,
@@ -221,6 +222,10 @@ func deletePriority(manager priorityManager) http.HandlerFunc {
 			}
 
 			if err := manager.Delete(ctx, id); err != nil {
+				if errors.Is(err, priority.ErrHasDependantEntities) {
+					return NoBody{}, ErrUnableToDelete("")
+				}
+
 				return NoBody{}, err
 			}
 
@@ -260,7 +265,7 @@ func listPriorities(manager priorityManager) http.HandlerFunc {
 	})
 }
 
-func toPriorityResponse(item dict.Entity) Priority {
+func toPriorityResponse(item priority.Priority) Priority {
 	return Priority{
 		ID:          item.ID,
 		Name:        item.Name,

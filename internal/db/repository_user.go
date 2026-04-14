@@ -211,6 +211,26 @@ func (r *UserRepository) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
+func (r *UserRepository) CountByTeam(ctx context.Context, teamID int64) (int, error) {
+	const query = `
+		SELECT COUNT(*)
+		FROM users
+		WHERE team_id = $1
+		  AND deleted_at IS NULL
+	`
+
+	var count int
+
+	tx := transaction.FromContext(ctx, r.db)
+
+	err := tx.QueryRow(ctx, query, teamID).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("count users by team: %w", err)
+	}
+
+	return count, nil
+}
+
 func (r *UserRepository) getOne(ctx context.Context, query string, args ...any) (User, error) {
 	var u User
 
