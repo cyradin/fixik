@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/cyradin/fixik/internal/config"
 	"github.com/cyradin/fixik/internal/container"
@@ -16,6 +17,7 @@ import (
 	"github.com/cyradin/fixik/internal/team"
 	"github.com/cyradin/fixik/internal/user"
 	"github.com/cyradin/fixik/pkg/logger"
+	"github.com/jackc/pgx/v5"
 )
 
 var GitCommit string = "dev"
@@ -555,10 +557,19 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 			UserID:      new(infraUsers[2]),
 			AuthorID:    new(infraUsers[0]),
 		},
+		{
+			Title:       "Старый инцидент",
+			Description: "Инцидент, который не будет показываться в списке активных",
+			StatusID:    statusMap["done"],
+			PriorityID:  priorityMap["p2"],
+			TeamID:      new(teamIDs[teamInfra]),
+			UserID:      new(infraUsers[1]),
+			AuthorID:    new(infraUsers[0]),
+		},
 	}
 
-	for _, d := range data {
-		_, err := c.IncidentManager().Create(ctx, incident.CreateIncident{
+	for i, d := range data {
+		inc, err := c.IncidentManager().Create(ctx, incident.CreateIncident{
 			Title:       d.Title,
 			Description: d.Description,
 			StatusID:    d.StatusID,
@@ -569,6 +580,23 @@ func createIncidents(ctx context.Context, c *container.Container, teamIDs map[st
 		})
 		if err != nil {
 			return fmt.Errorf("create incident %s: %w", d.Title, err)
+		}
+
+		if i == len(data)-1 {
+			args := pgx.NamedArgs{
+				"id":         inc.ID,
+				"created_at": time.Now().Add(-4 * 168 * time.Hour),
+				"updated_at": time.Now().Add(-3 * 168 * time.Hour),
+			}
+
+			_, err := c.PgPool().Exec(ctx, `UPDATE incidents SET
+				created_at = @created_at,
+				updated_at = @updated_at
+				WHERE id = @id
+			`, args)
+			if err != nil {
+				return fmt.Errorf("update incident timestamps: %w", err)
+			}
 		}
 	}
 

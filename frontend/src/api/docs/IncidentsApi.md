@@ -16,7 +16,7 @@ All URIs are relative to *http://localhost:8080/api*
 
 ## incidentsGet
 
-> WebIncidentListResponse incidentsGet(statusIds, priorityIds, teamIds, userIds, authorIds, limit, offset)
+> WebIncidentListResponse incidentsGet(statusIds, priorityIds, teamIds, userIds, authorIds, active, limit, offset)
 
 List incidents
 
@@ -46,6 +46,8 @@ async function example() {
     userIds: ...,
     // Array<number> | Author IDs (optional)
     authorIds: ...,
+    // boolean | Return only active incidents (optional)
+    active: true,
     // number | Limit (optional)
     limit: 56,
     // number | Offset (optional)
@@ -74,6 +76,7 @@ example().catch(console.error);
 | **teamIds** | `Array<number>` | Team IDs | [Optional] |
 | **userIds** | `Array<number>` | User IDs | [Optional] |
 | **authorIds** | `Array<number>` | Author IDs | [Optional] |
+| **active** | `boolean` | Return only active incidents | [Optional] [Defaults to `undefined`] |
 | **limit** | `number` | Limit | [Optional] [Defaults to `100`] |
 | **offset** | `number` | Offset | [Optional] [Defaults to `0`] |
 

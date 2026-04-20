@@ -13,6 +13,7 @@ type IncidentFilter struct {
 	TeamIDs     []int64
 	PriorityIDs []int64
 	StatusIDs   []int64
+	ActiveOnly  bool
 }
 
 type Incident struct {

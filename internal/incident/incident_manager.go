@@ -202,6 +202,7 @@ func (m *IncidentManager) List(ctx context.Context, filter Filter, limit, offset
 		TeamIDs:     filter.TeamIDs,
 		PriorityIDs: filter.PriorityIDs,
 		StatusIDs:   filter.StatusIDs,
+		ActiveOnly:  filter.ActiveOnly,
 	}
 
 	listResult, err := m.repo.List(ctx, f, limit, offset)

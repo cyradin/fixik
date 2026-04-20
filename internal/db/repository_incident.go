@@ -195,8 +195,9 @@ func (r *IncidentRepository) List(ctx context.Context, filter IncidentFilter, li
 			WHERE deleted_at IS NULL
 			GROUP BY incident_id
 		) c ON c.incident_id = i.id
+		LEFT JOIN statuses s ON i.status_id = s.id
 		WHERE %s
-		ORDER BY i.id DESC
+		ORDER BY i.updated_at DESC
 		LIMIT @limit
 		OFFSET @offset
 	`
@@ -204,6 +205,7 @@ func (r *IncidentRepository) List(ctx context.Context, filter IncidentFilter, li
 	const countQuery = `
 		SELECT COUNT(*)
 		FROM incidents i
+		LEFT JOIN statuses s ON i.status_id = s.id
 		WHERE %s
 	`
 
@@ -218,6 +220,10 @@ func (r *IncidentRepository) List(ctx context.Context, filter IncidentFilter, li
 	conditions = r.addFilter(conditions, args, "i.team_id", filter.TeamIDs, "team_ids")
 	conditions = r.addFilter(conditions, args, "i.priority_id", filter.PriorityIDs, "priority_ids")
 	conditions = r.addFilter(conditions, args, "i.status_id", filter.StatusIDs, "status_ids")
+
+	if filter.ActiveOnly {
+		conditions = append(conditions, "(s.is_final IS NOT TRUE OR i.updated_at > NOW() - INTERVAL '2 weeks')")
+	}
 
 	where := strings.Join(conditions, " AND ")
 

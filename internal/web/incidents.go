@@ -311,6 +311,7 @@ func deleteIncident(manager incidentManager) http.HandlerFunc {
 // @Param teamIds query []int false "Team IDs" collectionFormat(csv)
 // @Param userIds query []int false "User IDs" collectionFormat(csv)
 // @Param authorIds query []int false "Author IDs" collectionFormat(csv)
+// @Param active query bool false "Return only active incidents"
 // @Param limit query int false "Limit" default(100)
 // @Param offset query int false "Offset" default(0)
 // @Success 200 {object} IncidentListResponse
@@ -563,11 +564,20 @@ func decodeIncidentFilter(r *http.Request) (incident.Filter, error) {
 		return incident.Filter{}, fmt.Errorf("invalid author ids: %w", err)
 	}
 
+	activeOnly := false
+	if active := q.Get("active"); active != "" {
+		activeOnly, err = strconv.ParseBool(q.Get("active"))
+		if err != nil {
+			return incident.Filter{}, fmt.Errorf("invalid 'active' value: %w", err)
+		}
+	}
+
 	return incident.Filter{
 		StatusIDs:   statusIDs,
 		PriorityIDs: priorityIDs,
 		TeamIDs:     teamIDs,
 		UserIDs:     userIDs,
 		AuthorIDs:   authorIDs,
+		ActiveOnly:  activeOnly,
 	}, nil
 }

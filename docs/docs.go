@@ -242,6 +242,12 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "description": "Return only active incidents",
+                        "name": "active",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "default": 100,
                         "description": "Limit",

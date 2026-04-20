@@ -49,6 +49,7 @@ export interface IncidentsGetRequest {
     teamIds?: Array<number>;
     userIds?: Array<number>;
     authorIds?: Array<number>;
+    active?: boolean;
     limit?: number;
     offset?: number;
 }
@@ -110,6 +111,10 @@ export class IncidentsApi extends runtime.BaseAPI {
 
         if (requestParameters['authorIds'] != null) {
             queryParameters['authorIds'] = requestParameters['authorIds']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['active'] != null) {
+            queryParameters['active'] = requestParameters['active'];
         }
 
         if (requestParameters['limit'] != null) {

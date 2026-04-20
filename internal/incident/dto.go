@@ -82,4 +82,5 @@ type Filter struct {
 	TeamIDs     []team.ID
 	PriorityIDs []priority.ID
 	StatusIDs   []status.ID
+	ActiveOnly  bool
 }

@@ -157,6 +157,7 @@ export const useIncidentsStore = defineStore('incidents', {
 
         while (true) {
           const resp = await incidentsApi.incidentsGet({
+            active: true,
             limit: limit,
             offset: offset,
           })

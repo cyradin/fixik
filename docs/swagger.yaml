@@ -645,6 +645,10 @@ paths:
           type: integer
         name: authorIds
         type: array
+      - description: Return only active incidents
+        in: query
+        name: active
+        type: boolean
       - default: 100
         description: Limit
         in: query
