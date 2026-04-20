@@ -11,6 +11,18 @@
     </el-button>
 
     <el-select
+      v-if="props.withStatus"
+      v-model="incidentsStore.filters.statusIds"
+      multiple
+      clearable
+      collapse-tags
+      placeholder="Статус"
+      style="min-width: 220px"
+    >
+      <el-option v-for="s in statusesStore.items" :key="s.id" :label="s.name" :value="s.id" />
+    </el-select>
+
+    <el-select
       v-model="incidentsStore.filters.authorIds"
       multiple
       clearable
@@ -57,11 +69,17 @@ import { useIncidentsStore } from '@/stores/incidentsStore'
 import { usePrioritiesStore } from '@/stores/prioritiesStore'
 import { useUsersStore } from '@/stores/usersStore'
 import { useTeamsStore } from '@/stores/teamsStore'
+import { useStatusesStore } from '@/stores/statusesStore'
+
+const props = defineProps<{
+  withStatus?: boolean
+}>()
 
 const usersStore = useUsersStore()
 const teamsStore = useTeamsStore()
 const incidentsStore = useIncidentsStore()
 const prioritiesStore = usePrioritiesStore()
+const statusesStore = useStatusesStore()
 
 onMounted(() => {
   if (prioritiesStore.items.length === 0) {

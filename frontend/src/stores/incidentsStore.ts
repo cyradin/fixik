@@ -60,10 +60,10 @@ interface IncidentsState {
   pendingDeletes: Map<number, { backup: Incident; timer: ReturnType<typeof setTimeout> }>
   filters: {
     priorityIds: number[]
-
     authorIds: number[]
     userIds: (number | null)[]
     teamIds: (number | null)[]
+    statusIds: (number | null)[]
   }
 }
 
@@ -77,6 +77,7 @@ export const useIncidentsStore = defineStore('incidents', {
       authorIds: [] as number[],
       userIds: [] as (number | null)[],
       teamIds: [] as (number | null)[],
+      statusIds: [] as (number | null)[],
     },
   }),
 
@@ -96,6 +97,11 @@ export const useIncidentsStore = defineStore('incidents', {
             !state.filters.priorityIds.includes(incident.priority.id)
           ) {
             return false
+          }
+
+          if (state.filters.statusIds.length) {
+            if (!incident.status) return false
+            if (!state.filters.statusIds.includes(incident.status.id)) return false
           }
 
           if (state.filters.authorIds.length) {
