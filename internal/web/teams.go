@@ -32,7 +32,12 @@ func (r CreateTeamRequest) Validate() error {
 	return validation.ValidateStruct(
 		&r,
 		validation.Field(&r.Name, validation.Required, validation.Length(1, maxNameLen)),
-		validation.Field(&r.Code, validation.Required, validation.Length(1, maxCodeLen)),
+		validation.Field(
+			&r.Code,
+			validation.Required,
+			validation.Length(1, maxCodeLen),
+			validation.Match(codeRegexp),
+		),
 		validation.Field(&r.Sort, validation.Required),
 	)
 }
@@ -48,7 +53,12 @@ func (r UpdateTeamRequest) Validate() error {
 	return validation.ValidateStruct(
 		&r,
 		validation.Field(&r.Name, validation.Required, validation.Length(1, maxNameLen)),
-		validation.Field(&r.Code, validation.Required, validation.Length(1, maxCodeLen)),
+		validation.Field(
+			&r.Code,
+			validation.Required,
+			validation.Length(1, maxCodeLen),
+			validation.Match(codeRegexp),
+		),
 		validation.Field(&r.Sort, validation.Required),
 	)
 }

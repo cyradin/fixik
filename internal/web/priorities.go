@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/cyradin/fixik/internal/container"
@@ -17,6 +18,8 @@ const (
 	maxNameLen = 100
 	maxCodeLen = 50
 )
+
+var codeRegexp = regexp.MustCompile(`^[A-Za-zА-Яа-яЁё0-9_-]+$`)
 
 type priorityManager interface {
 	Create(ctx context.Context, e priority.Priority) (priority.Priority, error)
@@ -37,7 +40,12 @@ func (r CreatePriorityRequest) Validate() error {
 	return validation.ValidateStruct(
 		&r,
 		validation.Field(&r.Name, validation.Required, validation.Length(1, maxNameLen)),
-		validation.Field(&r.Code, validation.Required, validation.Length(1, maxCodeLen)),
+		validation.Field(
+			&r.Code,
+			validation.Required,
+			validation.Length(1, maxCodeLen),
+			validation.Match(codeRegexp),
+		),
 		validation.Field(&r.Sort, validation.Required),
 	)
 }
@@ -53,7 +61,12 @@ func (r UpdatePriorityRequest) Validate() error {
 	return validation.ValidateStruct(
 		&r,
 		validation.Field(&r.Name, validation.Required, validation.Length(1, maxNameLen)),
-		validation.Field(&r.Code, validation.Required, validation.Length(1, maxCodeLen)),
+		validation.Field(
+			&r.Code,
+			validation.Required,
+			validation.Length(1, maxCodeLen),
+			validation.Match(codeRegexp),
+		),
 		validation.Field(&r.Sort, validation.Required),
 	)
 }

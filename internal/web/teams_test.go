@@ -165,6 +165,25 @@ func TestUpdateTeam(t *testing.T) {
 		require.Equal(t, http.StatusOK, rr.Code)
 	})
 
+	t.Run("invalid code", func(t *testing.T) {
+		t.Parallel()
+
+		m := &mockTeamManager{}
+		r := chi.NewRouter()
+		r.Put("/entities/{id}", updateTeam(m))
+
+		reqBody := UpdateTeamRequest{Name: "Updated", Code: "+", Sort: 123}
+		req := httptest.NewRequest(http.MethodPut, "/entities/1", jsonBody(t, reqBody)).
+			WithContext(user.WithContext(t.Context(), user.User{
+				Role: role.Admin,
+			}))
+		req.Header.Set("Content-Type", "application/json")
+
+		rr := httptest.NewRecorder()
+		r.ServeHTTP(rr, req)
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
 	t.Run("validation error", func(t *testing.T) {
 		t.Parallel()
 
