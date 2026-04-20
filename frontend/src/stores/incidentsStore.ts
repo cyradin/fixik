@@ -161,7 +161,10 @@ export const useIncidentsStore = defineStore('incidents', {
         const limit = 100
 
         while (true) {
-          const resp = await incidentsApi.incidentsGet({ limit, offset })
+          const resp = await incidentsApi.incidentsGet({
+            limit: limit,
+            offset: offset,
+          })
           const items = resp.items ?? []
 
           allItems = allItems.concat(items.map(mapApiIncidentToIncident))

@@ -5,7 +5,8 @@
     <h1 style="margin: 0">Fixik: Система инцидентов</h1>
 
     <el-menu v-if="authStore.isAuth" mode="horizontal" :ellipsis="false" router>
-      <el-menu-item index="/">Инциденты</el-menu-item>
+      <el-menu-item index="/">Активные инциденты</el-menu-item>
+      <el-menu-item index="/history">Все инциденты</el-menu-item>
       <el-menu-item index="/admin/statuses" v-if="can(PERMISSION_GROUPS.STATUS_ADMIN)"
         >Статусы</el-menu-item
       >

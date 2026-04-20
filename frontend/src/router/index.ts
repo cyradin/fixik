@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 
 import IncidentList from '@/views/incidents/List.vue'
+import IncidentHistory from '@/views/incidents/History.vue'
 import IncidentDetail from '@/views/incidents/Detail.vue'
 import IncidentCreate from '@/views/incidents/Create.vue'
 
@@ -25,6 +26,11 @@ const routes = [
   {
     path: '/',
     component: IncidentList,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/history',
+    component: IncidentHistory,
     meta: { requiresAuth: true },
   },
   {
