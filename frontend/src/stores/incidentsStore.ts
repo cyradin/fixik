@@ -176,17 +176,19 @@ export const useIncidentsStore = defineStore('incidents', {
       }
     },
 
+    async getById(id: number): Promise<Incident> {
+      try {
+        const res = await incidentsApi.incidentsIdGet({ id })
+        return mapApiIncidentToIncident(res)
+      } catch (e) {
+        console.error('get incident error:', e)
+        throw new Error(await extractUserMessage(e))
+      }
+    },
+
     async updateStatus(id: number, statusId: number) {
       try {
         await incidentsApi.incidentsIdPatch({ id, request: { statusId } })
-        const item = this.items.find((i) => i.id === id)
-        if (item) {
-          const statusesStore = useStatusesStore()
-          const status = statusesStore.items.find((s) => s.id === statusId)
-          if (status) {
-            item.status = { ...status }
-          }
-        }
       } catch (e) {
         console.error('update status error:', e)
         throw new Error(await extractUserMessage(e))
@@ -196,14 +198,6 @@ export const useIncidentsStore = defineStore('incidents', {
     async updatePriority(id: number, priorityId: number) {
       try {
         await incidentsApi.incidentsIdPatch({ id, request: { priorityId } })
-        const item = this.items.find((i) => i.id === id)
-        if (item) {
-          const prioritiesStore = usePrioritiesStore()
-          const priority = prioritiesStore.items.find((p) => p.id === priorityId)
-          if (priority) {
-            item.priority = { ...priority }
-          }
-        }
       } catch (e) {
         console.error('update priority error:', e)
         throw new Error(await extractUserMessage(e))
@@ -213,8 +207,6 @@ export const useIncidentsStore = defineStore('incidents', {
     async updateDescription(id: number, description: string) {
       try {
         await incidentsApi.incidentsIdPatch({ id, request: { description } })
-        const item = this.items.find((i) => i.id === id)
-        if (item) item.description = description
       } catch (e) {
         console.error('update description error:', e)
         throw new Error(await extractUserMessage(e))
@@ -227,13 +219,6 @@ export const useIncidentsStore = defineStore('incidents', {
           id,
           request: { teamId: teamId || 0 },
         })
-
-        const item = this.items.find((i) => i.id === id)
-        if (!item) return
-
-        const teamsStore = useTeamsStore()
-        item.team =
-          teamId && teamId > 0 ? (teamsStore.items.find((t) => t.id === teamId) ?? null) : null
       } catch (e) {
         console.error('update team error:', e)
         throw new Error(await extractUserMessage(e))
@@ -246,13 +231,6 @@ export const useIncidentsStore = defineStore('incidents', {
           id,
           request: { userId: userId || 0 },
         })
-
-        const item = this.items.find((i) => i.id === id)
-        if (!item) return
-
-        const usersStore = useUsersStore()
-        item.user =
-          userId && userId > 0 ? (usersStore.items.find((u) => u.id === userId) ?? null) : null
       } catch (e) {
         console.error('update user error:', e)
         throw new Error(await extractUserMessage(e))

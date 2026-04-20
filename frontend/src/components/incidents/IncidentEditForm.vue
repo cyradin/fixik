@@ -64,14 +64,17 @@
 <script setup lang="ts">
 import { reactive, watch, computed } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
-
 import { notifyError, notifySuccess } from '@/utils/notify'
 
-import { useIncidentsStore } from '@/stores/incidentsStore'
+import { Incident, useIncidentsStore } from '@/stores/incidentsStore'
 import { useStatusesStore } from '@/stores/statusesStore'
 import { useUsersStore } from '@/stores/usersStore'
 import { useTeamsStore } from '@/stores/teamsStore'
 import { usePrioritiesStore } from '@/stores/prioritiesStore'
+
+const props = defineProps<{
+  incident: Incident
+}>()
 
 const incidentsStore = useIncidentsStore()
 const statusesStore = useStatusesStore()
@@ -82,18 +85,10 @@ const usersStore = useUsersStore()
 const statuses = computed(() => statusesStore.items)
 const priorities = computed(() => prioritiesStore.items)
 const teams = computed(() => teamsStore.items)
+
 const users = computed(() => {
   const teamId = editable.teamId
   return usersStore.byTeam(teamId ?? undefined)
-})
-
-const props = defineProps<{
-  id: string
-}>()
-
-const incident = computed(() => {
-  const id = Number(props.id)
-  return incidentsStore.items.find((i) => i.id === id) || null
 })
 
 const loading = reactive({
@@ -102,7 +97,6 @@ const loading = reactive({
   priority: false,
   team: false,
   user: false,
-  delete: false,
 })
 
 const editable = reactive({
@@ -114,13 +108,13 @@ const editable = reactive({
 })
 
 watch(
-  incident,
+  () => props.incident,
   (inc) => {
     if (!inc) return
 
     editable.description = inc.description
-    editable.statusId = inc.status?.id ?? null
-    editable.priorityId = inc.priority?.id ?? null
+    editable.statusId = inc.status?.id ?? 0
+    editable.priorityId = inc.priority?.id ?? 0
     editable.teamId = inc.team?.id ?? null
     editable.userId = inc.user?.id ?? null
   },
@@ -128,12 +122,15 @@ watch(
 )
 
 const updateDescription = async (value: string) => {
-  if (!incident.value) return
+  const inc = props.incident
+  if (!inc) return
 
   loading.description = true
   try {
-    await incidentsStore.updateDescription(incident.value.id, value)
-    incident.value.description = value
+    await incidentsStore.updateDescription(inc.id, value)
+
+    inc.description = value
+
     notifySuccess('Описание обновлено')
   } catch (e: any) {
     notifyError(e.message)
@@ -143,14 +140,16 @@ const updateDescription = async (value: string) => {
 }
 
 const updateStatus = async (value: number) => {
-  if (!incident.value) return
+  const inc = props.incident
+  if (!inc) return
 
   loading.status = true
   try {
-    await incidentsStore.updateStatus(incident.value.id, value)
+    await incidentsStore.updateStatus(inc.id, value)
 
     const status = statusesStore.items.find((s) => s.id === value)
-    if (status) incident.value.status = { ...status }
+    if (status) inc.status = { ...status }
+
     notifySuccess('Статус обновлен')
   } catch (e: any) {
     notifyError(e.message)
@@ -160,14 +159,16 @@ const updateStatus = async (value: number) => {
 }
 
 const updatePriority = async (value: number) => {
-  if (!incident.value) return
+  const inc = props.incident
+  if (!inc) return
 
   loading.priority = true
   try {
-    await incidentsStore.updatePriority(incident.value.id, value)
+    await incidentsStore.updatePriority(inc.id, value)
 
     const priority = prioritiesStore.items.find((p) => p.id === value)
-    if (priority) incident.value.priority = { ...priority }
+    if (priority) inc.priority = { ...priority }
+
     notifySuccess('Приоритет обновлен')
   } catch (e: any) {
     notifyError(e.message)
@@ -177,14 +178,16 @@ const updatePriority = async (value: number) => {
 }
 
 const updateTeam = async (value: number | null) => {
-  if (!incident.value) return
+  const inc = props.incident
+  if (!inc) return
 
   loading.team = true
   try {
-    await incidentsStore.updateTeam(incident.value.id, value ?? undefined)
+    await incidentsStore.updateTeam(inc.id, value ?? undefined)
 
     const team = teamsStore.items.find((t) => t.id === value)
-    incident.value.team = team ? { ...team } : null
+    inc.team = team ? { ...team } : null
+
     notifySuccess('Команда обновлена')
   } catch (e: any) {
     notifyError(e.message)
@@ -194,14 +197,16 @@ const updateTeam = async (value: number | null) => {
 }
 
 const updateUser = async (value: number | null) => {
-  if (!incident.value) return
+  const inc = props.incident
+  if (!inc) return
 
   loading.user = true
   try {
-    await incidentsStore.updateUser(incident.value.id, value ?? undefined)
+    await incidentsStore.updateUser(inc.id, value ?? undefined)
 
     const user = usersStore.items.find((u) => u.id === value)
-    incident.value.user = user ? { ...user } : null
+    inc.user = user ? { ...user } : null
+
     notifySuccess('Исполнитель обновлен')
   } catch (e: any) {
     notifyError(e.message)

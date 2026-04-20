@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
 import { useIncidentsStore } from '@/stores/incidentsStore'
-import { notifyError, notifySuccess } from '@/utils/notify'
+import { notifySuccess } from '@/utils/notify'
 
 const props = defineProps<{ id: number }>()
 
