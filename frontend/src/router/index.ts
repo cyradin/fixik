@@ -93,14 +93,9 @@ export const router = createRouter({
 
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
-  const rolesStore = useRolesStore()
 
   if (!authStore.initialized) {
     await authStore.refresh()
-  }
-
-  if (!rolesStore.initialized) {
-    await rolesStore.fetchAll()
   }
 
   if (to.meta.requiresAuth && !authStore.isAuth) {

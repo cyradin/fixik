@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
-import { authApi, usersApi } from '@/api/client'
+import { ref } from 'vue'
+import { authApi } from '@/api/client'
 import { extractUserMessage } from '@/utils/errors'
 import { useRolesStore } from './rolesStore'
 
@@ -52,6 +52,10 @@ export const useAuthStore = defineStore('auth', () => {
       const data = await authApi.authRefreshPost()
       isAuth.value = true
       user.value = data
+
+      if (!rolesStore.initialized) {
+        await rolesStore.fetchAll()
+      }
     } catch (e) {
       isAuth.value = false
       user.value = null
