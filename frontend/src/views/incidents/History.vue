@@ -4,7 +4,6 @@
 
     <el-row justify="space-between" align="middle" style="margin-bottom: 16px">
       <h2 style="margin: 0">Инциденты</h2>
-
       <el-button type="primary" size="large" @click="goToCreate"> + Создать инцидент </el-button>
     </el-row>
 
@@ -15,6 +14,7 @@
       @row-click="goToIncident"
       size="small"
       class="incidents-table"
+      v-loading="incidentsHistoryStore.historyLoading"
     >
       <el-table-column prop="id" label="#" width="70" />
 
@@ -68,6 +68,16 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-pagination
+      v-model:current-page="incidentsHistoryStore.currentPage"
+      :page-size="pageSize"
+      :total="incidentsHistoryStore.total"
+      layout="total, prev, pager, next, jumper"
+      @current-change="incidentsHistoryStore.setPage"
+      :disabled="incidentsHistoryStore.historyLoading"
+      style="margin-top: 16px; justify-content: flex-end; display: flex"
+    />
   </div>
 </template>
 
@@ -79,18 +89,13 @@ import { formatDateTime } from '@/utils/date'
 import IncidentFilters from '@/components/incidents/IncidentFilters.vue'
 import { notifyError } from '@/utils/notify'
 import { onMounted, watch } from 'vue'
-import { useIncidentsHistoryStore } from '@/stores/incidentsHistoryStore'
+import { useIncidentsHistoryStore, pageSize } from '@/stores/incidentsHistoryStore'
 
 const incidentsHistoryStore = useIncidentsHistoryStore()
 const router = useRouter()
 
-const goToIncident = (row: any) => {
-  router.push(`/incident/${row.id}`)
-}
-
-const goToCreate = () => {
-  router.push('/incident/create')
-}
+const goToIncident = (row: any) => router.push(`/incident/${row.id}`)
+const goToCreate = () => router.push('/incident/create')
 
 onMounted(async () => {
   try {
@@ -103,6 +108,7 @@ onMounted(async () => {
 watch(
   () => incidentsHistoryStore.filters,
   async () => {
+    incidentsHistoryStore.currentPage = 1
     try {
       await incidentsHistoryStore.fetch()
     } catch (e: any) {
@@ -118,7 +124,6 @@ watch(
 .incidents-table :deep(.el-table__row) {
   cursor: pointer;
 }
-
 .incidents-table :deep(.el-table__row:hover) {
   background-color: var(--el-fill-color-light);
 }

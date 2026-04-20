@@ -7,14 +7,18 @@ interface IncidentsState {
   filters: FilterState
   items: Incident[]
   historyLoading: boolean
+  currentPage: number
+  total: number
 }
 
-export const pageSize = 50
+export const pageSize = 10
 
 export const useIncidentsHistoryStore = defineStore('incidentsHistory', {
   state: (): IncidentsState => ({
     items: [],
     historyLoading: false,
+    currentPage: 1,
+    total: 0,
     filters: {
       priorityIds: [] as number[],
       authorIds: [] as number[],
@@ -27,13 +31,13 @@ export const useIncidentsHistoryStore = defineStore('incidentsHistory', {
   actions: {
     async fetch(): Promise<void> {
       this.historyLoading = true
-
       try {
         const mapNullToZero = (arr: (number | null)[]): number[] => arr.map((id) => id ?? 0)
+        const offset = (this.currentPage - 1) * pageSize
 
         const resp = await incidentsApi.incidentsGet({
-          limit: 100,
-          offset: 0,
+          limit: pageSize,
+          offset,
           statusIds: mapNullToZero(this.filters.statusIds),
           priorityIds: this.filters.priorityIds,
           userIds: mapNullToZero(this.filters.userIds),
@@ -42,6 +46,7 @@ export const useIncidentsHistoryStore = defineStore('incidentsHistory', {
         })
 
         this.items = (resp.items ?? []).map(mapApiIncidentToIncident)
+        this.total = resp.pagination.total
       } catch (e) {
         console.error('history fetch error:', e)
         throw e
@@ -50,12 +55,18 @@ export const useIncidentsHistoryStore = defineStore('incidentsHistory', {
       }
     },
 
+    setPage(page: number) {
+      this.currentPage = page
+      return this.fetch()
+    },
+
     resetFilters() {
       this.filters.priorityIds = []
       this.filters.authorIds = []
       this.filters.userIds = []
       this.filters.teamIds = []
       this.filters.statusIds = []
+      this.currentPage = 1
     },
 
     togglePriority(priorityId: number) {
@@ -65,6 +76,7 @@ export const useIncidentsHistoryStore = defineStore('incidentsHistory', {
       } else {
         this.filters.priorityIds.splice(idx, 1)
       }
+      this.currentPage = 1
     },
   },
 })
