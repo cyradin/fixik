@@ -7,6 +7,14 @@ import (
 
 var ErrNotFound = fmt.Errorf("not found")
 
+type IncidentFilter struct {
+	AuthorIDs   []int64
+	UserIDs     []int64
+	TeamIDs     []int64
+	PriorityIDs []int64
+	StatusIDs   []int64
+}
+
 type Incident struct {
 	ID          int64
 	Title       string

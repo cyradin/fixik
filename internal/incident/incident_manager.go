@@ -16,7 +16,7 @@ type incidentRepo interface {
 	GetByID(ctx context.Context, id int64) (db.Incident, error)
 	Update(ctx context.Context, i *db.Incident) error
 	Delete(ctx context.Context, id int64) error
-	List(ctx context.Context, limit, offset int) (db.IncidentListResult, error)
+	List(ctx context.Context, filter db.IncidentFilter, limit, offset int) (db.IncidentListResult, error)
 }
 
 type statusProvider interface {
@@ -195,8 +195,16 @@ func (m *IncidentManager) Delete(ctx context.Context, id int64) error {
 }
 
 // nolint:gocognit
-func (m *IncidentManager) List(ctx context.Context, limit, offset int) (IncidentList, error) {
-	listResult, err := m.repo.List(ctx, limit, offset)
+func (m *IncidentManager) List(ctx context.Context, filter Filter, limit, offset int) (IncidentList, error) {
+	f := db.IncidentFilter{
+		AuthorIDs:   filter.AuthorIDs,
+		UserIDs:     filter.UserIDs,
+		TeamIDs:     filter.TeamIDs,
+		PriorityIDs: filter.PriorityIDs,
+		StatusIDs:   filter.StatusIDs,
+	}
+
+	listResult, err := m.repo.List(ctx, f, limit, offset)
 	if err != nil {
 		return IncidentList{}, fmt.Errorf("list incidents: %w", err)
 	}

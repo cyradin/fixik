@@ -610,6 +610,41 @@ paths:
       - application/json
       description: Get all incidents with pagination
       parameters:
+      - collectionFormat: csv
+        description: Status IDs
+        in: query
+        items:
+          type: integer
+        name: statusIds
+        type: array
+      - collectionFormat: csv
+        description: Priority IDs
+        in: query
+        items:
+          type: integer
+        name: priorityIds
+        type: array
+      - collectionFormat: csv
+        description: Team IDs
+        in: query
+        items:
+          type: integer
+        name: teamIds
+        type: array
+      - collectionFormat: csv
+        description: User IDs
+        in: query
+        items:
+          type: integer
+        name: userIds
+        type: array
+      - collectionFormat: csv
+        description: Author IDs
+        in: query
+        items:
+          type: integer
+        name: authorIds
+        type: array
       - default: 100
         description: Limit
         in: query
@@ -633,6 +668,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -668,6 +707,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -697,6 +740,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -729,6 +776,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -767,6 +818,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -812,6 +867,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -850,6 +909,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -871,6 +934,10 @@ paths:
             $ref: '#/definitions/web.ListPrioritiesResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -906,6 +973,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -935,6 +1006,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -967,6 +1042,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1005,6 +1084,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1053,6 +1136,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1086,6 +1173,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1115,6 +1206,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1147,6 +1242,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1187,6 +1286,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1208,6 +1311,10 @@ paths:
             $ref: '#/definitions/web.ListTeamsResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1243,6 +1350,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1272,6 +1383,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1304,6 +1419,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1342,6 +1461,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1384,6 +1507,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1417,6 +1544,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1446,6 +1577,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1478,6 +1613,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":
@@ -1516,6 +1655,10 @@ paths:
             $ref: '#/definitions/web.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/web.ErrorResponse'
         "500":

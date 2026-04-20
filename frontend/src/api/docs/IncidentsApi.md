@@ -16,7 +16,7 @@ All URIs are relative to *http://localhost:8080/api*
 
 ## incidentsGet
 
-> WebIncidentListResponse incidentsGet(limit, offset)
+> WebIncidentListResponse incidentsGet(statusIds, priorityIds, teamIds, userIds, authorIds, limit, offset)
 
 List incidents
 
@@ -36,6 +36,16 @@ async function example() {
   const api = new IncidentsApi();
 
   const body = {
+    // Array<number> | Status IDs (optional)
+    statusIds: ...,
+    // Array<number> | Priority IDs (optional)
+    priorityIds: ...,
+    // Array<number> | Team IDs (optional)
+    teamIds: ...,
+    // Array<number> | User IDs (optional)
+    userIds: ...,
+    // Array<number> | Author IDs (optional)
+    authorIds: ...,
     // number | Limit (optional)
     limit: 56,
     // number | Offset (optional)
@@ -59,6 +69,11 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
+| **statusIds** | `Array<number>` | Status IDs | [Optional] |
+| **priorityIds** | `Array<number>` | Priority IDs | [Optional] |
+| **teamIds** | `Array<number>` | Team IDs | [Optional] |
+| **userIds** | `Array<number>` | User IDs | [Optional] |
+| **authorIds** | `Array<number>` | Author IDs | [Optional] |
 | **limit** | `number` | Limit | [Optional] [Defaults to `100`] |
 | **offset** | `number` | Offset | [Optional] [Defaults to `0`] |
 
@@ -82,6 +97,7 @@ No authorization required
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
 | **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
@@ -158,6 +174,7 @@ No authorization required
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
 | **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
@@ -231,6 +248,7 @@ No authorization required
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
 | **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
@@ -301,6 +319,7 @@ No authorization required
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
 | **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
@@ -371,6 +390,7 @@ No authorization required
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
 | **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
@@ -444,6 +464,7 @@ No authorization required
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
 | **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
@@ -514,6 +535,7 @@ No authorization required
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
 | **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)

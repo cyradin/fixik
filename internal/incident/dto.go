@@ -75,3 +75,11 @@ type CommentList struct {
 	Items []Comment
 	Total int
 }
+
+type Filter struct {
+	AuthorIDs   []user.ID
+	UserIDs     []user.ID
+	TeamIDs     []team.ID
+	PriorityIDs []priority.ID
+	StatusIDs   []status.ID
+}

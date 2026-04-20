@@ -1,8 +1,6 @@
 package db
 
 import (
-	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -30,7 +28,7 @@ func (s *IncidentRepositorySuite) SetupTest() {
 		TRUNCATE TABLE teams RESTART IDENTITY CASCADE;
 		TRUNCATE TABLE users RESTART IDENTITY CASCADE;
 	`)
-	s.Require().NoError(err)
+	s.NoError(err)
 }
 
 func (s *IncidentRepositorySuite) TestCreate() {
@@ -53,7 +51,7 @@ func (s *IncidentRepositorySuite) TestCreate() {
 	}
 
 	err := s.repo.Create(ctx, inc)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.NotZero(inc.ID)
 	s.NotZero(inc.CreatedAt)
 	s.NotZero(inc.UpdatedAt)
@@ -82,7 +80,7 @@ func (s *IncidentRepositorySuite) TestGetByID_Found() {
 	})[0]
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), inc.ID)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.Equal(inc.ID, fromDB.ID)
 	s.Equal(inc.TeamID, fromDB.TeamID)
 	s.Equal(inc.UserID, fromDB.UserID)
@@ -124,11 +122,11 @@ func (s *IncidentRepositorySuite) TestUpdate_Found() {
 	inc.AuthorID = &author.ID
 
 	err := s.repo.Update(s.T().Context(), &inc)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.True(inc.UpdatedAt.After(oldUpdatedAt))
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), inc.ID)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.Equal("Updated title", fromDB.Title)
 	s.Equal(newStatus.ID, fromDB.StatusID)
 	s.Equal(&newTeam.ID, fromDB.TeamID)
@@ -161,7 +159,7 @@ func (s *IncidentRepositorySuite) TestDelete_Found() {
 	})[0]
 
 	err := s.repo.Delete(s.T().Context(), inc.ID)
-	s.Require().NoError(err)
+	s.NoError(err)
 
 	fromDB, err := s.repo.GetByID(s.T().Context(), inc.ID)
 	s.Require().ErrorIs(err, ErrNotFound)
@@ -170,69 +168,216 @@ func (s *IncidentRepositorySuite) TestDelete_Found() {
 
 func (s *IncidentRepositorySuite) TestDelete_NotFound() {
 	err := s.repo.Delete(s.T().Context(), 999999)
-	s.Require().NoError(err)
+	s.NoError(err)
 }
 
-func (s *IncidentRepositorySuite) TestList() {
+func (s *IncidentRepositorySuite) TestList_All() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("critical", "Critical")
+	status := s.createStatus("open", "Open")
+	team1 := s.createTeam("team1_list", "team1_list")
+	team2 := s.createTeam("team2_list", "team2_list")
+	user1 := s.createUser("user1_list", "user1_list", "user1_list", team1.ID)
+
+	incidents := s.loadIncidents([]Incident{
+		{Title: "Incident 1", Description: "Desc 1", PriorityID: priority.ID, StatusID: status.ID, UserID: &user1.ID, TeamID: &team1.ID},
+		{Title: "Incident 2", Description: "Desc 2", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team2.ID},
+		{Title: "Incident 3", Description: "Desc 3", PriorityID: priority.ID, StatusID: status.ID},
+	})
+
+	res, err := s.repo.List(ctx, IncidentFilter{}, 10, 0)
+	s.NoError(err)
+
+	s.Len(res.Items, 3)
+	s.Equal(3, res.Total)
+
+	s.Equal(incidents[2].Title, res.Items[0].Title)
+	s.Equal(incidents[1].Title, res.Items[1].Title)
+	s.Equal(incidents[0].Title, res.Items[2].Title)
+}
+
+func (s *IncidentRepositorySuite) TestList_Limit() {
 	ctx := s.T().Context()
 
 	priority := s.createPriority("critical", "Critical")
 	status := s.createStatus("open", "Open")
 
 	incidents := s.loadIncidents([]Incident{
-		{Title: "Incident 1", Description: "Desc 1", PriorityID: priority.ID, StatusID: status.ID},
-		{Title: "Incident 2", Description: "Desc 2", PriorityID: priority.ID, StatusID: status.ID},
-		{Title: "Incident 3", Description: "Desc 3", PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "1", PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "2", PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "3", PriorityID: priority.ID, StatusID: status.ID},
 	})
 
-	s.Run("all", func() {
-		res, err := s.repo.List(ctx, 10, 0)
-		s.Require().NoError(err)
+	res, err := s.repo.List(ctx, IncidentFilter{}, 2, 0)
+	s.NoError(err)
 
-		s.Len(res.Items, 3)
-		s.Equal(3, res.Total)
+	s.Len(res.Items, 2)
+	s.Equal(3, res.Total)
 
-		s.Equal(incidents[2].Title, res.Items[0].Title)
-		s.Equal(incidents[1].Title, res.Items[1].Title)
-		s.Equal(incidents[0].Title, res.Items[2].Title)
+	s.Equal(incidents[2].Title, res.Items[0].Title)
+	s.Equal(incidents[1].Title, res.Items[1].Title)
+}
+
+func (s *IncidentRepositorySuite) TestList_Offset() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("critical", "Critical")
+	status := s.createStatus("open", "Open")
+
+	incidents := s.loadIncidents([]Incident{
+		{Title: "1", PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "2", PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "3", PriorityID: priority.ID, StatusID: status.ID},
 	})
 
-	s.Run("limit", func() {
-		res, err := s.repo.List(ctx, 2, 0)
-		s.Require().NoError(err)
+	res, err := s.repo.List(ctx, IncidentFilter{}, 2, 1)
+	s.NoError(err)
 
-		s.Len(res.Items, 2)
-		s.Equal(3, res.Total)
+	s.Len(res.Items, 2)
+	s.Equal(3, res.Total)
 
-		s.Equal(incidents[2].Title, res.Items[0].Title)
-		s.Equal(incidents[1].Title, res.Items[1].Title)
+	s.Equal(incidents[1].Title, res.Items[0].Title)
+	s.Equal(incidents[0].Title, res.Items[1].Title)
+}
+
+func (s *IncidentRepositorySuite) TestList_DeletedFiltered() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("critical", "Critical")
+	status := s.createStatus("open", "Open")
+
+	incidents := s.loadIncidents([]Incident{
+		{Title: "1", PriorityID: priority.ID, StatusID: status.ID},
+		{Title: "2", PriorityID: priority.ID, StatusID: status.ID},
 	})
 
-	s.Run("offset", func() {
-		res, err := s.repo.List(ctx, 2, 1)
-		s.Require().NoError(err)
+	err := s.repo.Delete(ctx, incidents[1].ID)
+	s.NoError(err)
 
-		s.Len(res.Items, 2)
-		s.Equal(3, res.Total)
+	res, err := s.repo.List(ctx, IncidentFilter{}, 10, 0)
+	s.NoError(err)
 
-		s.Equal(incidents[1].Title, res.Items[0].Title)
-		s.Equal(incidents[0].Title, res.Items[1].Title)
+	s.Len(res.Items, 1)
+	s.Equal(1, res.Total)
+
+	for _, i := range res.Items {
+		s.NotEqual(incidents[1].ID, i.ID)
+	}
+}
+
+func (s *IncidentRepositorySuite) TestList_FilterByTeam() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("critical", "Critical")
+	status := s.createStatus("open", "Open")
+	team1 := s.createTeam("team1", "team1")
+	team2 := s.createTeam("team2", "team2")
+
+	s.loadIncidents([]Incident{
+		{Title: "1", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team1.ID},
+		{Title: "2", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team2.ID},
 	})
 
-	s.Run("deleted filtered", func() {
-		err := s.repo.Delete(ctx, incidents[1].ID)
-		s.Require().NoError(err)
+	res, err := s.repo.List(ctx, IncidentFilter{
+		TeamIDs: []int64{team1.ID},
+	}, 10, 0)
 
-		res, err := s.repo.List(ctx, 10, 0)
-		s.Require().NoError(err)
+	s.NoError(err)
+	s.Len(res.Items, 1)
 
-		s.Len(res.Items, 2)
-		s.Equal(2, res.Total)
+	for _, i := range res.Items {
+		s.Equal(team1.ID, *i.TeamID)
+	}
+}
 
-		for _, i := range res.Items {
-			s.NotEqual(incidents[1].ID, i.ID)
-		}
+func (s *IncidentRepositorySuite) TestList_FilterMultipleTeams() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("critical", "Critical")
+	status := s.createStatus("open", "Open")
+	team1 := s.createTeam("team1", "team1")
+	team2 := s.createTeam("team2", "team2")
+
+	s.loadIncidents([]Incident{
+		{Title: "1", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team1.ID},
+		{Title: "2", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team2.ID},
 	})
+
+	res, err := s.repo.List(ctx, IncidentFilter{
+		TeamIDs: []int64{team1.ID, team2.ID},
+	}, 10, 0)
+
+	s.NoError(err)
+	s.Len(res.Items, 2)
+}
+
+func (s *IncidentRepositorySuite) TestList_FilterTeamNull() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("critical", "Critical")
+	status := s.createStatus("open", "Open")
+
+	s.loadIncidents([]Incident{
+		{Title: "1", PriorityID: priority.ID, StatusID: status.ID},
+	})
+
+	res, err := s.repo.List(ctx, IncidentFilter{
+		TeamIDs: []int64{0},
+	}, 10, 0)
+
+	s.NoError(err)
+	s.Len(res.Items, 1)
+
+	for _, i := range res.Items {
+		s.Nil(i.TeamID)
+	}
+}
+
+func (s *IncidentRepositorySuite) TestList_FilterTeamAndUser() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("critical", "Critical")
+	status := s.createStatus("open", "Open")
+	team := s.createTeam("team", "team")
+	user := s.createUser("user", "user", "user@test.com", team.ID)
+
+	s.loadIncidents([]Incident{
+		{Title: "1", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team.ID, UserID: &user.ID},
+	})
+
+	res, err := s.repo.List(ctx, IncidentFilter{
+		TeamIDs: []int64{team.ID},
+		UserIDs: []int64{user.ID},
+	}, 10, 0)
+
+	s.NoError(err)
+
+	for _, i := range res.Items {
+		s.Equal(team.ID, *i.TeamID)
+		s.Equal(user.ID, *i.UserID)
+	}
+}
+
+func (s *IncidentRepositorySuite) TestList_TotalRespectsFilter() {
+	ctx := s.T().Context()
+
+	priority := s.createPriority("critical", "Critical")
+	status := s.createStatus("open", "Open")
+	team1 := s.createTeam("team1", "team1")
+	team2 := s.createTeam("team2", "team2")
+
+	s.loadIncidents([]Incident{
+		{Title: "1", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team1.ID},
+		{Title: "2", PriorityID: priority.ID, StatusID: status.ID, TeamID: &team2.ID},
+	})
+
+	res, err := s.repo.List(ctx, IncidentFilter{
+		TeamIDs: []int64{team1.ID},
+	}, 10, 0)
+
+	s.NoError(err)
+	s.Equal(1, res.Total)
 }
 
 func (s *IncidentRepositorySuite) loadIncidents(fixtures []Incident) []Incident {
@@ -241,16 +386,6 @@ func (s *IncidentRepositorySuite) loadIncidents(fixtures []Incident) []Incident 
 
 	inserted := make([]Incident, len(fixtures))
 	for i, inc := range fixtures {
-		if inc.TeamID == nil {
-			team := s.createTeam("team"+strconv.Itoa(i), "Team "+strconv.Itoa(i))
-			inc.TeamID = &team.ID
-		}
-
-		if inc.UserID == nil {
-			user := s.createUser("User"+strconv.Itoa(i), "user"+strconv.Itoa(i), fmt.Sprintf("user%d@test.com", i), *inc.TeamID)
-			inc.UserID = &user.ID
-		}
-
 		row := s.Postgres().QueryRow(ctx,
 			`INSERT INTO incidents (title, description, priority_id, status_id, team_id, user_id, author_id)
              VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -258,7 +393,7 @@ func (s *IncidentRepositorySuite) loadIncidents(fixtures []Incident) []Incident 
 			inc.Title, inc.Description, inc.PriorityID, inc.StatusID, inc.TeamID, inc.UserID, inc.AuthorID,
 		)
 		err := row.Scan(&inc.ID, &inc.CreatedAt, &inc.UpdatedAt)
-		s.Require().NoError(err)
+		s.NoError(err)
 
 		inserted[i] = inc
 	}
@@ -272,7 +407,7 @@ func (s *IncidentRepositorySuite) createStatus(code, name string) *Status {
 
 	status := &Status{Code: code, Name: name}
 	err := sr.Create(ctx, status)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.NotZero(status.ID)
 
 	return status
@@ -284,7 +419,7 @@ func (s *IncidentRepositorySuite) createPriority(code, name string) *Priority {
 
 	priority := &Priority{Code: code, Name: name}
 	err := pr.Create(ctx, priority)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.NotZero(priority.ID)
 
 	return priority
@@ -296,7 +431,7 @@ func (s *IncidentRepositorySuite) createTeam(code, name string) *Team {
 
 	team := &Team{Code: code, Name: name}
 	err := tr.Create(ctx, team)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.NotZero(team.ID)
 
 	return team
@@ -315,7 +450,7 @@ func (s *IncidentRepositorySuite) createUser(name, username, email string, teamI
 		Role:     RoleUser,
 	}
 	err := ur.Create(ctx, user)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.NotZero(user.ID)
 
 	return user
@@ -336,22 +471,22 @@ func (s *IncidentRepositorySuite) TestCountByStatus() {
 
 	s.Run("count correct", func() {
 		count, err := s.repo.CountByStatus(ctx, status1.ID)
-		s.Require().NoError(err)
+		s.NoError(err)
 		s.Equal(2, count)
 	})
 
 	s.Run("deleted not counted", func() {
 		err := s.repo.Delete(ctx, incidents[0].ID)
-		s.Require().NoError(err)
+		s.NoError(err)
 
 		count, err := s.repo.CountByStatus(ctx, status1.ID)
-		s.Require().NoError(err)
+		s.NoError(err)
 		s.Equal(1, count)
 	})
 
 	s.Run("zero", func() {
 		count, err := s.repo.CountByStatus(ctx, 999999)
-		s.Require().NoError(err)
+		s.NoError(err)
 		s.Equal(0, count)
 	})
 }
@@ -370,7 +505,7 @@ func (s *IncidentRepositorySuite) TestCountByPriority() {
 	})
 
 	count, err := s.repo.CountByPriority(ctx, priority1.ID)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.Equal(2, count)
 }
 
@@ -393,7 +528,7 @@ func (s *IncidentRepositorySuite) TestCountByTeam() {
 	})
 
 	count, err := s.repo.CountByTeam(ctx, team1.ID)
-	s.Require().NoError(err)
+	s.NoError(err)
 	s.Equal(2, count)
 }
 
@@ -441,7 +576,7 @@ func (s *IncidentRepositorySuite) TestCountByUser() {
 	})
 
 	count, err := s.repo.CountByUser(ctx, user1.ID)
-	s.Require().NoError(err)
+	s.NoError(err)
 
 	s.Equal(3, count)
 }

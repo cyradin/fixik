@@ -485,7 +485,7 @@ func TestIncidentManager_List(t *testing.T) {
 				priorityProvider *priorityProviderMock,
 				user *userProviderMock,
 			) {
-				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
+				repo.listFn = func(context.Context, db.IncidentFilter, int, int) (db.IncidentListResult, error) {
 					return db.IncidentListResult{}, errors.New("repo error")
 				}
 			},
@@ -499,7 +499,7 @@ func TestIncidentManager_List(t *testing.T) {
 				priorityProvider *priorityProviderMock,
 				user *userProviderMock,
 			) {
-				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
+				repo.listFn = func(context.Context, db.IncidentFilter, int, int) (db.IncidentListResult, error) {
 					return db.IncidentListResult{
 						Items: dbIncidents,
 						Total: 2,
@@ -520,7 +520,7 @@ func TestIncidentManager_List(t *testing.T) {
 				priorityProvider *priorityProviderMock,
 				user *userProviderMock,
 			) {
-				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
+				repo.listFn = func(context.Context, db.IncidentFilter, int, int) (db.IncidentListResult, error) {
 					return db.IncidentListResult{
 						Items: dbIncidents,
 						Total: 2,
@@ -545,7 +545,7 @@ func TestIncidentManager_List(t *testing.T) {
 				priorityProvider *priorityProviderMock,
 				up *userProviderMock,
 			) {
-				repo.listFn = func(context.Context, int, int) (db.IncidentListResult, error) {
+				repo.listFn = func(context.Context, db.IncidentFilter, int, int) (db.IncidentListResult, error) {
 					return db.IncidentListResult{
 						Items: dbIncidents,
 						Total: 2,
@@ -586,7 +586,7 @@ func TestIncidentManager_List(t *testing.T) {
 
 			manager := NewIncidentManager(repo, status, priority, team, user)
 
-			res, err := manager.List(ctx, 10, 0)
+			res, err := manager.List(ctx, Filter{}, 10, 0)
 
 			if tt.err {
 				require.Error(t, err)
@@ -611,7 +611,7 @@ type incidentRepoMock struct {
 	getByIDFn func(context.Context, int64) (db.Incident, error)
 	updateFn  func(context.Context, *db.Incident) error
 	deleteFn  func(context.Context, int64) error
-	listFn    func(context.Context, int, int) (db.IncidentListResult, error)
+	listFn    func(context.Context, db.IncidentFilter, int, int) (db.IncidentListResult, error)
 }
 
 func (m *incidentRepoMock) Create(ctx context.Context, i *db.Incident) error {
@@ -630,8 +630,8 @@ func (m *incidentRepoMock) Delete(ctx context.Context, id int64) error {
 	return m.deleteFn(ctx, id)
 }
 
-func (m *incidentRepoMock) List(ctx context.Context, limit, offset int) (db.IncidentListResult, error) {
-	return m.listFn(ctx, limit, offset)
+func (m *incidentRepoMock) List(ctx context.Context, filter db.IncidentFilter, limit, offset int) (db.IncidentListResult, error) {
+	return m.listFn(ctx, filter, limit, offset)
 }
 
 type statusProviderMock struct {

@@ -44,6 +44,11 @@ import {
 } from '../models/index';
 
 export interface IncidentsGetRequest {
+    statusIds?: Array<number>;
+    priorityIds?: Array<number>;
+    teamIds?: Array<number>;
+    userIds?: Array<number>;
+    authorIds?: Array<number>;
     limit?: number;
     offset?: number;
 }
@@ -86,6 +91,26 @@ export class IncidentsApi extends runtime.BaseAPI {
      */
     async incidentsGetRequestOpts(requestParameters: IncidentsGetRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
+
+        if (requestParameters['statusIds'] != null) {
+            queryParameters['statusIds'] = requestParameters['statusIds']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['priorityIds'] != null) {
+            queryParameters['priorityIds'] = requestParameters['priorityIds']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['teamIds'] != null) {
+            queryParameters['teamIds'] = requestParameters['teamIds']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['userIds'] != null) {
+            queryParameters['userIds'] = requestParameters['userIds']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
+
+        if (requestParameters['authorIds'] != null) {
+            queryParameters['authorIds'] = requestParameters['authorIds']!.join(runtime.COLLECTION_FORMATS["csv"]);
+        }
 
         if (requestParameters['limit'] != null) {
             queryParameters['limit'] = requestParameters['limit'];

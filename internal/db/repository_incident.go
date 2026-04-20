@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/cyradin/fixik/pkg/transaction"
 	"github.com/jackc/pgx/v5"
@@ -171,7 +172,8 @@ func (r *IncidentRepository) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
-func (r *IncidentRepository) List(ctx context.Context, limit, offset int) (IncidentListResult, error) {
+
+func (r *IncidentRepository) List(ctx context.Context, filter IncidentFilter, limit, offset int) (IncidentListResult, error) {
 	const listQuery = `
 		SELECT
 			i.id,
@@ -193,7 +195,7 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) (Incid
 			WHERE deleted_at IS NULL
 			GROUP BY incident_id
 		) c ON c.incident_id = i.id
-		WHERE i.deleted_at IS NULL
+		WHERE %s
 		ORDER BY i.id DESC
 		LIMIT @limit
 		OFFSET @offset
@@ -201,16 +203,25 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) (Incid
 
 	const countQuery = `
 		SELECT COUNT(*)
-		FROM incidents
-		WHERE deleted_at IS NULL
+		FROM incidents i
+		WHERE %s
 	`
 
+	conditions := []string{"i.deleted_at IS NULL"}
 	args := pgx.NamedArgs{
 		"limit":  limit,
 		"offset": offset,
 	}
 
-	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, listQuery, args)
+	conditions = r.addFilter(conditions, args, "i.author_id", filter.AuthorIDs, "author_ids")
+	conditions = r.addFilter(conditions, args, "i.user_id", filter.UserIDs, "user_ids")
+	conditions = r.addFilter(conditions, args, "i.team_id", filter.TeamIDs, "team_ids")
+	conditions = r.addFilter(conditions, args, "i.priority_id", filter.PriorityIDs, "priority_ids")
+	conditions = r.addFilter(conditions, args, "i.status_id", filter.StatusIDs, "status_ids")
+
+	where := strings.Join(conditions, " AND ")
+
+	rows, err := transaction.FromContext(ctx, r.db).Query(ctx, fmt.Sprintf(listQuery, where), args)
 	if err != nil {
 		return IncidentListResult{}, fmt.Errorf("db list query: %w", err)
 	}
@@ -242,7 +253,7 @@ func (r *IncidentRepository) List(ctx context.Context, limit, offset int) (Incid
 
 	var total int
 	if err := transaction.FromContext(ctx, r.db).
-		QueryRow(ctx, countQuery).
+		QueryRow(ctx, fmt.Sprintf(countQuery, where), args).
 		Scan(&total); err != nil {
 		return IncidentListResult{}, fmt.Errorf("db count query: %w", err)
 	}
@@ -311,4 +322,25 @@ func (r *IncidentRepository) count(ctx context.Context, query string, id int64, 
 	}
 
 	return count, nil
+}
+
+func (r *IncidentRepository) addFilter(
+	conditions []string,
+	args pgx.NamedArgs,
+	field string, values []int64, argName string) []string {
+	if len(values) == 0 {
+		return conditions
+	}
+
+	// special case: [0] => IS NULL
+	if len(values) == 1 && values[0] == 0 {
+		conditions = append(conditions, fmt.Sprintf("%s IS NULL", field))
+
+		return conditions
+	}
+
+	conditions = append(conditions, fmt.Sprintf("%s = ANY(@%s)", field, argName))
+	args[argName] = values
+
+	return conditions
 }

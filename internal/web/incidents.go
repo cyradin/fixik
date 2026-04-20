@@ -2,8 +2,10 @@ package web
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cyradin/fixik/internal/container"
@@ -17,7 +19,7 @@ type incidentManager interface {
 	Create(ctx context.Context, i incident.CreateIncident) (incident.Incident, error)
 	GetByID(ctx context.Context, id int64) (incident.Incident, error)
 	Update(ctx context.Context, i incident.UpdateIncident) (incident.Incident, error)
-	List(ctx context.Context, limit, offset int) (incident.IncidentList, error)
+	List(ctx context.Context, filter incident.Filter, limit, offset int) (incident.IncidentList, error)
 	Delete(ctx context.Context, id int64) error
 }
 
@@ -304,6 +306,11 @@ func deleteIncident(manager incidentManager) http.HandlerFunc {
 // @Tags incidents
 // @Accept json
 // @Produce json
+// @Param statusIds query []int false "Status IDs" collectionFormat(csv)
+// @Param priorityIds query []int false "Priority IDs" collectionFormat(csv)
+// @Param teamIds query []int false "Team IDs" collectionFormat(csv)
+// @Param userIds query []int false "User IDs" collectionFormat(csv)
+// @Param authorIds query []int false "Author IDs" collectionFormat(csv)
 // @Param limit query int false "Limit" default(100)
 // @Param offset query int false "Offset" default(0)
 // @Success 200 {object} IncidentListResponse
@@ -320,12 +327,18 @@ func listIncidents(manager incidentManager) http.HandlerFunc {
 			return
 		}
 
+		filter, err := decodeIncidentFilter(r)
+		if err != nil {
+			handleError(r.Context(), w, ErrValidation(err.Error()))
+			return
+		}
+
 		handle(func(ctx context.Context, _ NoBody) (IncidentListResponse, error) {
 			if !checkPermissions(ctx, role.IncidentGet) {
 				return IncidentListResponse{}, ErrForbidden
 			}
 
-			listResult, err := manager.List(ctx, limit, offset)
+			listResult, err := manager.List(ctx, filter, limit, offset)
 			if err != nil {
 				return IncidentListResponse{}, err
 			}
@@ -500,4 +513,61 @@ func toIncidentCommentResponse(c incident.Comment) IncidentComment {
 		CreatedAt:  c.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:  c.UpdatedAt.Format(time.RFC3339),
 	}
+}
+
+func parseIDs(value string) ([]int64, error) {
+	if value == "" {
+		return nil, nil
+	}
+
+	parts := strings.Split(value, ",")
+	res := make([]int64, 0, len(parts))
+
+	for _, p := range parts {
+		id, err := strconv.ParseInt(strings.TrimSpace(p), 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid id '%s'", p)
+		}
+
+		res = append(res, id)
+	}
+
+	return res, nil
+}
+
+func decodeIncidentFilter(r *http.Request) (incident.Filter, error) {
+	q := r.URL.Query()
+
+	statusIDs, err := parseIDs(q.Get("statusIds"))
+	if err != nil {
+		return incident.Filter{}, fmt.Errorf("invalid status ids: %w", err)
+	}
+
+	priorityIDs, err := parseIDs(q.Get("priorityIds"))
+	if err != nil {
+		return incident.Filter{}, fmt.Errorf("invalid priority ids: %w", err)
+	}
+
+	teamIDs, err := parseIDs(q.Get("teamIds"))
+	if err != nil {
+		return incident.Filter{}, fmt.Errorf("invalid team ids: %w", err)
+	}
+
+	userIDs, err := parseIDs(q.Get("userIds"))
+	if err != nil {
+		return incident.Filter{}, fmt.Errorf("invalid user ids: %w", err)
+	}
+
+	authorIDs, err := parseIDs(q.Get("authorIds"))
+	if err != nil {
+		return incident.Filter{}, fmt.Errorf("invalid author ids: %w", err)
+	}
+
+	return incident.Filter{
+		StatusIDs:   statusIDs,
+		PriorityIDs: priorityIDs,
+		TeamIDs:     teamIDs,
+		UserIDs:     userIDs,
+		AuthorIDs:   authorIDs,
+	}, nil
 }
