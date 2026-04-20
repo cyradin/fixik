@@ -6,6 +6,7 @@ import { useTeamsStore } from '@/stores/teamsStore'
 import { useUsersStore } from '@/stores/usersStore'
 import { notifyError } from '@/utils/notify'
 import { extractUserMessage } from '@/utils/errors'
+import { FilterState } from '@/types/filters'
 
 export interface IncidentStatus {
   id: number
@@ -58,13 +59,7 @@ interface IncidentsState {
   items: Incident[]
   pollingId: ReturnType<typeof setInterval> | null
   pendingDeletes: Map<number, { backup: Incident; timer: ReturnType<typeof setTimeout> }>
-  filters: {
-    priorityIds: number[]
-    authorIds: number[]
-    userIds: (number | null)[]
-    teamIds: (number | null)[]
-    statusIds: (number | null)[]
-  }
+  filters: FilterState
 }
 
 export const useIncidentsStore = defineStore('incidents', {
@@ -339,20 +334,15 @@ export const useIncidentsStore = defineStore('incidents', {
 
     resetFilters() {
       this.filters.priorityIds = []
-
       this.filters.authorIds = []
       this.filters.userIds = []
       this.filters.teamIds = []
+      this.filters.statusIds = []
     },
   },
 })
 
-function mapApiIncidentToIncident(item: any): Incident {
-  const statusesStore = useStatusesStore()
-  const prioritiesStore = usePrioritiesStore()
-  const teamsStore = useTeamsStore()
-  const usersStore = useUsersStore()
-
+export function mapApiIncidentToIncident(item: any): Incident {
   return {
     ...item,
     status: {

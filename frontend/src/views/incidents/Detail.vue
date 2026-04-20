@@ -61,6 +61,6 @@ const incident = computed(() => {
 })
 
 const goBack = () => {
-  router.push('/')
+  router.back()
 }
 </script>

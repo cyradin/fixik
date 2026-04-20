@@ -16,7 +16,7 @@ import UserProfile from '@/views/user/Profile.vue'
 import UserInfo from '@/views/user/Info.vue'
 import { PERMISSION_GROUPS } from '@/constants/permissions'
 import Forbidden from '@/views/Forbidden.vue'
-import { useRolesStore } from '@/stores/rolesStore'
+import { useIncidentsStore } from '@/stores/incidentsStore'
 
 const routes = [
   {
@@ -123,4 +123,10 @@ router.beforeEach(async (to) => {
   }
 
   return true
+})
+
+router.beforeEach((to, from) => {
+  if (to.meta.resetFiltersOnEnter && to.path !== from.path) {
+    useIncidentsStore().resetFilters()
+  }
 })

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <IncidentFilters :with-status="true" />
+    <IncidentFilters :store="incidentsHistoryStore" :with-status="true" />
 
     <el-row justify="space-between" align="middle" style="margin-bottom: 16px">
       <h2 style="margin: 0">Инциденты</h2>
@@ -9,7 +9,7 @@
     </el-row>
 
     <el-table
-      :data="incidentsStore.filteredItems"
+      :data="incidentsHistoryStore.items"
       style="width: 100%"
       row-key="id"
       @row-click="goToIncident"
@@ -72,14 +72,16 @@
 </template>
 
 <script setup lang="ts">
-import { useIncidentsStore } from '@/stores/incidentsStore'
 import { useRouter } from 'vue-router'
 import IncidentPriorityColor from '@/components/incidents/IncidentPriorityColor.vue'
 import UserLink from '@/components/users/UserLink.vue'
 import { formatDateTime } from '@/utils/date'
 import IncidentFilters from '@/components/incidents/IncidentFilters.vue'
+import { notifyError } from '@/utils/notify'
+import { onMounted, watch } from 'vue'
+import { useIncidentsHistoryStore } from '@/stores/incidentsHistoryStore'
 
-const incidentsStore = useIncidentsStore()
+const incidentsHistoryStore = useIncidentsHistoryStore()
 const router = useRouter()
 
 const goToIncident = (row: any) => {
@@ -89,6 +91,27 @@ const goToIncident = (row: any) => {
 const goToCreate = () => {
   router.push('/incident/create')
 }
+
+onMounted(async () => {
+  try {
+    await incidentsHistoryStore.fetch()
+  } catch (e: any) {
+    notifyError('Не удалось загрузить историю инцидентов')
+  }
+})
+
+watch(
+  () => incidentsHistoryStore.filters,
+  async () => {
+    try {
+      await incidentsHistoryStore.fetch()
+    } catch (e: any) {
+      console.error(e)
+      notifyError('Не удалось загрузить историю инцидентов')
+    }
+  },
+  { deep: true },
+)
 </script>
 
 <style scoped>

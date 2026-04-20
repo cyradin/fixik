@@ -1,6 +1,6 @@
 <template>
   <div>
-    <IncidentFilters :with-status="false" />
+    <IncidentFilters :store="incidentsStore" :with-status="false" />
 
     <el-row justify="space-between" align="middle" style="margin-bottom: 16px">
       <h2 style="margin: 0">Инциденты</h2>
