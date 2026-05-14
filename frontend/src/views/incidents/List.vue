@@ -2,7 +2,7 @@
   <div>
     <IncidentFilters :store="incidentsStore" :with-status="false" />
 
-    <el-row justify="space-between" align="middle" style="margin-bottom: 16px">
+    <el-row justify="space-between" align="middle" style="margin: 16px">
       <h2 style="margin: 0">Инциденты</h2>
 
       <el-button type="primary" size="large" @click="goToCreate"> + Создать инцидент </el-button>
@@ -30,8 +30,8 @@
                 <strong>#{{ incident.id }} {{ incident.title }}</strong>
 
                 <p>
-                  {{ incident.description?.slice(0, 200)
-                  }}{{ incident.description && incident.description.length > 200 ? '…' : '' }}
+                  {{ incident.description?.slice(0, 50)
+                  }}{{ incident.description && incident.description.length > 50 ? '…' : '' }}
                 </p>
 
                 <p><b>Создан:</b> {{ formatDateTime(incident.createdAt) }}</p>
@@ -46,12 +46,14 @@
 
                 <template #footer>
                   <el-row justify="space-between" align="middle">
-                    <el-space size="small">
+                    <el-space size="small" class="incident-user">
                       <el-icon><User /></el-icon>
-                      <p v-if="incident.user" style="margin: 0">
+
+                      <span v-if="incident.user" class="incident-user-name">
                         <UserLink :user="incident.user" :is-link="false" />
-                      </p>
-                      <p v-else style="margin: 0">Не назначено</p>
+                      </span>
+
+                      <span v-else class="incident-user-empty"> Не назначено </span>
                     </el-space>
 
                     <el-space size="small">
@@ -120,12 +122,105 @@ const onDrop = async (statusCode: string, dropResult: any) => {
 <style scoped>
 .statuses-scroll {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   overflow-x: auto;
-  padding-bottom: 8px;
+  padding-bottom: 12px;
 }
 
 .status-column {
   flex: 0 0 320px;
+}
+
+.status-column :deep(.el-card) {
+  border-radius: 12px;
+}
+
+.status-column > .el-card {
+  background: #f5f7fa;
+  border: 1px solid #dcdfe6;
+}
+
+.status-column h3 {
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #303133;
+
+  border-bottom: 2px solid #dcdfe6;
+}
+
+.status-column .el-card .el-card {
+  border: 1px solid #dcdfe6;
+  border-left: 4px solid #409eff;
+
+  background: #ffffff;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.status-column .el-card .el-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #409eff;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.status-column strong {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+
+  color: #1f2329;
+}
+
+.status-column p {
+  margin: 6px 0;
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  color: #4e5969;
+}
+
+.status-column p b {
+  color: #303133;
+}
+
+.status-column .el-card__footer {
+  background: #fafafa;
+}
+
+.incident-user {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.incident-user-name {
+  color: #409eff;
+}
+
+.incident-user-empty {
+  color: #909399;
+  font-style: italic;
+}
+
+.incident-user :deep(a) {
+  color: #409eff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.incident-user :deep(a:hover) {
+  text-decoration: underline;
 }
 </style>
