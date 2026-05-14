@@ -187,9 +187,36 @@ export const useIncidentsStore = defineStore('incidents', {
     },
 
     async updateStatus(id: number, statusId: number) {
+      const statusesStore = useStatusesStore()
+
+      const incident = this.items.find((i) => i.id === id)
+      if (!incident) return
+
+      const newStatus = statusesStore.items.find((s) => s.id === statusId)
+      if (!newStatus) return
+
+      const oldStatus = { ...incident.status }
+      const oldUpdatedAt = incident.updatedAt
+
+      // optimistic update
+      incident.status = {
+        id: newStatus.id,
+        code: newStatus.code,
+        name: newStatus.name,
+      }
+
+      incident.updatedAt = new Date().toISOString()
+
       try {
-        await incidentsApi.incidentsIdPatch({ id, request: { statusId } })
+        await incidentsApi.incidentsIdPatch({
+          id,
+          request: { statusId },
+        })
       } catch (e) {
+        // rollback
+        incident.status = oldStatus
+        incident.updatedAt = oldUpdatedAt
+
         console.error('update status error:', e)
         throw new Error(await extractUserMessage(e))
       }
