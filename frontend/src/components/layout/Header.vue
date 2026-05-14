@@ -2,7 +2,7 @@
   <el-header
     style="display: flex; justify-content: space-between; align-items: center; position: relative"
   >
-    <h1 style="margin: 0">Fixik: Система инцидентов</h1>
+    <h1 style="margin: 0">Fixik</h1>
 
     <el-menu v-if="authStore.isAuth" mode="horizontal" :ellipsis="false" router>
       <el-menu-item index="/">Активные инциденты</el-menu-item>
